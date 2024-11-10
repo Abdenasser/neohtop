@@ -1,7 +1,11 @@
 name: MacOS (Intel/Apple Silicon) Nightly Build
 
 on:
-  workflow_dispatch:  # Allows manual triggering
+  workflow_dispatch:
+    inputs:
+      release_upload_url:
+        description: 'Release upload URL'
+        required: true
 
 env:
   CARGO_TERM_COLOR: always
@@ -48,9 +52,12 @@ jobs:
         run: |
           echo "Building for Intel Mac..."
           npm run tauri build -- --target x86_64-apple-darwin --bundles dmg
-          # Rename the Intel build
+          # Rename the Intel build and store the filename
           cd src-tauri/target/x86_64-apple-darwin/release/bundle/dmg/
-          for f in *.dmg; do mv "$f" "intel-$f"; done
+          for f in *.dmg; do 
+            mv "$f" "intel-$f"
+            echo "INTEL_DMG_PATH=src-tauri/target/x86_64-apple-darwin/release/bundle/dmg/intel-$f" >> $GITHUB_ENV
+          done
         env:
           APPLE_ID: ${{ secrets.APPLE_ID }}
           APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
@@ -60,39 +67,39 @@ jobs:
         run: |
           echo "Building for aarch64..."
           npm run tauri build -- --target aarch64-apple-darwin --bundles dmg
-          # Rename the Apple Silicon build
+          # Rename the Apple Silicon build and store the filename
           cd src-tauri/target/aarch64-apple-darwin/release/bundle/dmg/
-          for f in *.dmg; do mv "$f" "silicon-$f"; done
+          for f in *.dmg; do 
+            mv "$f" "silicon-$f"
+            echo "SILICON_DMG_PATH=src-tauri/target/aarch64-apple-darwin/release/bundle/dmg/silicon-$f" >> $GITHUB_ENV
+          done
         env:
           APPLE_ID: ${{ secrets.APPLE_ID }}
           APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
           
-      - name: Upload Intel Build
-        uses: actions/upload-artifact@v4
-        with:
-          name: macos-intel-build
-          path: src-tauri/target/x86_64-apple-darwin/release/bundle/dmg/*.dmg
-          
-      - name: Upload Apple Silicon Build
-        uses: actions/upload-artifact@v4
-        with:
-          name: macos-apple-silicon-build
-          path: src-tauri/target/aarch64-apple-darwin/release/bundle/dmg/*.dmg
-          
       - name: Get version from package.json
         id: version
         run: echo "version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
-          
-      - name: Create Release
-        if: github.event_name == 'workflow_dispatch'
-        uses: softprops/action-gh-release@v1
-        with:
-          name: "MacOS Nightly Build v${{ steps.version.outputs.version }}"
-          tag_name: "macos-nightly-${{ steps.version.outputs.version }}"
-          files: |
-            src-tauri/target/x86_64-apple-darwin/release/bundle/dmg/*.dmg
-            src-tauri/target/aarch64-apple-darwin/release/bundle/dmg/*.dmg
-          prerelease: false
+
+      - name: Upload Intel Build to Release
+        if: github.event.inputs.release_upload_url != ''
+        uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
+        with:
+          upload_url: ${{ github.event.inputs.release_upload_url }}
+          asset_path: ${{ env.INTEL_DMG_PATH }}
+          asset_name: intel-NeoHtop_${{ steps.version.outputs.version }}_x64.dmg
+          asset_content_type: application/x-apple-diskimage
+
+      - name: Upload Silicon Build to Release
+        if: github.event.inputs.release_upload_url != ''
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
+        with:
+          upload_url: ${{ github.event.inputs.release_upload_url }}
+          asset_path: ${{ env.SILICON_DMG_PATH }}
+          asset_name: silicon-NeoHtop_${{ steps.version.outputs.version }}_aarch64.dmg
+          asset_content_type: application/x-apple-diskimage

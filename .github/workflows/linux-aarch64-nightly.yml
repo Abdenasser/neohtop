@@ -1,9 +1,11 @@
 name: Linux (aarch64) Nightly Build
 
 on:
-  workflow_dispatch:  # Allows manual triggering
-  schedule:
-    - cron: '0 0 * * *'  # Run daily at midnight UTC
+  workflow_dispatch:
+    inputs:
+      release_upload_url:
+        description: 'Release upload URL'
+        required: true
 
 env:
   CARGO_TERM_COLOR: always
@@ -120,37 +122,62 @@ jobs:
         run: |
           echo "Building AppImage for aarch64..."
           npm run tauri build -- --target aarch64-unknown-linux-gnu --bundles appimage
+          cd src-tauri/target/aarch64-unknown-linux-gnu/release/bundle/appimage/
+          for f in *.AppImage; do
+            echo "AARCH64_APPIMAGE_PATH=src-tauri/target/aarch64-unknown-linux-gnu/release/bundle/appimage/$f" >> $GITHUB_ENV
+          done
           
       - name: Build Debian Package
         run: |
           echo "Building Debian package for aarch64..."
           npm run tauri build -- --target aarch64-unknown-linux-gnu --bundles deb
-          
-      - name: Upload AppImage
-        uses: actions/upload-artifact@v4
-        with:
-          name: linux-appimage-aarch64
-          path: src-tauri/target/aarch64-unknown-linux-gnu/release/bundle/appimage/*.AppImage
-          
-      - name: Upload Debian Package
-        uses: actions/upload-artifact@v4
-        with:
-          name: linux-deb-aarch64
-          path: src-tauri/target/aarch64-unknown-linux-gnu/release/bundle/deb/*.deb
+          cd src-tauri/target/aarch64-unknown-linux-gnu/release/bundle/deb/
+          for f in *.deb; do
+            echo "AARCH64_DEB_PATH=src-tauri/target/aarch64-unknown-linux-gnu/release/bundle/deb/$f" >> $GITHUB_ENV
+          done
+
+      - name: Build RPM Package
+        run: |
+          echo "Building RPM package for aarch64..."
+          npm run tauri build -- --target aarch64-unknown-linux-gnu --bundles rpm
+          cd src-tauri/target/aarch64-unknown-linux-gnu/release/bundle/rpm/
+          for f in *.rpm; do
+            echo "AARCH64_RPM_PATH=src-tauri/target/aarch64-unknown-linux-gnu/release/bundle/rpm/$f" >> $GITHUB_ENV
+          done
           
       - name: Get version from package.json
         id: version
         run: echo "version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
           
-      - name: Create Release
-        if: github.event_name == 'workflow_dispatch'
-        uses: softprops/action-gh-release@v1
-        with:
-          name: "Linux ARM64 Nightly Build v${{ steps.version.outputs.version }}"
-          tag_name: "linux-arm64-nightly-${{ steps.version.outputs.version }}"
-          files: |
-            src-tauri/target/aarch64-unknown-linux-gnu/release/bundle/appimage/*.AppImage
-            src-tauri/target/aarch64-unknown-linux-gnu/release/bundle/deb/*.deb
-          prerelease: false
+      - name: Upload AppImage to Release
+        if: github.event.inputs.release_upload_url != ''
+        uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
+        with:
+          upload_url: ${{ github.event.inputs.release_upload_url }}
+          asset_path: ${{ env.AARCH64_APPIMAGE_PATH }}
+          asset_name: NeoHtop_${{ steps.version.outputs.version }}_aarch64.AppImage
+          asset_content_type: application/x-executable
+        
+      - name: Upload Debian Package to Release
+        if: github.event.inputs.release_upload_url != ''
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
+        with:
+          upload_url: ${{ github.event.inputs.release_upload_url }}
+          asset_path: ${{ env.AARCH64_DEB_PATH }}
+          asset_name: NeoHtop_${{ steps.version.outputs.version }}_aarch64.deb
+          asset_content_type: application/vnd.debian.binary-package
+
+      - name: Upload RPM Package to Release
+        if: github.event.inputs.release_upload_url != ''
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
+        with:
+          upload_url: ${{ github.event.inputs.release_upload_url }}
+          asset_path: ${{ env.AARCH64_RPM_PATH }}
+          asset_name: NeoHtop_${{ steps.version.outputs.version }}_aarch64.rpm
+          asset_content_type: application/x-rpm

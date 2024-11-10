@@ -86,6 +86,7 @@
   </button>
 
   {#if showInfo}
+    <!-- svelte-ignore a11y_no_static_element_interactions -->
     <div class="info-panel" on:mouseleave={() => (showInfo = false)}>
       <div class="info-content">
         <pre class="ascii-art">{ASCII_ART}</pre>

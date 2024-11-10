@@ -46,6 +46,12 @@
         <div class="panel-header">
           <Fa icon={faMicrochip} />
           <h3>CPU Usage</h3>
+          <div class="usage-pill">
+            {formatPercentage(
+              systemStats.cpu_usage.reduce((a, b) => a + b, 0) /
+                systemStats.cpu_usage.length,
+            )}
+          </div>
         </div>
         <div class="stats-content cpu-grid">
           {#each systemStats.cpu_usage as usage, i}
@@ -96,10 +102,6 @@
           <div class="stat-item">
             <span>Free</span>
             <span>{formatMemorySize(systemStats.memory_free)}</span>
-          </div>
-          <div class="stat-item">
-            <span>Cached</span>
-            <span>{formatMemorySize(systemStats.memory_cached)}</span>
           </div>
         </div>
       </div>
@@ -456,5 +458,6 @@
   .stat-panel:nth-child(4),
   .stat-panel:nth-child(5) {
     flex: 0.8; /* Storage, System, and Network: less space */
+    min-width: 125px;
   }
 </style>

@@ -1,7 +1,11 @@
 name: Windows (x86_64) Nightly Build
 
 on:
-  workflow_dispatch:  # Allows manual triggering
+  workflow_dispatch:
+    inputs:
+      release_upload_url:
+        description: 'Release upload URL'
+        required: true
 
 env:
   CARGO_TERM_COLOR: always
@@ -37,28 +41,24 @@ jobs:
         run: npm run build
         
       - name: Build Windows Executable
+        shell: bash  # Force using bash shell for consistent environment variable setting
         run: |
           echo "Building Windows executable..."
           npm run tauri build
-          
-      - name: Upload Executable
-        uses: actions/upload-artifact@v4
-        with:
-          name: windows-exe
-          path: src-tauri/target/release/*.exe
+          echo "WIN_EXE_PATH=src-tauri/target/release/NeoHtop.exe" >> $GITHUB_ENV
           
       - name: Get version from package.json
         id: version
         shell: bash  # Force using bash shell
         run: echo "version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
           
-      - name: Create Release
-        if: github.event_name == 'workflow_dispatch'
-        uses: softprops/action-gh-release@v1
-        with:
-          name: "Windows Nightly Build v${{ steps.version.outputs.version }}"
-          tag_name: "windows-nightly-${{ steps.version.outputs.version }}"
-          files: src-tauri/target/release/*.exe
-          prerelease: false
+      - name: Upload to Release
+        if: github.event.inputs.release_upload_url != ''
+        uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
+        with:
+          upload_url: ${{ github.event.inputs.release_upload_url }}
+          asset_path: ${{ env.WIN_EXE_PATH }}
+          asset_name: NeoHtop_${{ steps.version.outputs.version }}_x64.exe
+          asset_content_type: application/vnd.microsoft.portable-executable

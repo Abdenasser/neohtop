@@ -12,10 +12,10 @@
   export let columns: Column[];
   export let systemStats: { memory_total: number } | null;
   export let sortConfig: { field: keyof Process; direction: "asc" | "desc" };
-  export let pinnedProcesses: Set<number>;
+  export let pinnedProcesses: Set<string>;
 
   export let onToggleSort: (field: keyof Process) => void;
-  export let onTogglePin: (pid: number) => void;
+  export let onTogglePin: (command: string) => void;
   export let onShowDetails: (process: Process) => void;
   export let onKillProcess: (process: Process) => void;
 
@@ -111,7 +111,7 @@
         <tr
           class:high-usage={process.cpu_usage > 50 ||
             process.memory_usage / (systemStats?.memory_total || 0) > 0.1}
-          class:pinned={pinnedProcesses.has(process.pid)}
+          class:pinned={pinnedProcesses.has(process.command)}
         >
           {#each columns.filter((col) => col.visible) as column}
             <td class="truncate">
@@ -138,9 +138,9 @@
             <div class="action-buttons">
               <button
                 class="btn-action pin-btn"
-                class:pinned={pinnedProcesses.has(process.pid)}
-                on:click={() => onTogglePin(process.pid)}
-                title={pinnedProcesses.has(process.pid) ? "Unpin" : "Pin"}
+                class:pinned={pinnedProcesses.has(process.command)}
+                on:click={() => onTogglePin(process.command)}
+                title={pinnedProcesses.has(process.command) ? "Unpin" : "Pin"}
               >
                 <Fa icon={faThumbtack} />
               </button>

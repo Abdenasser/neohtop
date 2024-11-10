@@ -28,7 +28,7 @@
   },
   "productName": "NeoHtop",
   "mainBinaryName": "NeoHtop",
-  "version": "1.0.7",
+  "version": "1.0.9",
   "identifier": "com.neohtop.dev",
   "plugins": {},
   "app": {
@@ -39,8 +39,10 @@
         "resizable": true,
         "title": "NeoHtop",
         "width": 1280,
-        "minWidth": 1280,
-        "minHeight": 900
+        "minWidth": 1120,
+        "minHeight": 700,
+        "titleBarStyle": "Overlay",
+        "hiddenTitle": true
       }
     ],
     "security": {
