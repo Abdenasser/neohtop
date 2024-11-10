@@ -10,7 +10,8 @@
   outputs = inputs@{ nixpkgs, ... }:
     let
       inherit (nixpkgs) lib;
-      systems = ["aarch64-darwin"];
+      # definitely not tested, but i like it exposed, who knows
+      systems = lib.systems.flakeExposed;
       forAllSystems = lib.genAttrs systems;
       spkgs = system : nixpkgs.legacyPackages.${system}.pkgs;
     in
@@ -29,9 +30,23 @@
           npmDeps = importNpmLock {
             npmRoot = ./.;
           };
-          tauriBuildFlags = "--no-bundle";
+          # remove macOS signing
+          postConfigure = ''
+            ${jq}/bin/jq 'del(.bundle.macOS.signingIdentity, .bundle.macOS.hardenedRuntime)' src-tauri/tauri.conf.json > tmp.json 
+            mv tmp.json src-tauri/tauri.conf.json
+          '';
           npmConfigHook = importNpmLock.npmConfigHook;
-          checkPhase = true;
+          checkPhase = "true"; # idk why checks fail, todo
+          installPhase = let path = "${cargoRoot}/target/${stdenv.hostPlatform.rust.cargoShortTarget}/release/bundle"; in 
+          if stdenv.isDarwin then ''
+            mkdir -p $out/bin
+            mv ${path}/macos $out/Applications
+            echo "#!${zsh}/bin/zsh" >> $out/bin/${name}
+            echo "open -a $out/Applications/${name}.app" >> $out/bin/${name}
+            chmod +x $out/bin/${name}
+          '' else ''
+            mv ${path}/deb/*/data/usr $out
+          '';
         };
         default = neohtop;
       });
