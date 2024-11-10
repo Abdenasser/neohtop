@@ -13,6 +13,10 @@ serde_json = "1.0"
 serde = { version = "1.0", features = ["derive"] }
 tauri = { version = "2", features = [] }
 sysinfo = "0.29.0"
+# currently needed for tauri by nix, caused by https://github.com/rust-lang/cargo/issues/10801
+hyper-tls = "^0.6"
+reqwest = "^0.12"
+#
 
 [features]
 default = [ "custom-protocol" ]

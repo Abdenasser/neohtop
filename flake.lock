@@ -16,18 +16,18 @@
         "type": "github"
       }
     },
-    "nixpkgs-getchoo-tauri": {
+    "nixpkgs2": {
       "locked": {
-        "lastModified": 1731084262,
-        "narHash": "sha256-/o85ENIXwwFmQqG+cn1z///8fAtTEeuZ9OMeoBvd6Dw=",
-        "owner": "getchoo-contrib",
+        "lastModified": 1731267546,
+        "narHash": "sha256-KWCYNrarlef3oXh2ykB5um6LGIKS9v7clnP90S6t5aM=",
+        "owner": "hannesGitH",
         "repo": "nixpkgs",
-        "rev": "1b7aa1c39a9252741afa3dcf0f6c347442800608",
+        "rev": "b50499f326b0399a86a6408060ddcb323595de96",
         "type": "github"
       },
       "original": {
-        "owner": "getchoo-contrib",
-        "ref": "pkgs/cargo-tauri/2.0.1",
+        "owner": "hannesGitH",
+        "ref": "tauri2",
         "repo": "nixpkgs",
         "type": "github"
       }
@@ -35,7 +35,7 @@
     "root": {
       "inputs": {
         "nixpkgs": "nixpkgs",
-        "nixpkgs-getchoo-tauri": "nixpkgs-getchoo-tauri"
+        "nixpkgs2": "nixpkgs2"
       }
     }
   },

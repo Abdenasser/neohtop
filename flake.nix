@@ -3,7 +3,8 @@
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-unstable";
-    nixpkgs-getchoo-tauri.url = "github:getchoo-contrib/nixpkgs?ref=pkgs/cargo-tauri/2.0.1";
+    # as upstream nixpkgs doesn't have tauri 2, we use a fork
+    nixpkgs2.url = "github:hannesGitH/nixpkgs?ref=tauri2";
   };
 
   outputs = inputs@{ nixpkgs, ... }:
@@ -15,12 +16,12 @@
     in
     {
       packages = forAllSystems (system: with spkgs system; rec {
-        getchoo = inputs.nixpkgs-getchoo-tauri.legacyPackages.${system};
-        tauri = getchoo.pkgs.cargo-tauri;
+        remote2 = inputs.nixpkgs2.legacyPackages.${system};
+        tauri = remote2.pkgs.cargo-tauri;
         neohtop = rustPlatform.buildRustPackage rec {
           name = "neoHtop";
           src = ./.;
-          nativeBuildInputs = [ tauri.hook npmHooks.npmConfigHook nodejs ];
+          nativeBuildInputs = [ tauri.hook npmConfigHook nodejs ];
           cargoRoot = "src-tauri";
           cargoLock = {
             lockFile = src-tauri/Cargo.lock;
@@ -28,6 +29,12 @@
           npmDeps = importNpmLock {
             npmRoot = ./.;
           };
+          patches = [
+            ./nix/patches/dontbundle.patch
+          ];
+          tauriFlags = "-vvv";
+          npmConfigHook = importNpmLock.npmConfigHook;
+          # npmConfigHook = npmHooks.npmConfigHook;
         };
         default = neohtop;
       });
