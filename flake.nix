@@ -29,12 +29,9 @@
           npmDeps = importNpmLock {
             npmRoot = ./.;
           };
-          patches = [
-            ./nix/patches/dontbundle.patch
-          ];
-          tauriFlags = "-vvv";
+          tauriBuildFlags = "--no-bundle";
           npmConfigHook = importNpmLock.npmConfigHook;
-          # npmConfigHook = npmHooks.npmConfigHook;
+          checkPhase = true;
         };
         default = neohtop;
       });
