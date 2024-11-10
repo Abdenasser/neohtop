@@ -9,6 +9,13 @@ export interface Process {
   user: string;
   command: string;
   threads?: number;
+  environ: string[];
+  root: string;
+  virtual_memory: number;
+  start_time: number;
+  run_time: number;
+  disk_usage: [number, number]; // [read_bytes, written_bytes]
+  session_id?: number;
 }
 
 export interface SystemStats {

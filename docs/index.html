@@ -196,6 +196,14 @@
                     <span class="secondary">Universal Linux</span>
                   </div>
                 </a>
+                <a href="" class="download-button linux" data-type="linux-rpm-x64" data-version="latest"
+                  style="margin-top: 10px;">
+                  <span class="icon">📦</span>
+                  <div class="button-text">
+                    <span class="primary">.rpm Package</span>
+                    <span class="secondary">Fedora/RHEL x86_64</span>
+                  </div>
+                </a>
               </div>
 
               <!-- ARM64 Downloads -->
@@ -214,6 +222,14 @@
                   <div class="button-text">
                     <span class="primary">AppImage</span>
                     <span class="secondary">Universal Linux ARM64</span>
+                  </div>
+                </a>
+                <a href="" class="download-button linux" data-type="linux-rpm-arm64" data-version="latest"
+                  style="margin-top: 10px;">
+                  <span class="icon">📦</span>
+                  <div class="button-text">
+                    <span class="primary">.rpm Package</span>
+                    <span class="secondary">Fedora/RHEL ARM64</span>
                   </div>
                 </a>
               </div>
@@ -420,11 +436,17 @@
               case 'linux-appimage-x64':
                 newHref = `https://github.com/Abdenasser/neohtop/releases/download/v${versionNumber}/NeoHtop_${versionNumber}_x86_64.AppImage`;
                 break;
+              case 'linux-rpm-x64':
+                newHref = `https://github.com/Abdenasser/neohtop/releases/download/v${versionNumber}/NeoHtop_${versionNumber}_x86_64.rpm`;
+                break;
               case 'linux-deb-arm64':
                 newHref = `https://github.com/Abdenasser/neohtop/releases/download/v${versionNumber}/NeoHtop_${versionNumber}_aarch64.deb`;
                 break;
               case 'linux-appimage-arm64':
                 newHref = `https://github.com/Abdenasser/neohtop/releases/download/v${versionNumber}/NeoHtop_${versionNumber}_aarch64.AppImage`;
+                break;
+              case 'linux-rpm-arm64':
+                newHref = `https://github.com/Abdenasser/neohtop/releases/download/v${versionNumber}/NeoHtop_${versionNumber}_aarch64.rpm`;
                 break;
             }
 

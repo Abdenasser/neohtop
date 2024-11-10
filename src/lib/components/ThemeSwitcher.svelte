@@ -2,6 +2,11 @@
   import { themeStore } from "$lib/stores";
   import { themes } from "$lib/styles";
   import { fade } from "svelte/transition";
+  import Fa from "svelte-fa";
+  import {
+    faChevronDown,
+    faChevronRight,
+  } from "@fortawesome/free-solid-svg-icons";
 
   let showMenu = false;
 
@@ -65,7 +70,13 @@
         ></div>
       </div>
     </div>
-    <span class="icon">{showMenu ? "▼" : "▶"}</span>
+    <span class="icon">
+      {#if showMenu}
+        <Fa icon={faChevronDown} />
+      {:else}
+        <Fa icon={faChevronRight} />
+      {/if}
+    </span>
   </button>
 
   {#if showMenu}

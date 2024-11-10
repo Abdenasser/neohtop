@@ -46,6 +46,12 @@
         <div class="panel-header">
           <Fa icon={faMicrochip} />
           <h3>CPU Usage</h3>
+          <div class="usage-pill">
+            {formatPercentage(
+              systemStats.cpu_usage.reduce((a, b) => a + b, 0) /
+                systemStats.cpu_usage.length,
+            )}
+          </div>
         </div>
         <div class="stats-content cpu-grid">
           {#each systemStats.cpu_usage as usage, i}

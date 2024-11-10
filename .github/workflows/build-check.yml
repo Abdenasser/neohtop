@@ -3,6 +3,8 @@ name: Build Check
 on:
   pull_request:
     branches: [ main ]
+    paths:
+      - 'src-tauri/**'
 
 env:
   CARGO_TERM_COLOR: always
