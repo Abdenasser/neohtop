@@ -3,9 +3,10 @@
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-unstable";
+    nixpkgs-getchoo-tauri.url = "github:getchoo-contrib/nixpkgs?ref=pkgs/cargo-tauri/2.0.1";
   };
 
-  outputs = { nixpkgs, ... }:
+  outputs = inputs@{ nixpkgs, ... }:
     let
       inherit (nixpkgs) lib;
       systems = ["aarch64-darwin"];
@@ -14,19 +15,21 @@
     in
     {
       packages = forAllSystems (system: with spkgs system; rec {
-        # tauri = callPackage ./nix/pkgs/tauri.nix { };
-        # taurihook = cargo-tauri.hook.override { cargo-tauri = tauri; };
-        # neohtop = buildNpmPackage {
-        #   name = "neohtop";
-        #   src = ./.;
-        #   nativeBuildInputs = [ taurihook ];
-        #   cargoRoot = "src-tauri";
-        #   npmDeps = importNpmLock {
-        #     npmRoot = ./.;
-        #   };
-        #   npmConfigHook = importNpmLock.npmConfigHook;
-        # };
-        # default = neohtop;
+        getchoo = inputs.nixpkgs-getchoo-tauri.legacyPackages.${system};
+        tauri = getchoo.pkgs.cargo-tauri;
+        neohtop = rustPlatform.buildRustPackage rec {
+          name = "neoHtop";
+          src = ./.;
+          nativeBuildInputs = [ tauri.hook npmHooks.npmConfigHook nodejs ];
+          cargoRoot = "src-tauri";
+          cargoLock = {
+            lockFile = src-tauri/Cargo.lock;
+          };
+          npmDeps = importNpmLock {
+            npmRoot = ./.;
+          };
+        };
+        default = neohtop;
       });
       devShells = forAllSystems (system: with spkgs system; {
         default = mkShell {
