@@ -44,7 +44,7 @@
         "resizable": true,
         "title": "NeoHtop",
         "width": 1280,
-        "minWidth": 1120,
+        "minWidth": 1000,
         "minHeight": 700,
         "titleBarStyle": "Overlay",
         "hiddenTitle": true,

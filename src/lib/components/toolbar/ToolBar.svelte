@@ -22,6 +22,9 @@
   }>;
   export let refreshRate: number;
   export let isFrozen: boolean;
+
+  let windowWidth = window.innerWidth;
+  window.onresize = () => (windowWidth = window.innerWidth);
 </script>
 
 <div class="toolbar">
@@ -43,7 +46,9 @@
 
     <RefreshControls bind:refreshRate bind:isFrozen />
 
-    <AppInfo />
+    {#if windowWidth >= 1115}
+      <AppInfo />
+    {/if}
   </div>
 </div>
 
