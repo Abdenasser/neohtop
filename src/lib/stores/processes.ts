@@ -96,6 +96,22 @@ function createProcessStore() {
     }
   };
 
+  const openProcessDirectory = async (process: Process) => {
+    try {
+      const success = await invoke<boolean>("open_process_directory", {
+        pid: process.pid,
+      });
+      if (!success) {
+        throw new Error("Failed to open process directory");
+      }
+    } catch (e: unknown) {
+      update((state) => ({
+        ...state,
+        error: e instanceof Error ? e.message : String(e),
+      }));
+    }
+  };
+
   const toggleSort = (field: keyof Process) => {
     update((state) => ({
       ...state,
@@ -202,6 +218,7 @@ function createProcessStore() {
     setIsLoading,
     getProcesses,
     killProcess,
+    openProcessDirectory,
     toggleSort,
     togglePin,
     setSearchTerm,

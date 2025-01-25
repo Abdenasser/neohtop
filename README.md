@@ -44,6 +44,7 @@
 - 🔍 Advanced process search and filtering
 - 📌 Pin important processes
 - 🛠 Process management (kill processes)
+- 📂 Open the directory of the process
 - 🎯 Sort by any column
 - 🔄 Auto-refresh system stats
 

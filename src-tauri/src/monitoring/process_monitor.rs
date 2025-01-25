@@ -55,6 +55,43 @@ impl ProcessMonitor {
             .unwrap_or(false)
     }
 
+    /// Opens the directory of the process executable
+    ///
+    /// # Arguments
+    ///
+    /// * `sys` - System information provider
+    /// * `pid` - Process ID
+    ///
+    /// # Returns
+    ///
+    /// Boolean indicating whether the directory was successfully opened
+    pub fn open_process_directory(sys: &sysinfo::System, pid: u32) -> bool {
+        sys.process(sysinfo::Pid::from(pid as usize))
+            .map(|process| {
+                let process_path = process.exe();
+                if std::fs::metadata(&process_path).is_ok() {
+                    let dir = process_path
+                        .parent()
+                        .unwrap_or_else(|| std::path::Path::new("."));
+
+                    #[cfg(target_os = "windows")]
+                    let cmd = "explorer";
+
+                    #[cfg(target_os = "macos")]
+                    let cmd = "open";
+
+                    #[cfg(not(any(target_os = "windows", target_os = "macos")))]
+                    let cmd = "xdg-open";
+
+                    if std::process::Command::new(cmd).arg(dir).spawn().is_ok() {
+                        return true;
+                    }
+                }
+                false
+            })
+            .unwrap_or(false)
+    }
+
     /// Gets the current system time in seconds since UNIX epoch
     fn get_current_time() -> Result<u64, String> {
         SystemTime::now()

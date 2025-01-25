@@ -10,6 +10,7 @@
   export let onTogglePin: (command: string) => void;
   export let onShowDetails: (process: Process) => void;
   export let onKillProcess: (process: Process) => void;
+  export let openProcessDirectory: (process: Process) => void;
 </script>
 
 <tr class:high-usage={isHighUsage} class:pinned={isPinned}>
@@ -31,6 +32,7 @@
     {process}
     {isPinned}
     {onTogglePin}
+    {openProcessDirectory}
     {onShowDetails}
     {onKillProcess}
   />

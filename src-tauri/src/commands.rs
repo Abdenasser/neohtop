@@ -64,3 +64,24 @@ pub async fn kill_process(pid: u32, state: State<'_, AppState>) -> Result<bool, 
     let sys = state.sys.lock().map_err(|e| e.to_string())?;
     Ok(ProcessMonitor::kill_process(&sys, pid))
 }
+
+/// Opens the directory of the process executable in the file explorer
+///
+/// # Arguments
+///
+/// * `pid` - Process ID
+/// * `state` - The application state
+///
+/// # Returns
+///
+/// * `true` if the directory was successfully opened
+/// * `false` otherwise
+///
+/// # Errors
+///
+/// Returns an error string if failed to acquire lock on system state
+#[tauri::command]
+pub async fn open_process_directory(pid: u32, state: State<'_, AppState>) -> Result<bool, String> {
+    let sys = state.sys.lock().map_err(|e| e.to_string())?;
+    Ok(ProcessMonitor::open_process_directory(&sys, pid))
+}

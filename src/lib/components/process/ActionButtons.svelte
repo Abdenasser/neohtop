@@ -3,6 +3,7 @@
     faThumbtack,
     faInfoCircle,
     faXmark,
+    faFolderOpen,
   } from "@fortawesome/free-solid-svg-icons";
   import Fa from "svelte-fa";
   import type { Process } from "$lib/types";
@@ -10,6 +11,7 @@
   export let process: Process;
   export let isPinned: boolean;
   export let onTogglePin: (command: string) => void;
+  export let openProcessDirectory: (process: Process) => void;
   export let onShowDetails: (process: Process) => void;
   export let onKillProcess: (process: Process) => void;
 </script>
@@ -23,6 +25,13 @@
       title={isPinned ? "Unpin" : "Pin"}
     >
       <Fa icon={faThumbtack} />
+    </button>
+    <button
+      class="btn-action open-btn"
+      on:click={() => openProcessDirectory(process)}
+      title="Open Directory"
+    >
+      <Fa icon={faFolderOpen} />
     </button>
     <button
       class="btn-action info-btn"
@@ -107,6 +116,14 @@
   .pin-btn.pinned::before {
     background: var(--blue);
     opacity: 0.15;
+  }
+
+  .open-btn {
+    color: var(--green);
+  }
+
+  .open-btn::before {
+    background: var(--green);
   }
 
   .info-btn {

@@ -126,6 +126,7 @@
         {pinnedProcesses}
         onToggleSort={processStore.toggleSort}
         onTogglePin={processStore.togglePin}
+        openProcessDirectory={processStore.openProcessDirectory}
         onShowDetails={processStore.showProcessDetails}
         onKillProcess={processStore.confirmKillProcess}
       />

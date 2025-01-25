@@ -33,6 +33,7 @@ fn main() {
         .invoke_handler(tauri::generate_handler![
             commands::get_processes,
             commands::kill_process,
+            commands::open_process_directory,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

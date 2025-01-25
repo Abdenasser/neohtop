@@ -10,6 +10,7 @@
 
   export let onToggleSort: (field: keyof Process) => void;
   export let onTogglePin: (command: string) => void;
+  export let openProcessDirectory: (process: Process) => void;
   export let onShowDetails: (process: Process) => void;
   export let onKillProcess: (process: Process) => void;
 </script>
@@ -26,6 +27,7 @@
           isHighUsage={process.cpu_usage > 50 ||
             process.memory_usage / (systemStats?.memory_total || 0) > 0.1}
           {onTogglePin}
+          {openProcessDirectory}
           {onShowDetails}
           {onKillProcess}
         />
