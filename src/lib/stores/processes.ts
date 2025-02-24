@@ -150,6 +150,16 @@ function createProcessStore() {
     }));
   };
 
+  const selectProcess = (process: Process) => {
+    update((state) => ({
+      ...state,
+      selectedProcessPid:
+        state.selectedProcessPid === process.pid ? null : process.pid,
+      selectedProcess:
+        state.selectedProcess?.pid === process.pid ? null : process,
+    }));
+  };
+
   const confirmKillProcess = (process: Process) => {
     update((state) => ({
       ...state,
@@ -209,6 +219,7 @@ function createProcessStore() {
     setCurrentPage,
     showProcessDetails,
     closeProcessDetails,
+    selectProcess,
     confirmKillProcess,
     closeConfirmKill,
     handleConfirmKill,

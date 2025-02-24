@@ -5,14 +5,21 @@
   export let process: Process;
   export let columns: Column[];
   export let isPinned: boolean;
+  export let isSelected: boolean;
   export let isHighUsage: boolean;
 
   export let onTogglePin: (command: string) => void;
   export let onShowDetails: (process: Process) => void;
   export let onKillProcess: (process: Process) => void;
+  export let onSelectProcess: (process: Process) => void;
 </script>
 
-<tr class:high-usage={isHighUsage} class:pinned={isPinned}>
+<tr
+  class:high-usage={isHighUsage}
+  class:pinned={isPinned}
+  class:selected={isSelected}
+  on:click={() => onSelectProcess(process)}
+>
   {#each columns.filter((col) => col.visible) as column}
     <td class="truncate">
       {#if column.id === "name"}
@@ -69,6 +76,14 @@
 
   tr.pinned:hover {
     background-color: color-mix(in srgb, var(--blue) 15%, transparent);
+  }
+
+  tr.selected {
+    background-color: color-mix(in srgb, var(--sky) 30%, transparent);
+  }
+
+  tr.selected:hover {
+    background-color: color-mix(in srgb, var(--sky) 60%, transparent);
   }
 
   .name-cell {

@@ -7,11 +7,13 @@
   export let systemStats: { memory_total: number } | null;
   export let sortConfig: { field: keyof Process; direction: "asc" | "desc" };
   export let pinnedProcesses: Set<string>;
+  export let selectedProcessPid: number | null;
 
   export let onToggleSort: (field: keyof Process) => void;
   export let onTogglePin: (command: string) => void;
   export let onShowDetails: (process: Process) => void;
   export let onKillProcess: (process: Process) => void;
+  export let onSelectProcess: (process: Process) => void;
 </script>
 
 <div class="table-container">
@@ -23,11 +25,13 @@
           {process}
           {columns}
           isPinned={pinnedProcesses.has(process.command)}
+          isSelected={selectedProcessPid === process.pid}
           isHighUsage={process.cpu_usage > 50 ||
             process.memory_usage / (systemStats?.memory_total || 0) > 0.1}
           {onTogglePin}
           {onShowDetails}
           {onKillProcess}
+          {onSelectProcess}
         />
       {/each}
     </tbody>

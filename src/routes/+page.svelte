@@ -21,6 +21,7 @@
     currentPage,
     pinnedProcesses,
     selectedProcess,
+    selectedProcessPid,
     showInfoModal,
     showConfirmModal,
     processToKill,
@@ -124,10 +125,12 @@
         {systemStats}
         {sortConfig}
         {pinnedProcesses}
+        {selectedProcessPid}
         onToggleSort={processStore.toggleSort}
         onTogglePin={processStore.togglePin}
         onShowDetails={processStore.showProcessDetails}
         onKillProcess={processStore.confirmKillProcess}
+        onSelectProcess={processStore.selectProcess}
       />
     </main>
   </div>
