@@ -40,6 +40,7 @@ export const THEME_GROUPS = [
       "dracula",
       "monokaiPro",
       "tokyoNight",
+      "solarizedDark",
       "ayuDark",
       "ayuMirage",
     ],
