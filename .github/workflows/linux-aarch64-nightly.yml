@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       release_upload_url:
-        description: 'Release upload URL'
+        description: "Release upload URL"
         required: true
 
 env:
@@ -17,21 +17,21 @@ jobs:
   build:
     name: Build Linux aarch64 Packages
     runs-on: ubuntu-latest
-    
+
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 'lts/*'
-          cache: 'npm'
-          
+          node-version: "lts/*"
+          cache: "npm"
+
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
         with:
           targets: aarch64-unknown-linux-gnu
-        
+
       - name: Configure ARM64 repositories
         run: |
           sudo dpkg --add-architecture arm64
@@ -68,7 +68,7 @@ jobs:
           # Configure pkg-config for cross-compilation
           echo "PKG_CONFIG=/usr/bin/aarch64-linux-gnu-pkg-config" >> $GITHUB_ENV
           echo "PKG_CONFIG_ALLOW_CROSS=1" >> $GITHUB_ENV
-          
+
       - name: Install Dependencies
         run: npm install
 
@@ -105,7 +105,7 @@ jobs:
           wget https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-aarch64.AppImage
           chmod +x appimagetool-aarch64.AppImage
           sudo mv appimagetool-aarch64.AppImage /usr/local/bin/appimagetool
-          
+
           # Set environment variables
           echo "PKG_CONFIG=/usr/bin/aarch64-linux-gnu-pkg-config" >> $GITHUB_ENV
           echo "PKG_CONFIG_ALLOW_CROSS=1" >> $GITHUB_ENV
@@ -117,7 +117,7 @@ jobs:
 
       - name: Build Frontend
         run: npm run build
-        
+
       - name: Build AppImage
         run: |
           echo "Building AppImage for aarch64..."
@@ -126,7 +126,7 @@ jobs:
           for f in *.AppImage; do
             echo "AARCH64_APPIMAGE_PATH=src-tauri/target/aarch64-unknown-linux-gnu/release/bundle/appimage/$f" >> $GITHUB_ENV
           done
-          
+
       - name: Build Debian Package
         run: |
           echo "Building Debian package for aarch64..."
@@ -144,11 +144,11 @@ jobs:
           for f in *.rpm; do
             echo "AARCH64_RPM_PATH=src-tauri/target/aarch64-unknown-linux-gnu/release/bundle/rpm/$f" >> $GITHUB_ENV
           done
-          
+
       - name: Get version from package.json
         id: version
         run: echo "version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
-          
+
       - name: Upload AppImage to Release
         if: github.event.inputs.release_upload_url != ''
         uses: actions/upload-release-asset@v1
@@ -159,7 +159,7 @@ jobs:
           asset_path: ${{ env.AARCH64_APPIMAGE_PATH }}
           asset_name: NeoHtop_${{ steps.version.outputs.version }}_aarch64.AppImage
           asset_content_type: application/x-executable
-        
+
       - name: Upload Debian Package to Release
         if: github.event.inputs.release_upload_url != ''
         uses: actions/upload-release-asset@v1

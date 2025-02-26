@@ -1,18 +1,18 @@
 name: Test Release Build
 
 on:
-  workflow_dispatch:  # Manual trigger
+  workflow_dispatch: # Manual trigger
 
 jobs:
   create-draft:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Get version from package.json
         id: version
         run: echo "version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
-      
+
       - name: Create Draft Release
         id: create_release
         uses: softprops/action-gh-release@v1
@@ -29,21 +29,21 @@ jobs:
           workflow: macos-nightly.yml
           token: ${{ secrets.PAT_TOKEN }}
           inputs: '{"release_upload_url": "${{ steps.create_release.outputs.upload_url }}"}'
-          
+
       - name: Trigger Windows Build
         uses: benc-uk/workflow-dispatch@v1
         with:
           workflow: windows-nightly.yml
           token: ${{ secrets.PAT_TOKEN }}
           inputs: '{"release_upload_url": "${{ steps.create_release.outputs.upload_url }}"}'
-          
+
       - name: Trigger Linux x86_64 Build
         uses: benc-uk/workflow-dispatch@v1
         with:
           workflow: linux-x86_64-nightly.yml
           token: ${{ secrets.PAT_TOKEN }}
           inputs: '{"release_upload_url": "${{ steps.create_release.outputs.upload_url }}"}'
-          
+
       - name: Trigger Linux ARM64 Build
         uses: benc-uk/workflow-dispatch@v1
         with:

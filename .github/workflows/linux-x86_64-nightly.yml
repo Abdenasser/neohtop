@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       release_upload_url:
-        description: 'Release upload URL'
+        description: "Release upload URL"
         required: true
 
 env:
@@ -14,19 +14,24 @@ jobs:
   build:
     name: Build Linux Packages
     runs-on: ubuntu-latest
-    
+
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 'lts/*'
-          cache: 'npm'
-          
+          node-version: "lts/*"
+          cache: "npm"
+
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
-        
+
+      - name: Add Ubuntu Jammy repo for WebKitGTK 4.0
+        run: |
+          echo "deb http://archive.ubuntu.com/ubuntu jammy main universe" | sudo tee -a /etc/apt/sources.list
+          sudo apt update
+
       - name: Install Linux Dependencies
         run: |
           sudo apt-get update
@@ -40,14 +45,19 @@ jobs:
             libjavascriptcoregtk-4.0-dev \
             libsoup-3.0-dev \
             libwebkit2gtk-4.1-dev
-          
+
+      - name: Remove Jammy repo
+        run: |
+          sudo sed -i '/jammy main universe/d' /etc/apt/sources.list
+          sudo apt update
+
       - name: Install Dependencies
         run: |
           npm install
-          
+
       - name: Build Frontend
         run: npm run build
-        
+
       - name: Build AppImage (x86_64)
         run: |
           echo "Building AppImage for x86_64..."
