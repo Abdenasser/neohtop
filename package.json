@@ -18,25 +18,25 @@
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^6.6.0",
     "@fortawesome/free-solid-svg-icons": "^6.6.0",
-    "@tauri-apps/api": "^2.0.3",
+    "@tauri-apps/api": "^2.3.0",
     "@tauri-apps/plugin-os": "^2.0.0",
     "@tauri-apps/plugin-shell": "^2.0.1",
-    "simple-icons": "^13.15.0",
+    "simple-icons": "^14.9.0",
     "svelte-fa": "^4.0.3"
   },
   "devDependencies": {
     "@sveltejs/adapter-static": "^3.0.5",
     "@sveltejs/kit": "^2.7.0",
-    "@sveltejs/vite-plugin-svelte": "^4.0.0",
-    "@tauri-apps/cli": "^2.0.4",
-    "husky": "^8.0.0",
+    "@sveltejs/vite-plugin-svelte": "^5.0.3",
+    "@tauri-apps/cli": "^2.3.1",
+    "husky": "^9.1.7",
     "lint-staged": "^15.2.10",
-    "prettier": "^3.3.3",
+    "prettier": "^3.5.3",
     "prettier-plugin-svelte": "^3.2.7",
     "svelte": "^5.0.0",
     "svelte-check": "^4.0.0",
     "typescript": "^5.5.0",
-    "vite": "^5.4.10"
+    "vite": "^6.2.0"
   },
   "lint-staged": {
     "src/**/*.{js,ts,jsx,tsx,svelte}": [
