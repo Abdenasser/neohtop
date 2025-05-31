@@ -43,10 +43,3 @@ jobs:
           workflow: linux-x86_64-nightly.yml
           token: ${{ secrets.PAT_TOKEN }}
           inputs: '{"release_upload_url": "${{ steps.create_release.outputs.upload_url }}"}'
-
-      - name: Trigger Linux ARM64 Build
-        uses: benc-uk/workflow-dispatch@v1
-        with:
-          workflow: linux-aarch64-nightly.yml
-          token: ${{ secrets.PAT_TOKEN }}
-          inputs: '{"release_upload_url": "${{ steps.create_release.outputs.upload_url }}"}'
