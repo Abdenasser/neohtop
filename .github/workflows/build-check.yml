@@ -2,9 +2,10 @@ name: Build Check
 
 on:
   pull_request:
-    branches: [ main ]
+    branches: [main]
     paths:
-      - 'src-tauri/**'
+      - "src-tauri/**"
+      - ".github/workflows/**"
 
 env:
   CARGO_TERM_COLOR: always
@@ -19,16 +20,16 @@ jobs:
   build:
     name: Build Check
     runs-on: ubuntu-latest
-    
+
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 'lts/*'
-          cache: 'npm'
-          
+          node-version: "lts/*"
+          cache: "npm"
+
       - name: Cache Linux Dependencies
         id: cache-apt
         uses: actions/cache@v3
@@ -39,6 +40,11 @@ jobs:
           key: ${{ runner.os }}-apt-${{ hashFiles('**/package.json', '**/Cargo.lock') }}
           restore-keys: |
             ${{ runner.os }}-apt-
+
+      - name: Add Ubuntu Jammy repo for WebKitGTK 4.0
+        run: |
+          echo "deb http://archive.ubuntu.com/ubuntu jammy main universe" | sudo tee -a /etc/apt/sources.list
+          sudo apt update
 
       - name: Install Linux Dependencies
         run: |
@@ -58,6 +64,11 @@ jobs:
             libsoup-3.0-dev \
             libwebkit2gtk-4.1-dev
 
+      - name: Remove Jammy repo
+        run: |
+          sudo sed -i '/jammy main universe/d' /etc/apt/sources.list
+          sudo apt update
+
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
         with:
@@ -75,10 +86,10 @@ jobs:
         with:
           workspaces: "./src-tauri -> target"
           shared-key: "build"
-          
+
       - name: Install Dependencies
         run: npm ci
-        
+
       - name: Build Application
         run: |
           npm run tauri build -- \
