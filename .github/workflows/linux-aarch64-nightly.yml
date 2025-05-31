@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       release_upload_url:
-        description: 'Release upload URL'
+        description: "Release upload URL"
         required: true
 
 env:
@@ -17,38 +17,31 @@ jobs:
   build:
     name: Build Linux aarch64 Packages
     runs-on: ubuntu-latest
-    
+
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 'lts/*'
-          cache: 'npm'
-          
+          node-version: "lts/*"
+          cache: "npm"
+
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
         with:
           targets: aarch64-unknown-linux-gnu
-        
-      - name: Configure ARM64 repositories
+
+      - name: Enable multiarch and add ARM64 ports repo
         run: |
           sudo dpkg --add-architecture arm64
-          # Remove all existing sources
-          sudo rm -rf /etc/apt/sources.list.d/*
-          sudo truncate -s 0 /etc/apt/sources.list
-          # Add only ports.ubuntu.com repository
-          sudo tee /etc/apt/sources.list << EOF
-          deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports jammy main restricted universe multiverse
-          deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports jammy-updates main restricted universe multiverse
-          deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports jammy-security main restricted universe multiverse
-          deb [arch=amd64] http://azure.archive.ubuntu.com/ubuntu jammy main restricted universe multiverse
-          deb [arch=amd64] http://azure.archive.ubuntu.com/ubuntu jammy-updates main restricted universe multiverse
-          deb [arch=amd64] http://azure.archive.ubuntu.com/ubuntu jammy-security main restricted universe multiverse
-          EOF
+          echo "deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports jammy main restricted universe multiverse" | sudo tee /etc/apt/sources.list.d/arm64-ports.list
+          echo "deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports jammy-updates main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list.d/arm64-ports.list
+          echo "deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports jammy-security main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list.d/arm64-ports.list
           sudo apt-get update
-          # Install required packages including cross-compilation tools
+
+      - name: Install cross-compilation dependencies
+        run: |
           sudo apt-get install -y \
             build-essential \
             pkg-config \
@@ -64,36 +57,23 @@ jobs:
             libwebkit2gtk-4.1-dev:arm64 \
             libssl-dev:arm64 \
             libssl-dev \
-            openssl:arm64
-          # Configure pkg-config for cross-compilation
-          echo "PKG_CONFIG=/usr/bin/aarch64-linux-gnu-pkg-config" >> $GITHUB_ENV
-          echo "PKG_CONFIG_ALLOW_CROSS=1" >> $GITHUB_ENV
-          
-      - name: Install Dependencies
-        run: npm install
-
-      - name: Setup cross-compilation environment
-        run: |
-          sudo apt-get install -y \
-            crossbuild-essential-arm64 \
-            pkg-config \
-            libssl-dev:arm64 \
-            libssl-dev \
             openssl:arm64 \
             file \
             desktop-file-utils \
             libfuse2 \
             qemu-user-static
 
-          # Setup pkg-config
-          sudo tee /usr/bin/aarch64-linux-gnu-pkg-config << 'EOF'
+      - name: Setup pkg-config for cross compilation
+        run: |
+          sudo tee /usr/bin/aarch64-linux-gnu-pkg-config > /dev/null << 'EOF'
           #!/bin/sh
           export PKG_CONFIG_PATH=/usr/lib/aarch64-linux-gnu/pkgconfig
           exec pkg-config "$@"
           EOF
           sudo chmod +x /usr/bin/aarch64-linux-gnu-pkg-config
 
-          # Create .cargo/config
+      - name: Setup .cargo config and environment variables
+        run: |
           mkdir -p .cargo
           cat > .cargo/config << EOF
           [target.aarch64-unknown-linux-gnu]
@@ -101,12 +81,10 @@ jobs:
           ar = "aarch64-linux-gnu-ar"
           EOF
 
-          # Download and setup appimagetool for ARM64
           wget https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-aarch64.AppImage
           chmod +x appimagetool-aarch64.AppImage
           sudo mv appimagetool-aarch64.AppImage /usr/local/bin/appimagetool
-          
-          # Set environment variables
+
           echo "PKG_CONFIG=/usr/bin/aarch64-linux-gnu-pkg-config" >> $GITHUB_ENV
           echo "PKG_CONFIG_ALLOW_CROSS=1" >> $GITHUB_ENV
           echo "OPENSSL_DIR=/usr" >> $GITHUB_ENV
@@ -115,9 +93,12 @@ jobs:
           echo "CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER=aarch64-linux-gnu-gcc" >> $GITHUB_ENV
           echo "APPIMAGE_EXTRACT_AND_RUN=1" >> $GITHUB_ENV
 
+      - name: Install Dependencies
+        run: npm install
+
       - name: Build Frontend
         run: npm run build
-        
+
       - name: Build AppImage
         run: |
           echo "Building AppImage for aarch64..."
@@ -126,7 +107,7 @@ jobs:
           for f in *.AppImage; do
             echo "AARCH64_APPIMAGE_PATH=src-tauri/target/aarch64-unknown-linux-gnu/release/bundle/appimage/$f" >> $GITHUB_ENV
           done
-          
+
       - name: Build Debian Package
         run: |
           echo "Building Debian package for aarch64..."
@@ -144,11 +125,11 @@ jobs:
           for f in *.rpm; do
             echo "AARCH64_RPM_PATH=src-tauri/target/aarch64-unknown-linux-gnu/release/bundle/rpm/$f" >> $GITHUB_ENV
           done
-          
+
       - name: Get version from package.json
         id: version
         run: echo "version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
-          
+
       - name: Upload AppImage to Release
         if: github.event.inputs.release_upload_url != ''
         uses: actions/upload-release-asset@v1
@@ -159,7 +140,7 @@ jobs:
           asset_path: ${{ env.AARCH64_APPIMAGE_PATH }}
           asset_name: NeoHtop_${{ steps.version.outputs.version }}_aarch64.AppImage
           asset_content_type: application/x-executable
-        
+
       - name: Upload Debian Package to Release
         if: github.event.inputs.release_upload_url != ''
         uses: actions/upload-release-asset@v1
