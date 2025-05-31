@@ -142,6 +142,43 @@ export function sortProcesses(
     const aValue = a[sortConfig.field];
     const bValue = b[sortConfig.field];
 
+    // Special handling for disk_usage which is an array [read_bytes, written_bytes]
+    if (sortConfig.field === "disk_usage") {
+      const aRead = (aValue as [number, number])[0];
+      const aWrite = (aValue as [number, number])[1];
+      const bRead = (bValue as [number, number])[0];
+      const bWrite = (bValue as [number, number])[1];
+
+      // Smart sorting: analyze if this is a read-heavy or write-heavy comparison
+      const totalReads = aRead + bRead;
+      const totalWrites = aWrite + bWrite;
+
+      if (totalWrites > totalReads * 1.5) {
+        // Write-heavy scenario: prioritize writes, use reads as tiebreaker
+        if (aWrite !== bWrite) {
+          return direction * (aWrite - bWrite);
+        }
+        return direction * (aRead - bRead);
+      } else if (totalReads > totalWrites * 1.5) {
+        // Read-heavy scenario: prioritize reads, use writes as tiebreaker
+        if (aRead !== bRead) {
+          return direction * (aRead - bRead);
+        }
+        return direction * (aWrite - bWrite);
+      } else {
+        // Balanced I/O: sort by total, use max as tiebreaker
+        const aTotalDisk = aRead + aWrite;
+        const bTotalDisk = bRead + bWrite;
+        if (aTotalDisk !== bTotalDisk) {
+          return direction * (aTotalDisk - bTotalDisk);
+        }
+        // Tiebreaker: use the dominant operation
+        const aMaxDisk = Math.max(aRead, aWrite);
+        const bMaxDisk = Math.max(bRead, bWrite);
+        return direction * (aMaxDisk - bMaxDisk);
+      }
+    }
+
     // Type-specific comparisons
     if (typeof aValue === "string") {
       return direction * aValue.localeCompare(bValue as string);

@@ -30,10 +30,13 @@ export let column_definitions: Column[] = [
   },
   {
     id: "disk_usage",
-    label: "Disk R/W",
+    label: "Disk I/O (R/W)",
     visible: true,
-    format: (v) =>
-      `${(v[0] / (1024 * 1024)).toFixed(1)} / ${(v[1] / (1024 * 1024)).toFixed(1)} MB`,
+    format: (v) => {
+      const readMB = (v[0] / (1024 * 1024)).toFixed(1);
+      const writeMB = (v[1] / (1024 * 1024)).toFixed(1);
+      return `${readMB}/${writeMB} MB`;
+    },
   },
   { id: "ppid", label: "Parent PID", visible: false },
   { id: "root", label: "Root", visible: false },
