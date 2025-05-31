@@ -20,7 +20,7 @@
     "@fortawesome/free-solid-svg-icons": "^6.6.0",
     "@tauri-apps/api": "^2.0.3",
     "@tauri-apps/plugin-os": "^2.0.0",
-    "@tauri-apps/plugin-shell": "^2.0.1",
+    "@tauri-apps/plugin-shell": "^2.2.1",
     "simple-icons": "^13.15.0",
     "svelte-fa": "^4.0.3"
   },
