@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onMount, onDestroy } from "svelte";
+  import { debounce } from "$lib/utils";
   import {
     StatsBar,
     ToolBar,
@@ -11,6 +12,7 @@
   import { themeStore, settingsStore, processStore } from "$lib/stores/index";
   import { column_definitions } from "$lib/definitions/columns";
   import { filterProcesses, sortProcesses } from "$lib/utils";
+  import type { Process } from "$lib/types";
 
   $: ({
     processes,
@@ -30,6 +32,17 @@
   } = $processStore);
 
   let intervalId: NodeJS.Timeout;
+  let lastProcessCount = 0;
+  let cachedFilteredProcesses: Process[] = [];
+  let cachedSortedProcesses: Process[] = [];
+
+  // Initialize filters object for the new FilterToggle
+  let filters = {
+    cpu: { operator: ">", value: 50, enabled: false },
+    ram: { operator: ">", value: 100, enabled: false },
+    runtime: { operator: ">", value: 60, enabled: false },
+    status: { values: [], enabled: false },
+  };
 
   $: columns = column_definitions.map((col) => ({
     ...col,
@@ -39,18 +52,42 @@
   }));
   $: itemsPerPage = $settingsStore.behavior.itemsPerPage;
   $: refreshRate = $settingsStore.behavior.refreshRate;
-  $: statusFilter = $settingsStore.behavior.defaultStatusFilter;
 
-  $: filteredProcesses = filterProcesses(processes, searchTerm, statusFilter);
+  // Throttled filtering to reduce CPU usage
+  const debouncedFilter = debounce(() => {
+    cachedFilteredProcesses = filterProcesses(processes, searchTerm, filters);
+  }, 100);
 
-  $: sortedProcesses = sortProcesses(
-    filteredProcesses,
-    sortConfig,
-    pinnedProcesses,
-  );
+  // Only recalculate filtering when inputs actually change
+  $: if (
+    processes.length !== lastProcessCount ||
+    searchTerm ||
+    Object.values(filters).some((f) => f.enabled)
+  ) {
+    lastProcessCount = processes.length;
+    debouncedFilter();
+  } else if (
+    processes.length === lastProcessCount &&
+    !searchTerm &&
+    !Object.values(filters).some((f) => f.enabled)
+  ) {
+    // No filters applied, use all processes directly
+    cachedFilteredProcesses = processes;
+  }
 
-  $: totalPages = Math.ceil(filteredProcesses.length / itemsPerPage);
-  $: paginatedProcesses = sortedProcesses.slice(
+  // Cache sorted results to avoid re-sorting unchanged data
+  $: if (cachedFilteredProcesses && (sortConfig || pinnedProcesses.size > 0)) {
+    cachedSortedProcesses = sortProcesses(
+      cachedFilteredProcesses,
+      sortConfig,
+      pinnedProcesses,
+    );
+  } else {
+    cachedSortedProcesses = cachedFilteredProcesses;
+  }
+
+  $: totalPages = Math.ceil(cachedFilteredProcesses.length / itemsPerPage);
+  $: paginatedProcesses = cachedSortedProcesses.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage,
   );
@@ -64,9 +101,11 @@
   $: {
     if (intervalId) clearInterval(intervalId);
     if (!isFrozen) {
+      // Use adaptive refresh rate - slightly slower for 1s to reduce CPU usage
+      const adaptiveRefreshRate = refreshRate === 1000 ? 1500 : refreshRate;
       intervalId = setInterval(() => {
         processStore.getProcesses();
-      }, refreshRate);
+      }, adaptiveRefreshRate);
     }
   }
 
@@ -104,13 +143,13 @@
 
       <ToolBar
         bind:searchTerm={$processStore.searchTerm}
-        bind:statusFilter
         bind:itemsPerPage
         bind:currentPage={$processStore.currentPage}
         bind:refreshRate
         bind:isFrozen={$processStore.isFrozen}
+        bind:filters
         {totalPages}
-        totalResults={filteredProcesses.length}
+        totalResults={cachedFilteredProcesses.length}
         bind:columns
       />
 

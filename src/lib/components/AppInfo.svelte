@@ -126,8 +126,8 @@
 
   .info-button,
   :global(.theme-button) {
-    height: 31px;
-    padding: 6px 12px;
+    height: 28px;
+    padding: 0 12px;
     font-size: 12px;
     display: inline-flex;
     align-items: center;
@@ -138,6 +138,7 @@
     border-radius: 6px;
     cursor: pointer;
     transition: all 0.2s ease;
+    box-sizing: border-box;
   }
 
   .info-button:hover,
