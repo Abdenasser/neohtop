@@ -1,15 +1,15 @@
 <script lang="ts">
   import {
     AppInfo,
-    StatusFilter,
     SearchBox,
     RefreshControls,
     PaginationControls,
     ColumnToggle,
+    FilterToggle,
   } from "$lib/components";
+  import { overlayStore } from "$lib/stores/overlay";
 
   export let searchTerm: string;
-  export let statusFilter: string = "all";
   export let itemsPerPage: number;
   export let currentPage: number;
   export let totalPages: number;
@@ -22,28 +22,55 @@
   }>;
   export let refreshRate: number;
   export let isFrozen: boolean;
+  export let filters: {
+    cpu: { operator: string; value: number; enabled: boolean };
+    ram: { operator: string; value: number; enabled: boolean };
+    runtime: { operator: string; value: number; enabled: boolean };
+    status: { values: string[]; enabled: boolean };
+  } = {
+    cpu: { operator: ">", value: 50, enabled: false },
+    ram: { operator: ">", value: 100, enabled: false },
+    runtime: { operator: ">", value: 60, enabled: false },
+    status: { values: [], enabled: false },
+  };
+
+  $: isAnyOverlayOpen = $overlayStore !== null;
+  $: activeOverlayType = $overlayStore;
 </script>
 
 <div class="toolbar">
-  <div class="toolbar-content">
-    <SearchBox bind:searchTerm />
-    <StatusFilter bind:statusFilter />
+  <div class="toolbar-content" class:overlay-mode={isAnyOverlayOpen}>
+    <div class:hidden={isAnyOverlayOpen && activeOverlayType !== "searchHelp"}>
+      <SearchBox bind:searchTerm />
+    </div>
 
-    <div class="toolbar-spacer"></div>
+    <div class:hidden={isAnyOverlayOpen && activeOverlayType !== "filters"}>
+      <FilterToggle bind:filters />
+    </div>
 
-    <PaginationControls
-      bind:itemsPerPage
-      bind:currentPage
-      {totalPages}
-      {totalResults}
-    />
-    <div class="toolbar-spacer"></div>
+    <div class="toolbar-spacer" class:hidden={isAnyOverlayOpen}></div>
 
-    <ColumnToggle {columns} />
+    <div class:hidden={isAnyOverlayOpen && activeOverlayType !== "pagination"}>
+      <PaginationControls
+        bind:itemsPerPage
+        bind:currentPage
+        {totalPages}
+        {totalResults}
+      />
+    </div>
+    <div class="toolbar-spacer" class:hidden={isAnyOverlayOpen}></div>
 
-    <RefreshControls bind:refreshRate bind:isFrozen />
+    <div class:hidden={isAnyOverlayOpen && activeOverlayType !== "columns"}>
+      <ColumnToggle {columns} />
+    </div>
 
-    <AppInfo />
+    <div class:hidden={isAnyOverlayOpen && activeOverlayType !== "refresh"}>
+      <RefreshControls bind:refreshRate bind:isFrozen />
+    </div>
+
+    <div class:hidden={isAnyOverlayOpen && activeOverlayType !== "theme"}>
+      <AppInfo />
+    </div>
   </div>
 </div>
 
@@ -60,6 +87,18 @@
     gap: 12px;
     padding: 0 12px;
     min-width: max-content;
+    height: 44px;
+    position: relative;
+  }
+
+  .toolbar-content > div {
+    display: flex;
+    align-items: center;
+  }
+
+  .toolbar-content :global(.hidden) {
+    opacity: 0;
+    pointer-events: none;
   }
 
   .toolbar-spacer {
