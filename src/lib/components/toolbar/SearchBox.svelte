@@ -265,7 +265,6 @@
     width: 100%;
     height: 28px;
     padding: 0 12px;
-    padding-right: 70px;
     border: 1px solid var(--surface1);
     border-radius: 6px;
     font-size: 12px;
