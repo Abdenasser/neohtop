@@ -5,9 +5,16 @@
 
 use super::{ProcessData, ProcessInfo, ProcessStaticInfo};
 use std::collections::HashMap;
+use std::ffi::OsString;
 use std::fmt::Debug;
 use std::time::{SystemTime, UNIX_EPOCH};
-use sysinfo::{PidExt, ProcessExt, ProcessStatus, SystemExt};
+use sysinfo::ProcessStatus;
+
+fn os_string_vec_to_string_vec(v: &[OsString]) -> Vec<String> {
+    v.iter()
+        .map(|c| c.to_string_lossy().into_owned())
+        .collect::<Vec<_>>()
+}
 
 /// Monitors and manages system processes
 #[derive(Debug)]
@@ -71,15 +78,18 @@ impl ProcessMonitor {
                 let start_time = process.start_time();
                 ProcessData {
                     pid: pid.as_u32(),
-                    name: process.name().to_string(),
-                    cmd: process.cmd().to_vec(),
+                    name: process.name().to_string_lossy().into_owned(),
+                    cmd: os_string_vec_to_string_vec(&process.cmd()),
                     user_id: process.user_id().map(|uid| uid.to_string()),
                     cpu_usage: process.cpu_usage(),
                     memory: process.memory(),
                     status: process.status(),
                     ppid: process.parent().map(|p| p.as_u32()),
-                    environ: process.environ().to_vec(),
-                    root: process.root().to_string_lossy().into_owned(),
+                    environ: os_string_vec_to_string_vec(&process.environ()),
+                    root: process
+                        .root()
+                        .map(|p| p.to_string_lossy().into_owned())
+                        .unwrap_or_default(),
                     virtual_memory: process.virtual_memory(),
                     start_time,
                     run_time: if start_time > 0 {
