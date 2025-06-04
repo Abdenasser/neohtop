@@ -6,7 +6,6 @@
 
 use crate::monitoring::{ProcessInfo, ProcessMonitor, SystemStats};
 use crate::state::AppState;
-use sysinfo::SystemExt;
 use tauri::State;
 
 /// Retrieves the current list of processes and system statistics
@@ -31,15 +30,17 @@ pub async fn get_processes(
     state: State<'_, AppState>,
 ) -> Result<(Vec<ProcessInfo>, SystemStats), String> {
     let mut sys = state.sys.lock().map_err(|e| e.to_string())?;
+    let mut disks = state.disks.lock().map_err(|e| e.to_string())?;
+    let mut networks = state.networks.lock().map_err(|e| e.to_string())?;
     sys.refresh_all();
-    sys.refresh_networks_list();
-    sys.refresh_disks_list();
+    disks.refresh(true);
+    networks.refresh(true);
 
     let mut process_monitor = state.process_monitor.lock().map_err(|e| e.to_string())?;
     let mut system_monitor = state.system_monitor.lock().map_err(|e| e.to_string())?;
 
     let processes = process_monitor.collect_processes(&sys)?;
-    let system_stats = system_monitor.collect_stats(&sys);
+    let system_stats = system_monitor.collect_stats(&sys, &networks, &disks);
 
     Ok((processes, system_stats))
 }
