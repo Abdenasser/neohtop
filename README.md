@@ -86,7 +86,6 @@ Download the latest release from the [releases page](https://github.com/Abdenass
 brew install --cask neohtop
 ```
 
-
 ### Running with Sudo
 Some processes require monitoring with sudo privileges. To monitor these processes, launch NeoHtop with sudo:
 
