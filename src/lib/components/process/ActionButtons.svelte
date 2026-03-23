@@ -3,6 +3,7 @@
     faThumbtack,
     faInfoCircle,
     faXmark,
+    faShield,
   } from "@fortawesome/free-solid-svg-icons";
   import Fa from "svelte-fa";
   import type { Process } from "$lib/types";
@@ -12,6 +13,7 @@
   export let onTogglePin: (command: string) => void;
   export let onShowDetails: (process: Process) => void;
   export let onKillProcess: (process: Process) => void;
+  export let onScanProcess: (process: Process) => void;
 </script>
 
 <td class="col-actions">
@@ -30,6 +32,13 @@
       title="Show Details"
     >
       <Fa icon={faInfoCircle} />
+    </button>
+    <button
+      class="btn-action scan-btn"
+      on:click={() => onScanProcess(process)}
+      title="Scan with VirusTotal"
+    >
+      <Fa icon={faShield} />
     </button>
     <button
       class="btn-action kill-btn"
@@ -54,7 +63,7 @@
     z-index: 2;
     background: var(--base);
     border-left: 1px solid var(--surface0);
-    width: 120px;
+    width: 148px;
   }
 
   .action-buttons {
@@ -129,6 +138,14 @@
 
   .kill-btn:hover::before {
     opacity: 1;
+  }
+
+  .scan-btn {
+    color: var(--teal);
+  }
+
+  .scan-btn::before {
+    background: var(--teal);
   }
 
   .btn-action:hover {

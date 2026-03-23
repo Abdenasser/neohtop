@@ -6,6 +6,7 @@
 
 use crate::monitoring::{ProcessInfo, ProcessMonitor, SystemStats};
 use crate::state::AppState;
+use crate::virustotal::{self, VTReport};
 use tauri::State;
 
 /// Retrieves the current list of processes and system statistics
@@ -64,4 +65,32 @@ pub async fn get_processes(
 pub async fn kill_process(pid: u32, state: State<'_, AppState>) -> Result<bool, String> {
     let sys = state.sys.lock().map_err(|e| e.to_string())?;
     Ok(ProcessMonitor::kill_process(&sys, pid))
+}
+
+/// Computes the SHA-256 hash of the executable for the given PID.
+///
+/// Reads `/proc/<pid>/exe` and returns a 64-character lowercase hex string.
+///
+/// # Errors
+///
+/// Returns an error string if the executable cannot be read
+/// (e.g., permission denied for root-owned processes).
+#[tauri::command]
+pub async fn hash_process(pid: u32) -> Result<String, String> {
+    virustotal::hash_executable(pid)
+}
+
+/// Queries the VirusTotal v3 API for a file by its SHA-256 hash.
+///
+/// # Arguments
+///
+/// * `hash`    - 64-char lowercase hex SHA-256 string
+/// * `api_key` - VirusTotal API key (entered by the user in the UI)
+///
+/// # Errors
+///
+/// Returns a user-friendly error string for auth failures, rate limits, etc.
+#[tauri::command]
+pub async fn check_virustotal_hash(hash: String, api_key: String) -> Result<VTReport, String> {
+    virustotal::check_virustotal(&hash, &api_key).await
 }

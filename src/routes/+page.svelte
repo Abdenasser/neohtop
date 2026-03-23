@@ -8,6 +8,7 @@
     ProcessTable,
     ProcessDetailsModal,
     KillProcessModal,
+    VirusTotalModal,
   } from "$lib/components/index";
   import { themeStore, settingsStore, processStore } from "$lib/stores/index";
   import { column_definitions } from "$lib/definitions/columns";
@@ -35,6 +36,20 @@
   let lastProcessCount = 0;
   let cachedFilteredProcesses: Process[] = [];
   let cachedSortedProcesses: Process[] = [];
+
+  // VirusTotal scan modal state
+  let showVTModal = false;
+  let vtProcess: Process | null = null;
+
+  function openVTScan(process: Process) {
+    vtProcess = process;
+    showVTModal = true;
+  }
+
+  function closeVTScan() {
+    showVTModal = false;
+    vtProcess = null;
+  }
 
   // Initialize filters object for the new FilterToggle
   let filters = {
@@ -167,6 +182,7 @@
         onTogglePin={processStore.togglePin}
         onShowDetails={processStore.showProcessDetails}
         onKillProcess={processStore.confirmKillProcess}
+        onScanProcess={openVTScan}
       />
     </main>
   </div>
@@ -187,6 +203,8 @@
   onClose={processStore.closeConfirmKill}
   onConfirm={processStore.handleConfirmKill}
 />
+
+<VirusTotalModal show={showVTModal} process={vtProcess} onClose={closeVTScan} />
 
 <style>
   :global(:root) {

@@ -113,3 +113,20 @@ export interface SortConfig {
   field: keyof Process;
   direction: "asc" | "desc";
 }
+
+export interface VTReport {
+  /** SHA-256 hex hash of the executable */
+  hash: string;
+  /** Overall verdict: clean | malicious | suspicious | unknown */
+  verdict: "clean" | "malicious" | "suspicious" | "unknown";
+  /** Number of AV engines that flagged as malicious */
+  malicious: number;
+  /** Number of AV engines that flagged as suspicious */
+  suspicious: number;
+  /** Number of AV engines that returned undetected */
+  undetected: number;
+  /** Total number of AV engines in the scan */
+  total: number;
+  /** Direct link to the VirusTotal report */
+  permalink: string;
+}

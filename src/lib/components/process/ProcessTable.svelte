@@ -12,6 +12,7 @@
   export let onTogglePin: (command: string) => void;
   export let onShowDetails: (process: Process) => void;
   export let onKillProcess: (process: Process) => void;
+  export let onScanProcess: (process: Process) => void;
 </script>
 
 <div class="table-container">
@@ -28,6 +29,7 @@
           {onTogglePin}
           {onShowDetails}
           {onKillProcess}
+          {onScanProcess}
         />
       {/each}
     </tbody>
