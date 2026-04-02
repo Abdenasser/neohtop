@@ -16,6 +16,11 @@ sysinfo = { version = "0.35.2", features = ["disk", "multithread", "network", "s
 tauri-plugin-shell = "2"
 tauri-plugin-os = "2"
 window-vibrancy = "0.5.2"
+sha2 = "0.10"
+reqwest = { version = "0.12", features = ["json", "rustls-tls"], default-features = false }
+
+[dev-dependencies]
+tokio = { version = "1", features = ["rt", "macros"] }
 
 [features]
 default = [ "custom-protocol" ]

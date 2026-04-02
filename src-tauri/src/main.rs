@@ -8,6 +8,7 @@ mod commands;
 mod monitoring;
 mod state;
 mod ui;
+mod virustotal;
 
 use state::AppState;
 use tauri::Manager;
@@ -38,6 +39,8 @@ fn main() {
         .invoke_handler(tauri::generate_handler![
             commands::get_processes,
             commands::kill_process,
+            commands::hash_process,
+            commands::check_virustotal_hash,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
