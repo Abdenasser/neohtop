@@ -73,8 +73,7 @@ async function updateVersion() {
 
 function updateDownloadLinks(versionNumber) {
   const platformUrls = {
-    'macos-intel': `intel-NeoHtop_${versionNumber}_x64.dmg`,
-    'macos-silicon': `silicon-NeoHtop_${versionNumber}_aarch64.dmg`,
+    'macos-universal': `NeoHtop_${versionNumber}_universal.dmg`,
     'windows': `NeoHtop_${versionNumber}_x64.exe`,
     'linux-deb-x64': `NeoHtop_${versionNumber}_x86_64.deb`,
     'linux-appimage-x64': `NeoHtop_${versionNumber}_x86_64.AppImage`,
