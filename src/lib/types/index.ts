@@ -16,6 +16,8 @@ export interface Process {
   run_time: number;
   disk_usage: [number, number]; // [read_bytes, written_bytes]
   session_id?: number;
+  /** Local bound ports (TCP LISTEN + UDP). Empty unless a port search is active. */
+  ports: number[];
 }
 
 export interface SystemStats {

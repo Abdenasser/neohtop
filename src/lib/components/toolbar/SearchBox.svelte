@@ -25,6 +25,16 @@
       type: "regex",
     },
     {
+      query: "1234",
+      description: "Search by PID",
+      type: "pid",
+    },
+    {
+      query: ":3000",
+      description: "Search by port",
+      type: "port",
+    },
+    {
       query: "^kernel",
       description: "Kernel processes",
       type: "regex",
@@ -35,9 +45,9 @@
       type: "regex",
     },
     {
-      query: "1234",
-      description: "Search by PID",
-      type: "pid",
+      query: "port:443",
+      description: "Search by port (explicit)",
+      type: "port",
     },
     {
       query: "python, node, nginx",
@@ -60,8 +70,8 @@
     "Search processes...",
     "Try: systemd, dbus",
     "Try: d$ (daemons)",
-    "Try: ^kernel (regex)",
-    "Search by name, command, or PID",
+    "Try: :3000 (port)",
+    "Search by name, command, PID, or :port",
     "Try: docker, nginx",
   ];
 
@@ -224,6 +234,7 @@
                   class:regex={example.type === "regex"}
                   class:multi={example.type === "multi"}
                   class:pid={example.type === "pid"}
+                  class:port={example.type === "port"}
                   on:click|stopPropagation={() => useExample(example.query)}
                   title={example.description}
                 >
@@ -240,6 +251,14 @@
               <code>$</code><span>end</span>
               <code>.*</code><span>any</span>
               <code>\d+</code><span>numbers</span>
+            </div>
+          </div>
+
+          <div class="regex-section">
+            <span class="section-label">Port:</span>
+            <div class="regex-tips">
+              <code>:3000</code><span>listen</span>
+              <code>port:443</code><span>alias</span>
             </div>
           </div>
         </div>
@@ -463,6 +482,11 @@
   .example-query.pid {
     border-color: var(--blue);
     color: var(--blue);
+  }
+
+  .example-query.port {
+    border-color: var(--teal);
+    color: var(--teal);
   }
 
   .regex-section {

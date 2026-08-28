@@ -4,14 +4,17 @@
 //! through Tauri's IPC mechanism. These commands provide the interface between
 //! the frontend and the system monitoring functionality.
 
-use crate::monitoring::{ProcessInfo, ProcessMonitor, SystemStats};
+use crate::monitoring::{collect_ports_by_pid, ProcessInfo, ProcessMonitor, SystemStats};
 use crate::state::AppState;
+use std::collections::HashMap;
 use tauri::State;
 
 /// Retrieves the current list of processes and system statistics
 ///
 /// # Arguments
 ///
+/// * `include_ports` - When true, attach local bound ports to each process.
+///   Intended for port search queries; skip on idle refreshes.
 /// * `state` - The application state containing system monitoring components
 ///
 /// # Returns
@@ -27,8 +30,15 @@ use tauri::State;
 /// * Failed to collect process information
 #[tauri::command]
 pub async fn get_processes(
+    include_ports: Option<bool>,
     state: State<'_, AppState>,
 ) -> Result<(Vec<ProcessInfo>, SystemStats), String> {
+    let ports_by_pid = if include_ports.unwrap_or(false) {
+        collect_ports_by_pid()
+    } else {
+        HashMap::new()
+    };
+
     let mut sys = state.sys.lock().map_err(|e| e.to_string())?;
     let mut disks = state.disks.lock().map_err(|e| e.to_string())?;
     let mut networks = state.networks.lock().map_err(|e| e.to_string())?;
@@ -39,7 +49,7 @@ pub async fn get_processes(
     let mut process_monitor = state.process_monitor.lock().map_err(|e| e.to_string())?;
     let mut system_monitor = state.system_monitor.lock().map_err(|e| e.to_string())?;
 
-    let processes = process_monitor.collect_processes(&sys)?;
+    let processes = process_monitor.collect_processes(&sys, &ports_by_pid)?;
     let system_stats = system_monitor.collect_stats(&sys, &networks, &disks);
 
     Ok((processes, system_stats))
