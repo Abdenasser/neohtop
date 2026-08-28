@@ -36,14 +36,19 @@ impl ProcessMonitor {
     /// # Arguments
     ///
     /// * `sys` - System information provider
+    /// * `ports_by_pid` - Local bound ports keyed by PID (empty to skip)
     ///
     /// # Returns
     ///
     /// A vector of process information, or an error string if collection failed
-    pub fn collect_processes(&mut self, sys: &sysinfo::System) -> Result<Vec<ProcessInfo>, String> {
+    pub fn collect_processes(
+        &mut self,
+        sys: &sysinfo::System,
+        ports_by_pid: &HashMap<u32, Vec<u16>>,
+    ) -> Result<Vec<ProcessInfo>, String> {
         let current_time = Self::get_current_time()?;
         let processes_data = self.collect_process_data(sys, current_time);
-        Ok(self.build_process_info(processes_data))
+        Ok(self.build_process_info(processes_data, ports_by_pid))
     }
 
     /// Attempts to kill a process
@@ -105,7 +110,11 @@ impl ProcessMonitor {
     }
 
     /// Builds process information from raw process data
-    fn build_process_info(&mut self, processes: Vec<ProcessData>) -> Vec<ProcessInfo> {
+    fn build_process_info(
+        &mut self,
+        processes: Vec<ProcessData>,
+        ports_by_pid: &HashMap<u32, Vec<u16>>,
+    ) -> Vec<ProcessInfo> {
         processes
             .into_iter()
             .map(|data| {
@@ -135,6 +144,7 @@ impl ProcessMonitor {
                     run_time: data.run_time,
                     disk_usage: (data.disk_usage.read_bytes, data.disk_usage.written_bytes),
                     session_id: data.session_id,
+                    ports: ports_by_pid.get(&data.pid).cloned().unwrap_or_default(),
                 }
             })
             .collect()
@@ -171,7 +181,7 @@ mod tests {
         let mut sys = System::new();
         sys.refresh_all();
 
-        let result = monitor.collect_processes(&sys);
+        let result = monitor.collect_processes(&sys, &HashMap::new());
         assert!(result.is_ok());
     }
 }

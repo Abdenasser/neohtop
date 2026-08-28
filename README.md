@@ -75,12 +75,13 @@
 - 🔄 Auto-refresh system stats
 
 ### Search Functionality
-Search for processes by name, command, or PID. Use commas to search for multiple terms simultaneously. Regular expressions are supported for advanced filtering.
+Search for processes by name, command, PID, or port. Use commas to search for multiple terms simultaneously. Regular expressions are supported for advanced filtering.
 
 Examples:
 - `arm, x86`: Returns processes with "arm" or "x86" in the name or command
 - `d$`: Lists daemons (processes ending with 'd')
 - `^(\w+\.)+\w+$`: Shows processes with reverse domain name notation (e.g., com.docker.vmnetd)
+- `:3000` or `port:443`: Processes listening on that local port (TCP listen or UDP). A bare number still matches PID. Privileged sockets may require launching with sudo / pkexec.
 
 ## Tech Stack
 - **Frontend**: SvelteKit, TypeScript

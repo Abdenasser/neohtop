@@ -62,6 +62,32 @@ export function debounce<T extends (...args: any[]) => any>(
 // Cache for compiled regex patterns
 const regexCache = new Map<string, RegExp>();
 
+const PORT_TERM_PATTERN = /^(?:port:|:)(\d{1,5})$/i;
+
+/** Parse `:3000` or `port:443` into a port number. Bare digits are not ports. */
+export function parsePortTerm(term: string): number | null {
+  const match = term.trim().match(PORT_TERM_PATTERN);
+  if (!match) {
+    return null;
+  }
+
+  const port = Number(match[1]);
+  if (!Number.isInteger(port) || port < 1 || port > 65535) {
+    return null;
+  }
+
+  return port;
+}
+
+/** True when any comma-separated search term is an explicit port query. */
+export function searchHasPortQuery(searchTerm: string): boolean {
+  if (searchTerm.length === 0) {
+    return false;
+  }
+
+  return searchTerm.split(",").some((term) => parsePortTerm(term) !== null);
+}
+
 export function filterProcesses(
   processes: Process[],
   searchTerm: string,
@@ -136,6 +162,11 @@ export function filterProcesses(
 
     // Check each term
     return terms.some((term) => {
+      const port = parsePortTerm(term);
+      if (port !== null) {
+        return process.ports?.includes(port) === true;
+      }
+
       const termLower = term.toLowerCase();
 
       // Try exact matches first (faster)

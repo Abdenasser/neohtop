@@ -86,6 +86,8 @@ pub struct ProcessInfo {
     pub disk_usage: (u64, u64),
     /// Session ID of the process
     pub session_id: Option<u32>,
+    /// Local bound ports (TCP LISTEN + UDP). Empty when port collection is skipped.
+    pub ports: Vec<u16>,
 }
 
 /// System-wide statistics exposed to the frontend
