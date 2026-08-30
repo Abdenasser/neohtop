@@ -3,7 +3,7 @@
 //! This module handles monitoring and managing system processes, including
 //! collecting process information and managing process lifecycle.
 
-use super::{ProcessData, ProcessInfo, ProcessStaticInfo};
+use super::{GpuProcessMonitor, ProcessData, ProcessInfo, ProcessStaticInfo};
 use std::collections::HashMap;
 use std::ffi::OsString;
 use std::fmt::Debug;
@@ -21,6 +21,8 @@ fn os_string_vec_to_string_vec(v: &[OsString]) -> Vec<String> {
 pub struct ProcessMonitor {
     /// Cache for static process information to avoid redundant allocations
     process_cache: HashMap<u32, ProcessStaticInfo>,
+    /// Tracks per-process GPU engine usage between refreshes
+    gpu_process_monitor: GpuProcessMonitor,
 }
 
 impl ProcessMonitor {
@@ -28,6 +30,7 @@ impl ProcessMonitor {
     pub fn new() -> Self {
         Self {
             process_cache: HashMap::new(),
+            gpu_process_monitor: GpuProcessMonitor::new(),
         }
     }
 
@@ -42,8 +45,9 @@ impl ProcessMonitor {
     /// A vector of process information, or an error string if collection failed
     pub fn collect_processes(&mut self, sys: &sysinfo::System) -> Result<Vec<ProcessInfo>, String> {
         let current_time = Self::get_current_time()?;
+        let gpu_usage = self.gpu_process_monitor.collect();
         let processes_data = self.collect_process_data(sys, current_time);
-        Ok(self.build_process_info(processes_data))
+        Ok(self.build_process_info(processes_data, &gpu_usage))
     }
 
     /// Attempts to kill a process
@@ -105,7 +109,14 @@ impl ProcessMonitor {
     }
 
     /// Builds process information from raw process data
-    fn build_process_info(&mut self, processes: Vec<ProcessData>) -> Vec<ProcessInfo> {
+    fn build_process_info(
+        &mut self,
+        processes: Vec<ProcessData>,
+        gpu_usage: &HashMap<u32, f32>,
+    ) -> Vec<ProcessInfo> {
+        // Processes that hold no GPU descriptor are idle rather than unknown,
+        // so they report zero wherever the platform supports the accounting
+        let supported = self.gpu_process_monitor.is_supported();
         processes
             .into_iter()
             .map(|data| {
@@ -123,6 +134,7 @@ impl ProcessMonitor {
                     ppid: data.ppid.unwrap_or(0),
                     name: cached_info.name.clone(),
                     cpu_usage: data.cpu_usage,
+                    gpu_usage: supported.then(|| gpu_usage.get(&data.pid).copied().unwrap_or(0.0)),
                     memory_usage: data.memory,
                     status: Self::format_status(data.status),
                     user: cached_info.user.clone(),

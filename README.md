@@ -66,7 +66,7 @@
 
 ## Features
 - 🚀 Real-time process monitoring
-- 💻 CPU and Memory usage tracking
+- 💻 CPU, GPU and Memory usage tracking
 - 🎨 Beautiful, modern UI with dark/light themes
 - 🔍 Advanced process search and filtering
 - 📌 Pin important processes

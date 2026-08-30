@@ -2,6 +2,7 @@
   import type { SystemStats } from "$lib/types";
   import {
     CpuPanel,
+    GpuPanel,
     MemoryPanel,
     StoragePanel,
     SystemPanel,
@@ -15,6 +16,13 @@
   {#if systemStats}
     <div class="stats-layout">
       <CpuPanel cpuUsage={systemStats.cpu_usage} />
+
+      {#each systemStats.gpus ?? [] as gpu, i}
+        <GpuPanel
+          {gpu}
+          title={(systemStats.gpus ?? []).length > 1 ? `GPU ${i}` : "GPU"}
+        />
+      {/each}
 
       <MemoryPanel
         memoryTotal={systemStats.memory_total}

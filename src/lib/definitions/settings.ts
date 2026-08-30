@@ -8,6 +8,7 @@ export const DEFAULT_CONFIG: AppConfig = {
       status: true,
       user: true,
       cpu_usage: true,
+      gpu_usage: true,
       memory_usage: true,
       virtual_memory: true,
       disk_usage: true,

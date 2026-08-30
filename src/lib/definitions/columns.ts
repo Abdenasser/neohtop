@@ -17,6 +17,13 @@ export let column_definitions: Column[] = [
     format: (v) => v.toFixed(1) + "%",
   },
   {
+    id: "gpu_usage",
+    label: "GPU %",
+    visible: true,
+    // Null means the platform cannot account GPU time per process
+    format: (v) => (v === null ? "—" : v.toFixed(1) + "%"),
+  },
+  {
     id: "memory_usage",
     label: "RAM",
     visible: true,

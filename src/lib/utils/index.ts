@@ -67,6 +67,7 @@ export function filterProcesses(
   searchTerm: string,
   filters: {
     cpu: { operator: string; value: number; enabled: boolean };
+    gpu: { operator: string; value: number; enabled: boolean };
     ram: { operator: string; value: number; enabled: boolean };
     runtime: { operator: string; value: number; enabled: boolean };
     status: { values: string[]; enabled: boolean };
@@ -98,6 +99,14 @@ export function filterProcesses(
     if (filters.cpu.enabled) {
       const cpuValue = process.cpu_usage;
       if (!compareValue(cpuValue, filters.cpu.operator, filters.cpu.value)) {
+        return false;
+      }
+    }
+
+    // Apply GPU filter, counting processes with no reading as idle
+    if (filters.gpu.enabled) {
+      const gpuValue = process.gpu_usage ?? 0;
+      if (!compareValue(gpuValue, filters.gpu.operator, filters.gpu.value)) {
         return false;
       }
     }
