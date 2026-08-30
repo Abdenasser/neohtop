@@ -6,11 +6,13 @@
 
   export let filters: {
     cpu: { operator: string; value: number; enabled: boolean };
+    gpu: { operator: string; value: number; enabled: boolean };
     ram: { operator: string; value: number; enabled: boolean };
     runtime: { operator: string; value: number; enabled: boolean };
     status: { values: string[]; enabled: boolean };
   } = {
     cpu: { operator: ">", value: 50, enabled: false },
+    gpu: { operator: ">", value: 50, enabled: false },
     ram: { operator: ">", value: 100, enabled: false },
     runtime: { operator: ">", value: 60, enabled: false },
     status: { values: [], enabled: false },
@@ -107,6 +109,7 @@
   function getFilterLabel(type: keyof typeof filters): string {
     const labels = {
       cpu: "CPU %",
+      gpu: "GPU %",
       ram: "RAM MB",
       runtime: "Runtime min",
       status: "Status",
@@ -178,8 +181,8 @@
           <div class="filter-section">
             <span class="section-label">Performance:</span>
             <div class="filter-controls">
-              {#each [["cpu", "CPU %"], ["ram", "RAM MB"], ["runtime", "Runtime min"]] as [type, label]}
-                {@const filterKey = type as "cpu" | "ram" | "runtime"}
+              {#each [["cpu", "CPU %", "50"], ["gpu", "GPU %", "50"], ["ram", "RAM MB", "100"], ["runtime", "Runtime min", "60"]] as [type, label, placeholder]}
+                {@const filterKey = type as "cpu" | "gpu" | "ram" | "runtime"}
                 <div class="filter-control">
                   <button
                     class="filter-toggle-btn"
@@ -216,11 +219,7 @@
                         )}
                       on:click|stopPropagation
                       on:focus|stopPropagation
-                      placeholder={type === "cpu"
-                        ? "50"
-                        : type === "ram"
-                          ? "100"
-                          : "60"}
+                      {placeholder}
                     />
                     {#if type === "ram"}
                       <span class="unit">MB</span>

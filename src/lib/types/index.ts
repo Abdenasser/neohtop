@@ -4,6 +4,7 @@ export interface Process {
   ppid: number;
   name: string;
   cpu_usage: number;
+  gpu_usage: number | null;
   memory_usage: number;
   status: string;
   user: string;
@@ -16,6 +17,17 @@ export interface Process {
   run_time: number;
   disk_usage: [number, number]; // [read_bytes, written_bytes]
   session_id?: number;
+}
+
+export interface GpuInfo {
+  name: string;
+  vendor: string;
+  utilization: number | null;
+  memory_total: number | null;
+  memory_used: number | null;
+  temperature: number | null;
+  power_watts: number | null;
+  core_clock_mhz: number | null;
 }
 
 export interface SystemStats {
@@ -31,6 +43,7 @@ export interface SystemStats {
   disk_total_bytes: number;
   disk_used_bytes: number;
   disk_free_bytes: number;
+  gpus: GpuInfo[];
 }
 
 export interface Column {

@@ -1,6 +1,7 @@
 export { default as StatsBar } from "./StatsBar.svelte";
 export { default as CpuPanel } from "./CpuPanel.svelte";
 export { default as MemoryPanel } from "./MemoryPanel.svelte";
+export { default as GpuPanel } from "./GpuPanel.svelte";
 export { default as StoragePanel } from "./StoragePanel.svelte";
 export { default as SystemPanel } from "./SystemPanel.svelte";
 export { default as NetworkPanel } from "./NetworkPanel.svelte";

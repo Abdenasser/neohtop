@@ -24,11 +24,13 @@
   export let isFrozen: boolean;
   export let filters: {
     cpu: { operator: string; value: number; enabled: boolean };
+    gpu: { operator: string; value: number; enabled: boolean };
     ram: { operator: string; value: number; enabled: boolean };
     runtime: { operator: string; value: number; enabled: boolean };
     status: { values: string[]; enabled: boolean };
   } = {
     cpu: { operator: ">", value: 50, enabled: false },
+    gpu: { operator: ">", value: 50, enabled: false },
     ram: { operator: ">", value: 100, enabled: false },
     runtime: { operator: ">", value: 60, enabled: false },
     status: { values: [], enabled: false },
