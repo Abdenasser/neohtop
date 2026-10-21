@@ -1,20 +1,19 @@
 <script lang="ts">
   import { faHardDrive } from "@fortawesome/free-solid-svg-icons";
   import { PanelHeader, StatItem } from "$lib/components";
-  import { formatBytes, formatPercentage } from "$lib/utils";
+  import { formatBytes } from "$lib/utils";
+  import { formatUsagePercentage } from "$lib/utils/metrics";
 
   export let diskTotalBytes: number;
   export let diskUsedBytes: number;
   export let diskFreeBytes: number;
-
-  $: diskUsagePercentage = (diskUsedBytes / diskTotalBytes) * 100;
 </script>
 
 <div class="stat-panel">
   <PanelHeader
     icon={faHardDrive}
     title="Storage"
-    usageValue={formatPercentage(diskUsagePercentage)}
+    usageValue={formatUsagePercentage(diskUsedBytes, diskTotalBytes)}
   />
   <div class="stats-content">
     <StatItem label="Total" value={formatBytes(diskTotalBytes)} />

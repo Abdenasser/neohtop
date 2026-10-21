@@ -9,6 +9,7 @@
     "preview": "vite preview",
     "check": "svelte-kit sync && svelte-check --tsconfig ./jsconfig.json",
     "check:watch": "svelte-kit sync && svelte-check --tsconfig ./jsconfig.json --watch",
+    "test:metrics": "node tests/format-usage-percentage.mjs",
     "tauri": "tauri",
     "format": "prettier --write ./src && cargo fmt --manifest-path src-tauri/Cargo.toml",
     "format:check": "prettier --check ./src && cargo fmt --manifest-path src-tauri/Cargo.toml -- --check",
