@@ -127,6 +127,10 @@ jobs:
             fi
           done
 
+      - name: Prepare frontend assets for native tests
+        # generate_context! embeds frontendDist even in cargo test builds.
+        run: npm run build
+
       - name: Test Rust code
         # Intel macOS is cross-compiled on ARM; tests run in the ARM job.
         if: matrix.platform != 'macos-x86_64'
