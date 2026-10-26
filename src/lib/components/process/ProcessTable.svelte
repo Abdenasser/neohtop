@@ -71,10 +71,27 @@
       >
     {/if}
   </div>
-  <div class="table-container">
+  <!-- svelte-ignore a11y_no_noninteractive_tabindex a11y_no_noninteractive_element_interactions (The labeled scroll region needs keyboard focus and arrow-key handling for WebKit scrolling.) -->
+  <div
+    class="table-container"
+    role="region"
+    aria-label="Process table"
+    tabindex="0"
+    on:keydown={(event) => {
+      if (
+        event.target === event.currentTarget &&
+        (event.key === "ArrowLeft" || event.key === "ArrowRight")
+      ) {
+        event.preventDefault();
+        event.currentTarget.scrollBy({
+          left: event.key === "ArrowRight" ? 160 : -160,
+        });
+      }
+    }}
+  >
     <table
       class:tree-view={viewMode === "tree"}
-      style:min-width={viewMode === "tree"
+      style:width={viewMode === "tree"
         ? `max(100%, ${440 + Math.max(0, columns.filter((column) => column.visible).length - 1) * 100}px)`
         : undefined}
     >
@@ -187,6 +204,11 @@
     overflow-y: auto;
     scrollbar-width: thin;
     scrollbar-color: var(--surface2) var(--mantle);
+  }
+
+  .table-container:focus-visible {
+    outline: 2px solid var(--blue);
+    outline-offset: -2px;
   }
 
   .table-container::-webkit-scrollbar {

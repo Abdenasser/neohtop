@@ -143,6 +143,22 @@ test("sorting and pinning prioritize whole families without mutating snapshots",
     pinnedProcesses: new Set(["process-2"]),
   };
   assert.deepEqual(
+    ids(
+      buildProcessTree(processes, new Set(), null, {
+        sortConfig: { field: "cpu_usage", direction: "asc" },
+      }),
+    ),
+    [4, 1],
+  );
+  assert.deepEqual(
+    ids(
+      buildProcessTree(processes, new Set(), null, {
+        sortConfig: { field: "memory_usage", direction: "desc" },
+      }),
+    ),
+    [4, 1],
+  );
+  assert.deepEqual(
     ids(buildProcessTree(processes, new Set(), null, pinned)),
     [1, 4],
   );
