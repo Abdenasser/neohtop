@@ -4,6 +4,7 @@
   export let columns: Column[];
   export let sortConfig: { field: keyof Process; direction: "asc" | "desc" };
   export let onToggleSort: (field: keyof Process) => void;
+  export let treeView = false;
 
   function getSortIndicator(field: keyof Process) {
     if (sortConfig.field !== field) return "↕";
@@ -14,9 +15,21 @@
 <thead>
   <tr>
     {#each columns.filter((col) => col.visible) as column}
-      <th class="sortable" on:click={() => onToggleSort(column.id)}>
+      <th
+        class="sortable"
+        on:click={() => onToggleSort(column.id)}
+        title={treeView && column.id === "memory_usage"
+          ? "Sum of reported resident memory for each process family; shared pages can be counted more than once."
+          : treeView && column.id === "cpu_usage"
+            ? "Combined CPU usage for this process and all descendants; may exceed 100% across CPU cores."
+            : undefined}
+      >
         <div class="th-content">
-          {column.label}
+          {treeView && column.id === "cpu_usage"
+            ? "Family CPU"
+            : treeView && column.id === "memory_usage"
+              ? "Family RAM"
+              : column.label}
           <span
             class="sort-indicator"
             class:active={sortConfig.field === column.id}
@@ -45,6 +58,8 @@
   }
 
   th:last-child {
+    right: 0;
+    z-index: 4;
     width: 120px;
     min-width: 120px;
     max-width: 120px;

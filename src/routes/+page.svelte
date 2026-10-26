@@ -13,6 +13,10 @@
   import { column_definitions } from "$lib/definitions/columns";
   import { filterProcesses, sortProcesses } from "$lib/utils";
   import type { Process } from "$lib/types";
+  import {
+    buildProcessTree,
+    paginateProcessTree,
+  } from "$lib/utils/process-tree.js";
 
   $: ({
     processes,
@@ -35,6 +39,21 @@
   let lastProcessCount = 0;
   let cachedFilteredProcesses: Process[] = [];
   let cachedSortedProcesses: Process[] = [];
+  let expandedProcesses = new Set<string>();
+
+  function setProcessView(view: "flat" | "tree") {
+    settingsStore.updateConfig({
+      behavior: { ...$settingsStore.behavior, processView: view },
+    });
+    processStore.setCurrentPage(1);
+  }
+
+  function toggleExpansion(key: string) {
+    const next = new Set(expandedProcesses);
+    if (next.has(key)) next.delete(key);
+    else next.add(key);
+    expandedProcesses = next;
+  }
 
   // Initialize filters object for the new FilterToggle
   let filters = {
@@ -52,6 +71,10 @@
   }));
   $: itemsPerPage = $settingsStore.behavior.itemsPerPage;
   $: refreshRate = $settingsStore.behavior.refreshRate;
+  $: processView = $settingsStore.behavior.processView ?? "flat";
+  $: searchActive =
+    searchTerm.trim().length > 0 ||
+    Object.values(filters).some((filter) => filter.enabled);
 
   // Throttled filtering to reduce CPU usage
   const debouncedFilter = debounce(() => {
@@ -86,7 +109,23 @@
     cachedSortedProcesses = cachedFilteredProcesses;
   }
 
-  $: totalPages = Math.ceil(cachedFilteredProcesses.length / itemsPerPage);
+  $: tree =
+    processView === "tree"
+      ? buildProcessTree(
+          sortProcesses(processes, sortConfig, pinnedProcesses),
+          expandedProcesses,
+          searchActive
+            ? new Set(cachedFilteredProcesses.map((process) => process.pid))
+            : null,
+          { sortConfig, pinnedProcesses },
+        )
+      : { rows: [], rootCount: 0 };
+  $: treePage = paginateProcessTree(tree, currentPage, itemsPerPage);
+  $: totalPages =
+    processView === "tree"
+      ? treePage.totalPages
+      : Math.max(1, Math.ceil(cachedFilteredProcesses.length / itemsPerPage));
+  $: if (currentPage > totalPages) processStore.setCurrentPage(totalPages);
   $: paginatedProcesses = cachedSortedProcesses.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage,
@@ -149,7 +188,16 @@
         bind:isFrozen={$processStore.isFrozen}
         bind:filters
         {totalPages}
-        totalResults={cachedFilteredProcesses.length}
+        totalResults={processView === "tree"
+          ? tree.rootCount
+          : cachedFilteredProcesses.length}
+        resultLabel={processView === "tree"
+          ? tree.rootCount === 1
+            ? "family"
+            : "families"
+          : cachedFilteredProcesses.length === 1
+            ? "process"
+            : "processes"}
         bind:columns
       />
 
@@ -163,6 +211,13 @@
         {systemStats}
         {sortConfig}
         {pinnedProcesses}
+        viewMode={processView}
+        treeRows={treePage.rows}
+        {searchActive}
+        expandedCount={expandedProcesses.size}
+        onViewChange={setProcessView}
+        onToggleExpand={toggleExpansion}
+        onCollapseAll={() => (expandedProcesses = new Set())}
         onToggleSort={processStore.toggleSort}
         onTogglePin={processStore.togglePin}
         onShowDetails={processStore.showProcessDetails}
@@ -229,7 +284,7 @@
     flex: 1;
     display: flex;
     flex-direction: column;
-    min-width: min-content;
+    min-width: 0;
     overflow: hidden;
   }
 
