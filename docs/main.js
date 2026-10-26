@@ -1,3 +1,5 @@
+import { resolveDownloadAssets } from './downloads.js';
+
 // ===============================
 // Theme Management
 // ===============================
@@ -58,36 +60,31 @@ async function fetchDownloadStats() {
 async function updateVersion() {
   try {
     const response = await fetch('https://api.github.com/repos/Abdenasser/neohtop/releases/latest');
+    if (!response.ok) throw new Error(`Release request failed: ${response.status}`);
     const data = await response.json();
     const version = data.tag_name;
     const versionNumber = version.match(/\d+\.\d+\.\d+/)?.[0];
 
     if (versionNumber) {
       document.getElementById('current-version').textContent = "v" + versionNumber;
-      updateDownloadLinks(versionNumber);
+      updateDownloadLinks(data);
     }
   } catch (error) {
     console.error('Failed to fetch version:', error);
   }
 }
 
-function updateDownloadLinks(versionNumber) {
-  const platformUrls = {
-    'macos-intel': `intel-NeoHtop_${versionNumber}_x64.dmg`,
-    'macos-silicon': `silicon-NeoHtop_${versionNumber}_aarch64.dmg`,
-    'windows': `NeoHtop_${versionNumber}_x64.exe`,
-    'linux-deb-x64': `NeoHtop_${versionNumber}_x86_64.deb`,
-    'linux-appimage-x64': `NeoHtop_${versionNumber}_x86_64.AppImage`,
-    'linux-rpm-x64': `NeoHtop_${versionNumber}_x86_64.rpm`,
-    'linux-deb-arm64': `NeoHtop_${versionNumber}_aarch64.deb`,
-    'linux-appimage-arm64': `NeoHtop_${versionNumber}_aarch64.AppImage`,
-    'linux-rpm-arm64': `NeoHtop_${versionNumber}_aarch64.rpm`
-  };
-
+function updateDownloadLinks(release) {
+  const platformUrls = resolveDownloadAssets(release);
   document.querySelectorAll('.download-button').forEach(link => {
     const platform = link.getAttribute('data-type');
     if (platformUrls[platform]) {
-      link.href = `https://github.com/Abdenasser/neohtop/releases/download/v${versionNumber}/${platformUrls[platform]}`;
+      link.href = platformUrls[platform];
+    } else {
+      link.removeAttribute('href');
+      link.setAttribute('aria-disabled', 'true');
+      link.tabIndex = -1;
+      link.querySelector('.secondary').textContent = 'Not available in this release';
     }
   });
 }
@@ -108,6 +105,10 @@ document.querySelectorAll('.faq-question').forEach(button => {
 // Download tracking
 document.querySelectorAll('.download-button').forEach(button => {
   button.addEventListener('click', (e) => {
+    if (button.getAttribute('aria-disabled') === 'true') {
+      e.preventDefault();
+      return;
+    }
     gtag('event', 'download', {
       'event_category': 'App',
       'event_label': button.getAttribute('data-type'),
