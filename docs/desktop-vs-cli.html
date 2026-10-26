@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>NeoHtop Desktop vs CLI — Choose your system monitor</title>
+    <meta
+      name="description"
+      content="Compare NeoHtop Desktop and NeoHtop CLI: graphical vs terminal interfaces, Rust vs Go, installation, process trees, and platform support."
+    />
+    <meta name="author" content="Abdenasser" />
+    <meta name="theme-color" content="#0c1012" />
+    <meta name="color-scheme" content="dark" />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+    <link
+      rel="canonical"
+      href="https://abdenasser.github.io/neohtop/desktop-vs-cli.html"
+    />
+    <link
+      rel="alternate"
+      type="text/markdown"
+      href="desktop-vs-cli.md"
+      title="Markdown version"
+    />
+    <link rel="describedby" href="llms.txt" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="NeoHtop" />
+    <meta
+      property="og:url"
+      content="https://abdenasser.github.io/neohtop/desktop-vs-cli.html"
+    />
+    <meta
+      property="og:title"
+      content="NeoHtop Desktop vs CLI — Choose your system monitor"
+    />
+    <meta
+      property="og:description"
+      content="Compare NeoHtop Desktop and NeoHtop CLI: graphical vs terminal interfaces, Rust vs Go, installation, process trees, and platform support."
+    />
+    <meta
+      property="og:image"
+      content="https://abdenasser.github.io/neohtop/assets/neohtop-desktop.png"
+    />
+    <meta property="og:image:width" content="2784" />
+    <meta property="og:image:height" content="2024" />
+    <meta
+      property="og:image:alt"
+      content="NeoHtop desktop system monitor showing process metrics"
+    />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:creator" content="@__abdenasser" />
+    <meta
+      name="twitter:title"
+      content="NeoHtop Desktop vs CLI — Choose your system monitor"
+    />
+    <meta
+      name="twitter:description"
+      content="Compare NeoHtop Desktop and NeoHtop CLI: graphical vs terminal interfaces, Rust vs Go, installation, process trees, and platform support."
+    />
+    <meta
+      name="twitter:image"
+      content="https://abdenasser.github.io/neohtop/assets/neohtop-desktop.png"
+    />
+    <link rel="icon" href="favicon.ico" />
+    <link rel="apple-touch-icon" href="assets/neohtop-icon.png" />
+    <link rel="stylesheet" href="styles.css" />
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Article",
+        "headline": "NeoHtop Desktop vs CLI",
+        "url": "https://abdenasser.github.io/neohtop/desktop-vs-cli.html",
+        "about": [
+          { "@type": "SoftwareApplication", "name": "NeoHtop Desktop" },
+          { "@type": "SoftwareApplication", "name": "NeoHtop CLI" }
+        ]
+      }
+    </script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header class="site-header">
+      <nav class="shell navigation" aria-label="Main navigation">
+        <a class="brand" href="./" aria-label="NeoHtop home"
+          ><img
+            src="assets/neohtop-icon.png"
+            width="32"
+            height="32"
+            alt=""
+          /><span>neohtop<span class="brand-cursor">_</span></span></a
+        ><button
+          class="menu-button"
+          aria-expanded="false"
+          aria-controls="navigation-links"
+        >
+          Menu <span aria-hidden="true">+</span>
+        </button>
+        <div class="nav-links" id="navigation-links">
+          <a href="./#features">Features</a
+          ><a href="install.html">Installation</a
+          ><a href="desktop-vs-cli.html">Desktop / CLI</a
+          ><a href="./#pro">Pro <span class="tiny-tag">IN DEV</span></a
+          ><a class="nav-github" href="https://github.com/Abdenasser/neohtop"
+            >GitHub <span aria-hidden="true">↗</span></a
+          >
+        </div>
+      </nav>
+    </header>
+    <main id="main">
+      <article class="guide shell">
+        <p class="eyebrow">NEOHTOP / FIELD GUIDE 02</p>
+        <h1>Desktop or terminal?<br /><em>Your call.</em></h1>
+        <p class="guide-lead">
+          NeoHtop Desktop and NeoHtop CLI are separate open-source applications.
+          They share an interest in making processes easier to understand, with
+          different interfaces and technology.
+        </p>
+        <div class="guide-table">
+          <table>
+            <caption>
+              NeoHtop Desktop vs. NeoHtop CLI
+            </caption>
+            <thead>
+              <tr>
+                <th>Choose by</th>
+                <th>NeoHtop Desktop</th>
+                <th>NeoHtop CLI</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th>Interface</th>
+                <td>A graphical desktop window</td>
+                <td>A terminal user interface</td>
+              </tr>
+              <tr>
+                <th>Built with</th>
+                <td>Rust, Tauri, Svelte</td>
+                <td>Go and the Charm ecosystem</td>
+              </tr>
+              <tr>
+                <th>Platforms</th>
+                <td>macOS, Linux, Windows</td>
+                <td>macOS, Linux, Windows</td>
+              </tr>
+              <tr>
+                <th>Install</th>
+                <td>
+                  Official GitHub release packages; community package managers
+                </td>
+                <td>
+                  <code>npm install -g neohtop-cli</code> or CLI release
+                  binaries
+                </td>
+              </tr>
+              <tr>
+                <th>Monitoring</th>
+                <td>
+                  Local process metrics, CPU, memory, storage, network I/O
+                </td>
+                <td>
+                  Local process monitoring with sparklines and memory
+                  visualizations
+                </td>
+              </tr>
+              <tr>
+                <th>Process trees</th>
+                <td>In development for the next desktop release</td>
+                <td>Documented in the CLI project</td>
+              </tr>
+              <tr>
+                <th>License</th>
+                <td>MIT</td>
+                <td>MIT</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <section>
+          <h2>Pick Desktop for a visual workspace</h2>
+          <p>
+            Use NeoHtop Desktop if you prefer a dedicated window with a
+            searchable process table, pinning, filters, detailed process
+            information, and configurable themes. It is a graphical alternative
+            to command-line tools such as htop and to your operating system’s
+            built-in process monitor.
+          </p>
+          <a class="button primary" href="./#download">Get NeoHtop Desktop ↓</a>
+        </section>
+        <section>
+          <h2>Pick CLI to stay in your terminal</h2>
+          <p>
+            Use the CLI companion if you want keyboard-driven process monitoring
+            without leaving your shell. The separate CLI repository documents
+            process trees, sparklines, themes, and command-line options. Desktop
+            and CLI versions do not necessarily ship the same features at the
+            same time.
+          </p>
+          <div class="install-command">
+            <span class="prompt" aria-hidden="true">$</span
+            ><code id="cli-command">npm install -g neohtop-cli</code
+            ><button
+              class="copy-button"
+              data-copy="cli-command"
+              aria-label="Copy CLI installation command"
+            >
+              Copy
+            </button>
+          </div>
+          <p>
+            <a href="https://github.com/Abdenasser/neohtop-cli"
+              >Read the CLI documentation ↗</a
+            >
+          </p>
+        </section>
+        <section>
+          <h2>What about NeoHtop Pro?</h2>
+          <p>
+            NeoHtop Pro is being explored for remote monitoring, historical
+            metrics, and alerts. It is in development, with no final scope,
+            price, or release date. Neither today’s desktop download nor the CLI
+            install command is a Pro subscription.
+          </p>
+        </section>
+        <section>
+          <h2>What do they have in common?</h2>
+          <p>
+            Both projects are open source under the MIT license and focus on
+            local process visibility. They are separate codebases. The desktop
+            app does not require the CLI to be installed, and installing the CLI
+            does not install the desktop app.
+          </p>
+        </section>
+      </article>
+    </main>
+    <footer class="site-footer shell">
+      <div class="footer-top">
+        <a class="brand" href="./"
+          ><img
+            src="assets/neohtop-icon.png"
+            width="28"
+            height="28"
+            alt=""
+          /><span>neohtop_</span></a
+        >
+        <p>Built for the beautifully curious.</p>
+        <a href="https://github.com/sponsors/Abdenasser"
+          >Support the project ↗</a
+        >
+      </div>
+      <div class="footer-bottom">
+        <span
+          >Free software. MIT license. Made by
+          <a href="https://github.com/Abdenasser">Abdenasser</a>.</span
+        >
+        <div>
+          <a href="install.html">Docs</a
+          ><a href="https://github.com/Abdenasser/neohtop/issues"
+            >Report an issue</a
+          ><a href="llms.txt">llms.txt</a><a href="sitemap.xml">Sitemap</a>
+        </div>
+      </div>
+    </footer>
+    <p class="sr-only" id="copy-status" role="status" aria-live="polite"></p>
+    <script type="module" src="main.js"></script>
+  </body>
+</html>
