@@ -136,17 +136,28 @@ jobs:
         if: matrix.platform != 'macos-x86_64'
         run: cargo test --locked --manifest-path src-tauri/Cargo.toml --target ${{ matrix.target }}
 
-      - name: Build platform packages
+      - name: Build packages without Apple credentials
+        if: runner.os != 'macOS' || !inputs.release
         uses: tauri-apps/tauri-action@v1
         env:
           APPIMAGE_EXTRACT_AND_RUN: 1
-          APPLE_CERTIFICATE: ${{ inputs.release && runner.os == 'macOS' && secrets.MACOS_CERTIFICATE || '' }}
-          APPLE_CERTIFICATE_PASSWORD: ${{ inputs.release && runner.os == 'macOS' && secrets.MACOS_CERTIFICATE_PASSWORD || '' }}
+          # Empty APPLE_CERTIFICATE still triggers Tauri's certificate import;
+          # preview builds must omit that variable entirely.
+          APPLE_SIGNING_IDENTITY: "-"
+        with:
+          args: --ci --target ${{ matrix.target }} --bundles ${{ matrix.bundles }} -- --locked
+
+      - name: Build signed macOS release packages
+        if: runner.os == 'macOS' && inputs.release
+        uses: tauri-apps/tauri-action@v1
+        env:
+          APPLE_CERTIFICATE: ${{ secrets.MACOS_CERTIFICATE }}
+          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.MACOS_CERTIFICATE_PASSWORD }}
           APPLE_SIGNING_IDENTITY: >-
-            ${{ inputs.release && (vars.APPLE_SIGNING_IDENTITY || 'Developer ID Application: Abdenasser Elidrissi (785JV74B9Y)') || '-' }}
-          APPLE_ID: ${{ inputs.release && runner.os == 'macOS' && secrets.APPLE_ID || '' }}
-          APPLE_PASSWORD: ${{ inputs.release && runner.os == 'macOS' && secrets.APPLE_PASSWORD || '' }}
-          APPLE_TEAM_ID: ${{ inputs.release && runner.os == 'macOS' && secrets.APPLE_TEAM_ID || '' }}
+            ${{ vars.APPLE_SIGNING_IDENTITY || 'Developer ID Application: Abdenasser Elidrissi (785JV74B9Y)' }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
         with:
           # Build only: release assets upload after every platform passes.
           args: --ci --target ${{ matrix.target }} --bundles ${{ matrix.bundles }} -- --locked
