@@ -6,6 +6,20 @@
   export let onToggleSort: (field: keyof Process) => void;
   export let treeView = false;
 
+  const treeColumnWidths: Partial<Record<keyof Process, number>> = {
+    name: 320,
+    pid: 90,
+    ppid: 90,
+    session_id: 90,
+    status: 110,
+    user: 80,
+    cpu_usage: 120,
+    memory_usage: 140,
+    virtual_memory: 120,
+    disk_usage: 160,
+    run_time: 140,
+  };
+
   function getSortIndicator(field: keyof Process) {
     if (sortConfig.field !== field) return "↕";
     return sortConfig.direction === "asc" ? "↑" : "↓";
@@ -17,6 +31,9 @@
     {#each columns.filter((col) => col.visible) as column}
       <th
         class="sortable"
+        style:width={treeView
+          ? `${treeColumnWidths[column.id] ?? 160}px`
+          : undefined}
         on:click={() => onToggleSort(column.id)}
         title={treeView && column.id === "memory_usage"
           ? "Sum of reported resident memory for each process family; shared pages can be counted more than once."
