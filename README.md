@@ -91,7 +91,7 @@ Examples:
 ## Getting Started
 
 ### Prerequisites
-- Node.js (v16 or later)
+- Node.js 22 (see `.nvmrc`)
 - Rust (latest stable)
 - Xcode Command Line Tools (for macOS)
 
@@ -169,7 +169,7 @@ Some processes require monitoring with sudo privileges. To monitor these process
 ### Setup
 ```bash
 # Install dependencies
-npm install
+npm ci
 
 # Run in development mode
 npm run tauri dev
@@ -177,6 +177,43 @@ npm run tauri dev
 # Build for production
 npm run tauri build
 ```
+
+### Build checks and releases
+
+Pull requests and pushes to `main` run formatting, type checks, release-tool tests,
+and package builds for Windows x64, macOS Intel/Apple Silicon, and Linux x64/ARM64.
+Linux packages are built on Ubuntu 22.04; newer distributions still need the
+appropriate WebKitGTK runtime. AppImages are checked for bundled Wayland client
+libraries to prevent the display-driver conflict reported in issue #203.
+
+To build preview packages, run **Build Check** or **Draft Release** from GitHub
+Actions on a branch. Download the `packages-*` workflow artifacts. Preview macOS
+packages are ad-hoc signed and are not notarized for public distribution.
+
+For a release candidate:
+
+1. Update the version in `package.json`, both root version entries in `package-lock.json`,
+   `src-tauri/tauri.conf.json`, `src-tauri/Cargo.toml`, and the NeoHtop entry in
+   `src-tauri/Cargo.lock`. Run `npm run release:check` and commit the changes.
+2. Push a matching version tag, for example `v1.3.0`. All platform packages are
+   built from that tag. A published version cannot be overwritten.
+3. After every build passes, **Draft Release** verifies all nine packages and
+   attaches `SHA256SUMS` and `release-manifest.json` to a draft GitHub release.
+4. Install and launch the packages on their supported operating systems, review
+   the release notes, then publish the draft from GitHub when ready.
+
+Tagged macOS builds require the existing repository secrets `MACOS_CERTIFICATE`
+(base64-encoded Developer ID `.p12`), `MACOS_CERTIFICATE_PASSWORD`, `APPLE_ID`,
+`APPLE_PASSWORD` (an app-specific password), and `APPLE_TEAM_ID`. The optional
+repository variable `APPLE_SIGNING_IDENTITY` overrides the current Developer ID
+identity. Tagged builds fail if credentials are missing or signature/notarization
+checks fail. Preview builds and pull requests do not need signing credentials.
+Windows packages are NSIS installers, named `NeoHtop_<version>_x64-setup.exe`;
+Windows code signing is not configured by this workflow.
+
+The release uses the scoped `GITHUB_TOKEN`; `PAT_TOKEN` is no longer needed.
+Existing branch-protection rules that require the old **Format Check** job should
+be updated to require **Source checks** and the platform package jobs.
 
 ### Code Formatting
 We use Prettier for web code and `cargo fmt` for Rust code.

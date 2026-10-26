@@ -1,0 +1,76 @@
+name: Draft Release
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  preflight:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+      - name: Verify version and tag
+        env:
+          RELEASE_TAG: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || '' }}
+        run: node scripts/release.mjs check-version "$RELEASE_TAG"
+      - name: Refuse changes to a published release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: actions/github-script@v7
+        with:
+          script: |
+            try {
+              const { data } = await github.rest.repos.getReleaseByTag({
+                ...context.repo, tag: context.ref.replace('refs/tags/', '')
+              });
+              if (!data.draft) core.setFailed('This version is already published. Create a new version and tag.');
+            } catch (error) {
+              if (error.status !== 404) throw error;
+            }
+
+  packages:
+    needs: preflight
+    uses: ./.github/workflows/build-check.yml
+    with:
+      # Branch dispatches build preview artifacts. Tags build signed candidates.
+      release: ${{ startsWith(github.ref, 'refs/tags/') }}
+    secrets: inherit
+
+  draft:
+    if: startsWith(github.ref, 'refs/tags/')
+    needs: packages
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: packages-*
+          merge-multiple: true
+          path: artifacts
+      - name: Verify all packages and generate checksums
+        env:
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: node scripts/release.mjs manifest artifacts "$RELEASE_TAG"
+      - name: Create or update the draft
+        uses: actions/github-script@v7
+        env:
+          ARTIFACT_DIR: artifacts
+        with:
+          script: |
+            const { uploadDraft } = await import(`${process.env.GITHUB_WORKSPACE}/scripts/upload-draft.mjs`);
+            await uploadDraft({ github, context, directory: process.env.ARTIFACT_DIR });

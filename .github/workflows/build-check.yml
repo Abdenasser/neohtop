@@ -3,96 +3,189 @@ name: Build Check
 on:
   pull_request:
     branches: [main]
-    paths:
-      - "src-tauri/**"
-      - ".github/workflows/**"
+  push:
+    branches: [main]
+  workflow_dispatch:
+  workflow_call:
+    inputs:
+      release:
+        description: Require signed and notarized macOS release builds
+        type: boolean
+        default: false
+    secrets:
+      MACOS_CERTIFICATE:
+        required: false
+      MACOS_CERTIFICATE_PASSWORD:
+        required: false
+      APPLE_ID:
+        required: false
+      APPLE_PASSWORD:
+        required: false
+      APPLE_TEAM_ID:
+        required: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: build-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 env:
   CARGO_TERM_COLOR: always
-  CARGO_INCREMENTAL: 1
-  CARGO_NET_RETRY: 10
-  RUSTUP_MAX_RETRIES: 10
-  RUST_BACKTRACE: 1
-  RUSTC_WRAPPER: sccache
-  CARGO_BUILD_JOBS: 2
+  CARGO_INCREMENTAL: 0
 
 jobs:
-  build:
-    name: Build Check
-    runs-on: ubuntu-latest
-
+  quality:
+    name: Source checks
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: "lts/*"
-          cache: "npm"
-
-      - name: Cache Linux Dependencies
-        id: cache-apt
-        uses: actions/cache@v3
+          node-version-file: .nvmrc
+          cache: npm
+      - uses: dtolnay/rust-toolchain@stable
         with:
-          path: |
-            /var/cache/apt/archives/*.deb
-            /var/lib/apt/lists/*
-          key: ${{ runner.os }}-apt-${{ hashFiles('**/package.json', '**/Cargo.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-apt-
+          components: rustfmt
+      - run: npm ci
+      - run: npm run format:check
+      - run: npm run check
+      - run: npm run test:release
+      - run: npm run release:check
+      - run: npm run build
 
-      - name: Add Ubuntu Jammy repo for WebKitGTK 4.0
-        run: |
-          echo "deb http://archive.ubuntu.com/ubuntu jammy main universe" | sudo tee -a /etc/apt/sources.list
-          sudo apt update
-
-      - name: Install Linux Dependencies
-        run: |
-          sudo rm -rf /var/cache/apt/archives/lock
-          sudo rm -rf /var/cache/apt/archives/partial
-          sudo rm -rf /var/lib/apt/lists/lock
-          sudo rm -rf /var/lib/apt/lists/partial
-          sudo apt-get update
-          sudo apt-get install --no-install-recommends -y \
-            build-essential \
-            pkg-config \
-            libgtk-3-dev \
-            libayatana-appindicator3-dev \
-            librsvg2-dev \
-            libglib2.0-dev \
-            libjavascriptcoregtk-4.0-dev \
-            libsoup-3.0-dev \
-            libwebkit2gtk-4.1-dev
-
-      - name: Remove Jammy repo
-        run: |
-          sudo sed -i '/jammy main universe/d' /etc/apt/sources.list
-          sudo apt update
-
-      - name: Install Rust
-        uses: dtolnay/rust-toolchain@stable
+  build:
+    name: Package (${{ matrix.platform }})
+    needs: quality
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: linux-x86_64
+            runner: ubuntu-22.04
+            target: x86_64-unknown-linux-gnu
+            bundles: deb,rpm,appimage
+          - platform: linux-aarch64
+            runner: ubuntu-22.04-arm
+            target: aarch64-unknown-linux-gnu
+            bundles: deb,rpm,appimage
+          - platform: macos-x86_64
+            runner: macos-15
+            target: x86_64-apple-darwin
+            bundles: app,dmg
+          - platform: macos-aarch64
+            runner: macos-15
+            target: aarch64-apple-darwin
+            bundles: app,dmg
+          - platform: windows-x86_64
+            runner: windows-2022
+            target: x86_64-pc-windows-msvc
+            bundles: nsis
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
-          components: cargo
-          target: x86_64-unknown-linux-gnu
-
-      - name: Install sccache
-        run: |
-          SCCACHE_VERSION=v0.7.7
-          curl -L "https://github.com/mozilla/sccache/releases/download/${SCCACHE_VERSION}/sccache-${SCCACHE_VERSION}-x86_64-unknown-linux-musl.tar.gz" | tar xz
-          sudo mv sccache-*/sccache /usr/local/bin/sccache
-          echo "RUSTC_WRAPPER=sccache" >> $GITHUB_ENV
-
+          node-version-file: .nvmrc
+          cache: npm
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
       - uses: Swatinem/rust-cache@v2
         with:
-          workspaces: "./src-tauri -> target"
-          shared-key: "build"
+          workspaces: src-tauri -> target
+          key: ${{ matrix.target }}-${{ inputs.release && 'release' || 'check' }}
+          cache-on-failure: true
 
-      - name: Install Dependencies
-        run: npm ci
-
-      - name: Build Application
+      - name: Install Linux packaging dependencies
+        if: runner.os == 'Linux'
         run: |
-          npm run tauri build -- \
-            --target x86_64-unknown-linux-gnu \
-            --bundles deb \
-            --ci
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y \
+            build-essential pkg-config libwebkit2gtk-4.1-dev \
+            libayatana-appindicator3-dev librsvg2-dev patchelf \
+            libfuse2 file rpm xdg-utils
+
+      - run: npm ci
+
+      - name: Require macOS release credentials
+        if: runner.os == 'macOS' && inputs.release
+        shell: bash
+        env:
+          APPLE_CERTIFICATE: ${{ secrets.MACOS_CERTIFICATE }}
+          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.MACOS_CERTIFICATE_PASSWORD }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          for name in APPLE_CERTIFICATE APPLE_CERTIFICATE_PASSWORD APPLE_ID APPLE_PASSWORD APPLE_TEAM_ID; do
+            if [ -z "${!name}" ]; then
+              echo "::error::Missing required release credential: $name"
+              exit 1
+            fi
+          done
+
+      - name: Prepare frontend assets for native tests
+        # generate_context! embeds frontendDist even in cargo test builds.
+        run: npm run build
+
+      - name: Test Rust code
+        # Intel macOS is cross-compiled on ARM; tests run in the ARM job.
+        if: matrix.platform != 'macos-x86_64'
+        run: cargo test --locked --manifest-path src-tauri/Cargo.toml --target ${{ matrix.target }}
+
+      - name: Remove cached package outputs
+        # Keep compiler caches, but never mix installers from different versions.
+        shell: bash
+        run: rm -rf "src-tauri/target/${{ matrix.target }}/release/bundle"
+
+      - name: Build packages without Apple credentials
+        if: runner.os != 'macOS' || !inputs.release
+        uses: tauri-apps/tauri-action@v1
+        env:
+          APPIMAGE_EXTRACT_AND_RUN: 1
+          # Empty APPLE_CERTIFICATE still triggers Tauri's certificate import;
+          # preview builds must omit that variable entirely.
+          APPLE_SIGNING_IDENTITY: "-"
+        with:
+          args: --ci --target ${{ matrix.target }} --bundles ${{ matrix.bundles }} -- --locked
+
+      - name: Build signed macOS release packages
+        if: runner.os == 'macOS' && inputs.release
+        uses: tauri-apps/tauri-action@v1
+        env:
+          APPLE_CERTIFICATE: ${{ secrets.MACOS_CERTIFICATE }}
+          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.MACOS_CERTIFICATE_PASSWORD }}
+          APPLE_SIGNING_IDENTITY: >-
+            ${{ vars.APPLE_SIGNING_IDENTITY || 'Developer ID Application: Abdenasser Elidrissi (785JV74B9Y)' }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        with:
+          # Build only: release assets upload after every platform passes.
+          args: --ci --target ${{ matrix.target }} --bundles ${{ matrix.bundles }} -- --locked
+
+      - name: Check AppImage display libraries
+        if: runner.os == 'Linux'
+        run: node scripts/release.mjs check-appimage src-tauri/target/${{ matrix.target }}/release/bundle/appimage
+
+      - name: Verify macOS release signature and notarization
+        if: runner.os == 'macOS' && inputs.release
+        shell: bash
+        env:
+          BUNDLE_ROOT: src-tauri/target/${{ matrix.target }}/release/bundle
+        run: |
+          codesign --verify --deep --strict --verbose=2 "$BUNDLE_ROOT/macos/NeoHtop.app"
+          xcrun stapler validate "$BUNDLE_ROOT/macos/NeoHtop.app"
+
+      - name: Stage and validate platform packages
+        run: node scripts/release.mjs stage ${{ matrix.platform }} src-tauri/target/${{ matrix.target }}/release/bundle artifacts
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: packages-${{ matrix.platform }}
+          path: artifacts/*
+          if-no-files-found: error
+          retention-days: 14
