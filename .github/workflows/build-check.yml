@@ -136,6 +136,11 @@ jobs:
         if: matrix.platform != 'macos-x86_64'
         run: cargo test --locked --manifest-path src-tauri/Cargo.toml --target ${{ matrix.target }}
 
+      - name: Remove cached package outputs
+        # Keep compiler caches, but never mix installers from different versions.
+        shell: bash
+        run: rm -rf "src-tauri/target/${{ matrix.target }}/release/bundle"
+
       - name: Build packages without Apple credentials
         if: runner.os != 'macOS' || !inputs.release
         uses: tauri-apps/tauri-action@v1
