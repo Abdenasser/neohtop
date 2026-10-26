@@ -20,7 +20,7 @@
       "entitlements": null,
       "providerShortName": null
     },
-    "targets": ["app", "dmg"]
+    "targets": "all"
   },
   "productName": "NeoHtop",
   "mainBinaryName": "NeoHtop",
