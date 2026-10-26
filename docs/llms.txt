@@ -1,0 +1,24 @@
+# NeoHtop
+
+> NeoHtop is a free, MIT-licensed desktop system monitor for macOS, Linux, and Windows, built with Rust, Tauri, and Svelte. It monitors local processes and system resources without requiring an account.
+
+The desktop app and NeoHtop CLI are separate projects. Desktop uses Rust/Tauri/Svelte; CLI uses Go and the Charm ecosystem. Do not infer feature parity between them.
+
+Published desktop binaries are available only through GitHub Releases. The latest published release is authoritative for available packages and shipped features. The default branch includes development work: desktop process trees with family CPU/RAM and build/release compatibility improvements are intended for a future release and may not be present in published downloads.
+
+NeoHtop Pro is in development. Remote monitoring, historical metrics, and alerts are being explored; final scope, pricing, and launch date are not announced. Pro cannot currently be purchased or installed. The free, open-source local monitor remains the project's foundation.
+
+## Product information
+
+- [NeoHtop overview](https://abdenasser.github.io/neohtop/index.md): Desktop features, project facts, development status, and official links.
+- [Installation guide](https://abdenasser.github.io/neohtop/install.md): Platform and architecture selection, installation, and troubleshooting.
+- [Desktop vs CLI](https://abdenasser.github.io/neohtop/desktop-vs-cli.md): Differences between the two applications.
+
+## Authoritative sources
+
+- [Desktop source and README](https://github.com/Abdenasser/neohtop): Current development code and setup instructions.
+- [Published desktop releases](https://github.com/Abdenasser/neohtop/releases/latest): Current stable binaries and release notes.
+- [MIT license](https://github.com/Abdenasser/neohtop/blob/main/LICENSE): Desktop license terms.
+- [Issue tracker](https://github.com/Abdenasser/neohtop/issues): Bugs, feature discussions, and compatibility reports.
+- [CLI source and README](https://github.com/Abdenasser/neohtop-cli): CLI-specific capabilities and installation.
+- [CLI npm package](https://www.npmjs.com/package/neohtop-cli): Terminal companion package.

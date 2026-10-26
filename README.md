@@ -246,6 +246,47 @@ Before submitting a PR, ensure:
 2. The format check passes (`npm run format:check`)
 3. Your commits follow the project's commit message conventions
 
+### Website and discoverability
+
+GitHub Pages serves the static `docs/` directory from `main`. Preview it over
+HTTP so browser modules and copy controls work:
+
+```bash
+python3 -m http.server 8765 --bind 127.0.0.1 --directory docs
+```
+
+Open `http://127.0.0.1:8765/`. The HTML contains the product content, navigation,
+FAQ answers, and release-page download links without requiring JavaScript.
+JavaScript resolves only assets from the latest published stable release; API
+failures retain working release-page links. Keep development features and Pro
+clearly separate from published downloads. The app release is deferred while the
+Pro offering is developed; merging code must not be treated as a release launch.
+
+Each public HTML page has a canonical URL, social metadata, structured data,
+and a linked Markdown equivalent. Keep the HTML, Markdown, `llms.txt`, and
+`sitemap.xml` consistent when changing product facts. The site uses local assets,
+system fonts, native FAQ disclosures, and reduced-motion styles. Existing Google
+Analytics remains optional; blocking it must not affect downloads or navigation.
+
+`llms.txt` follows a [proposed convention](https://llmstxt.org/), not a search
+ranking guarantee. [Google's AI search guidance](https://developers.google.com/search/docs/appearance/ai-features)
+prioritizes the same useful, crawlable content as ordinary SEO. Submit
+`https://abdenasser.github.io/neohtop/sitemap.xml` in the site's verified Search
+Console property after deployment and monitor indexing there. Ownership
+verification and sitemap submission are account-side actions, not completed by
+this repository.
+
+Robots rules apply at `https://abdenasser.github.io/robots.txt`, the host root.
+A `docs/robots.txt` would be served below `/neohtop/` and would not control
+crawlers. No blocking host-root robots file was present when the site was
+refreshed. Any future host-root rules must keep the public site crawlable; do not
+change unrelated host-wide policy from this project. The sitemap is linked from
+the footer even without a host-root robots declaration.
+
+Run `npm run test:release` to check internal links, metadata, structured data,
+Markdown references, sitemap coverage, and static download fallbacks alongside
+the release and process-tree tests.
+
 ## Contributing
 We welcome contributions! Please see our [contributing guidelines](./.github/CONTRIBUTING.md) for more information.
 

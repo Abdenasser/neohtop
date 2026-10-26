@@ -10,8 +10,8 @@
     "check": "svelte-kit sync && svelte-check --tsconfig ./jsconfig.json",
     "check:watch": "svelte-kit sync && svelte-check --tsconfig ./jsconfig.json --watch",
     "tauri": "tauri",
-    "format": "prettier --write ./src ./scripts .github/workflows && cargo fmt --manifest-path src-tauri/Cargo.toml",
-    "format:check": "prettier --check ./src ./scripts .github/workflows && cargo fmt --manifest-path src-tauri/Cargo.toml -- --check",
+    "format": "prettier --write ./src ./scripts ./docs .github/workflows && cargo fmt --manifest-path src-tauri/Cargo.toml",
+    "format:check": "prettier --check ./src ./scripts ./docs .github/workflows && cargo fmt --manifest-path src-tauri/Cargo.toml -- --check",
     "release:check": "node scripts/release.mjs check-version",
     "test:release": "node --test scripts/*.test.mjs",
     "prepare": "husky install"

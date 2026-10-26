@@ -1,564 +1,655 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>NeoHtop - Blazing-fast system monitoring for your desktop (built with Rust, Tauri & Svelte)</title>
-  <meta name="description"
-    content="A beautiful, efficient system monitor built with Rust and Svelte. Monitor processes, CPU, and memory usage in real-time with a modern interface.">
-  <meta name="keywords"
-    content="system monitor, task manager, cross-platform, process monitor, cpu usage, memory usage, rust, svelte">
-  <meta name="author" content="Your Name">
-  <meta property="og:type" content="website">
-  <meta property="og:url" content="https://abdenasser.github.io/neohtop/">
-  <meta property="og:title" content="NeoHtop - Blazing-fast system monitoring for your desktop">
-  <meta property="og:description"
-    content="A beautiful, efficient system monitor built with Rust and Svelte. Monitor processes, CPU, and memory usage in real-time.">
-  <meta property="og:image" content="https://github.com/Abdenasser/neohtop/raw/main/app-icon.png">
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:creator" content="@__abdenasser">
-  <meta name="twitter:title" content="NeoHtop - Blazing-fast system monitoring for your desktop">
-  <meta name="twitter:description" content="A beautiful, efficient system monitor built with Rust and Svelte.">
-  <meta name="twitter:image" content="https://github.com/Abdenasser/neohtop/raw/main/app-icon.png">
-  <link rel="icon" type="image/png" href="favicon.ico">
-  <link rel="apple-touch-icon" href="apple-touch-icon.png">
-  <link rel="stylesheet" href="styles.css">
-  <link rel="preload" href="https://github.com/Abdenasser/neohtop/raw/main/app-icon.png" as="image">
-  <link rel="preload" href="https://github.com/Abdenasser/neohtop/raw/main/screenshot.png" as="image">
-</head>
-
-<body>
-  <header class="glass-nav">
-    <nav>
-      <div class="logo-container">
-        <img src="https://github.com/Abdenasser/neohtop/raw/main/app-icon.png" alt="NeoHtop" class="nav-logo">
-        <span class="nav-brand">NeoHtop</span>
-      </div>
-      <button class="menu-button" aria-label="Toggle menu">
-        ☰
-      </button>
-      <div class="nav-links">
-        <a href="#home">Home</a>
-        <a href="#cli" class="nav-cli-link">CLI <span class="nav-cli-badge">NEW</span></a>
-        <a href="#features">Features</a>
-        <a href="#download">Download</a>
-        <a href="#install">Install</a>
-        <a href="#testimonials">Testimonials</a>
-        <a href="#faq">FAQ</a>
-        <button id="themeToggle" class="theme-toggle" aria-label="Toggle theme">
-          <span class="theme-icon">🌙</span>
-        </button>
-      </div>
-    </nav>
-  </header>
-
-  <main>
-    <section id="home" class="hero">
-      <div class="hero-content">
-        <div class="hero-text">
-          <h1 class="gradient-text">Monitor Your System<br>With Style</h1>
-          <p class="hero-subtitle">A beautiful, lightning-fast cross-platform system monitor.</p>
-          <div class="hero-cta">
-            <a href="#download" class="primary-button">Download Now</a>
-            <a href="https://github.com/abdenasser/neohtop" class="secondary-button">
-              View on GitHub
-            </a>
-          </div>
-          <div class="badges">
-            <script data-name="BMC-Widget" data-cfasync="false"
-              src="https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js" data-id="abdenasser"
-              data-description="Support me on Buy me a coffee!" data-message="" data-color="#FF5F5F"
-              data-position="Right" data-x_margin="18" data-y_margin="18"></script>
-          </div>
-        </div>
-      </div>
-      <div class="hero-background">
-        <img src="https://github.com/Abdenasser/neohtop/raw/main/screenshot-light.png" alt="NeoHtop Interface light" />
-        <img src="https://github.com/Abdenasser/neohtop/raw/main/screenshot.png" alt="NeoHtop Interface dark" />
-      </div>
-    </section>
-
-    <!-- CLI Announcement Banner -->
-    <section id="cli" class="cli-banner">
-      <div class="cli-banner-inner">
-        <div class="cli-badge">NEW</div>
-        <div class="cli-content">
-          <h2 class="cli-title">
-            <span class="cli-ghost">👻</span>
-            NeoHtop CLI — Your Terminal, Supercharged
-          </h2>
-          <p class="cli-subtitle">
-            All the power of NeoHtop, right in your terminal. Real-time CPU sparklines, memory bars,
-            process tree view, search, filters, themes & more.
-          </p>
-          <p class="cli-tech">Built with <strong>Go</strong> + the <strong>Charm</strong> ecosystem. Works everywhere — macOS, Linux, Windows.</p>
-
-          <div class="cli-install">
-            <code class="cli-command">npm install -g neohtop-cli</code>
-          </div>
-
-          <div class="cli-actions">
-            <a href="https://github.com/Abdenasser/neohtop-cli" class="cli-button cli-button-primary" target="_blank" rel="noopener">
-              View on GitHub
-            </a>
-            <a href="https://www.npmjs.com/package/neohtop-cli" class="cli-button cli-button-secondary" target="_blank" rel="noopener">
-              npm Package
-            </a>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section id="features" class="features">
-      <h2 class="section-title">Why Choose NeoHtop?</h2>
-      <div class="feature-grid">
-        <div class="feature-card">
-          <div class="feature-icon">🚀</div>
-          <h3>Real-time Monitoring</h3>
-          <p>Track system processes in real-time with minimal resource usage</p>
-        </div>
-        <div class="feature-card">
-          <div class="feature-icon">🎨</div>
-          <h3>Modern UI</h3>
-          <p>Beautiful interface with automatic dark/light theme detection</p>
-        </div>
-        <div class="feature-card">
-          <div class="feature-icon">🔍</div>
-          <h3>Smart Search</h3>
-          <p>Quick process search with advanced filtering options</p>
-        </div>
-        <div class="feature-card">
-          <div class="feature-icon">📌</div>
-          <h3>Process Pinning</h3>
-          <p>Keep important processes in view for easy monitoring</p>
-        </div>
-        <div class="feature-card">
-          <div class="feature-icon">⚡️</div>
-          <h3>Resource Efficient</h3>
-          <p>Built with Rust for optimal performance and low memory usage</p>
-        </div>
-        <div class="feature-card">
-          <div class="feature-icon">🛠</div>
-          <h3>Process Management</h3>
-          <p>View and manage processes with detailed information</p>
-        </div>
-      </div>
-    </section>
-
-    <section id="download" class="downloads">
-      <div class="download-container glass-card">
-        <h2>Download NeoHtop <span id="current-version">Loading...</span></h2>
-        <div class="download-stats">
-          <span id="download-count">...</span> Total Downloads
-        </div>
-        <p class="download-subtitle">Choose your platform to get started</p>
-        <div class="download-options">
-          <!-- macOS Downloads -->
-          <div class="download-group">
-            <h3 class="platform-title">macOS</h3>
-            <!-- notarized by apple badge -->
-            <div class="notarized-badge">
-              <img
-                src="https://img.shields.io/badge/Notarized%20by%20Apple-000000?style=for-the-badge&logo=apple&logoColor=white"
-                alt="Notarized by Apple">
-            </div>
-            <div class="platform-options">
-              <a href="https://github.com/Abdenasser/neohtop/releases/latest" class="download-button macos" data-type="macos-intel" data-version="latest">
-                <span class="icon">💻</span>
-                <div class="button-text">
-                  <span class="primary">Intel Chip</span>
-                  <span class="secondary">macOS 10.15 or later</span>
-                </div>
-              </a>
-              <a href="https://github.com/Abdenasser/neohtop/releases/latest" class="download-button macos" data-type="macos-silicon" data-version="latest">
-                <span class="icon">🍎</span>
-                <div class="button-text">
-                  <span class="primary">Apple Silicon</span>
-                  <span class="secondary">macOS 11.0 or later</span>
-                </div>
-              </a>
-            </div>
-          </div>
-
-          <!-- Windows Download -->
-          <div class="download-group">
-            <h3 class="platform-title">Windows</h3>
-            <div class="platform-options">
-              <a href="https://github.com/Abdenasser/neohtop/releases/latest" class="download-button windows" data-type="windows" data-version="latest">
-                <span class="icon">🫣</span>
-                <div class="button-text">
-                  <span class="primary">Windows</span>
-                  <span class="secondary">Windows 10 or later</span>
-                </div>
-              </a>
-            </div>
-          </div>
-
-          <!-- Linux Downloads -->
-          <div class="download-group">
-            <h3 class="platform-title">Linux</h3>
-            <div class="platform-options">
-              <!-- x86_64 Downloads -->
-              <div class="linux-downloads">
-                <h4>x86_64</h4>
-                <a href="https://github.com/Abdenasser/neohtop/releases/latest" class="download-button linux" data-type="linux-deb-x64" data-version="latest">
-                  <span class="icon">📦</span>
-                  <div class="button-text">
-                    <span class="primary">.deb Package</span>
-                    <span class="secondary">Debian/Ubuntu</span>
-                  </div>
-                </a>
-                <a href="https://github.com/Abdenasser/neohtop/releases/latest" class="download-button linux" data-type="linux-appimage-x64" data-version="latest"
-                  style="margin-top: 10px;">
-                  <span class="icon">🐧</span>
-                  <div class="button-text">
-                    <span class="primary">AppImage</span>
-                    <span class="secondary">Universal Linux</span>
-                  </div>
-                </a>
-                <a href="https://github.com/Abdenasser/neohtop/releases/latest" class="download-button linux" data-type="linux-rpm-x64" data-version="latest"
-                  style="margin-top: 10px;">
-                  <span class="icon">📦</span>
-                  <div class="button-text">
-                    <span class="primary">.rpm Package</span>
-                    <span class="secondary">Fedora/RHEL x86_64</span>
-                  </div>
-                </a>
-              </div>
-
-              <!-- ARM64 Downloads -->
-              <div class="linux-downloads">
-                <h4>ARM64</h4>
-                <a href="https://github.com/Abdenasser/neohtop/releases/latest" class="download-button linux" data-type="linux-deb-arm64" data-version="latest">
-                  <span class="icon">📦</span>
-                  <div class="button-text">
-                    <span class="primary">.deb Package</span>
-                    <span class="secondary">Debian/Ubuntu ARM64</span>
-                  </div>
-                </a>
-                <a href="https://github.com/Abdenasser/neohtop/releases/latest" class="download-button linux" data-type="linux-appimage-arm64" data-version="latest"
-                  style="margin-top: 10px;">
-                  <span class="icon">🐧</span>
-                  <div class="button-text">
-                    <span class="primary">AppImage</span>
-                    <span class="secondary">Universal Linux ARM64</span>
-                  </div>
-                </a>
-                <a href="https://github.com/Abdenasser/neohtop/releases/latest" class="download-button linux" data-type="linux-rpm-arm64" data-version="latest"
-                  style="margin-top: 10px;">
-                  <span class="icon">📦</span>
-                  <div class="button-text">
-                    <span class="primary">.rpm Package</span>
-                    <span class="secondary">Fedora/RHEL ARM64</span>
-                  </div>
-                </a>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section id="install" class="install">
-      <h2>Installation Guide</h2>
-      <div class="install-steps">
-        <div class="step">
-          <span class="step-number">1</span>
-          <h3>Download</h3>
-          <p>Choose and download the appropriate version for your Mac</p>
-        </div>
-        <div class="step">
-          <span class="step-number">2</span>
-          <h3>Open DMG</h3>
-          <p>Double-click the downloaded .dmg file</p>
-        </div>
-        <div class="step">
-          <span class="step-number">3</span>
-          <h3>Install</h3>
-          <p>Drag NeoHtop to your Applications folder</p>
-        </div>
-        <div class="step">
-          <span class="step-number">4</span>
-          <h3>First Launch</h3>
-          <p>Right-click and choose Open to bypass Gatekeeper</p>
-        </div>
-      </div>
-    </section>
-
-    <section id="testimonials" class="testimonials">
-      <h2 class="section-title">What People Are Saying</h2>
-      <div class="testimonial-grid">
-        <blockquote class="twitter-tweet">
-          <p lang="en" dir="ltr">Neohtop is absolutely beautiful to look at. It's a modern system monitor inspired by
-            htop, providing real-time insights into CPU, memory, disk, and network usage. A work of art! <a
-              href="https://t.co/TAzCIEb8uF">pic.twitter.com/TAzCIEb8uF</a></p>&mdash; JoeyBaggaDonuts (@haxxusj) <a
-            href="https://twitter.com/haxxusj/status/1854590782684250487?ref_src=twsrc%5Etfw">November 7, 2024</a>
-        </blockquote>
-
-
-        <blockquote class="twitter-tweet">
-          <p lang="zh" dir="ltr">Htop 加强版： NeoHtop<br>基于 Svelte、Rust 和 Tauri 构建的现代化、跨平台的系统监控工具<a
-              href="https://t.co/OtWlxxrCHZ">https://t.co/OtWlxxrCHZ</a> <a
-              href="https://t.co/2MK9n8rZVw">pic.twitter.com/2MK9n8rZVw</a></p>&mdash; Geek (@geekbb) <a
-            href="https://twitter.com/geekbb/status/1854081285846888881?ref_src=twsrc%5Etfw">November 6, 2024</a>
-        </blockquote>
-
-
-        <blockquote class="twitter-tweet">
-          <p lang="zh" dir="ltr">💻 NeoHtop：现代跨平台系统监视器！实时追踪 CPU 和内存使用，支持进程管理。<br><br>基于 Svelte、Rust 和 Tauri
-            构建，轻量高效，非常适合日常系统监控！<br><br>👉 <a href="https://t.co/MaOIMMbbPV">https://t.co/MaOIMMbbPV</a> <a
-              href="https://t.co/rFLyULJVei">https://t.co/rFLyULJVei</a> <a
-              href="https://t.co/6c6hGOeiLa">pic.twitter.com/6c6hGOeiLa</a></p>&mdash; 小弟调调 (@jaywcjlove) <a
-            href="https://twitter.com/jaywcjlove/status/1854089502853357880?ref_src=twsrc%5Etfw">November 6, 2024</a>
-        </blockquote>
-
-
-        <blockquote class="twitter-tweet">
-          <p lang="en" dir="ltr">neoHTOP: A modern, cross-platform system monitor built on top of Svelte, Rust and
-            Tauri<a href="https://t.co/MKZ53ZThKv">https://t.co/MKZ53ZThKv</a></p>&mdash; Nitin (@gniting) <a
-            href="https://twitter.com/gniting/status/1853920938976223463?ref_src=twsrc%5Etfw">November 5, 2024</a>
-        </blockquote>
-
-
-        <blockquote class="twitter-tweet">
-          <p lang="en" dir="ltr">🚀 Introducing NeoHtop, the ultimate process monitoring tool for all your system needs!
-            🖥️ Say goodbye to clunky, outdated monitors and hello to a modern, native solution with a clean and
-            user-friendly interface. 🤩 With NeoHtop, you can easily keep track of your system's… <a
-              href="https://t.co/qq8cXI8Qq1">pic.twitter.com/qq8cXI8Qq1</a></p>&mdash; Durgesh Gupta (@ilearnbydoing) <a
-            href="https://twitter.com/ilearnbydoing/status/1854037593987428754?ref_src=twsrc%5Etfw">November 6, 2024</a>
-        </blockquote>
-
-
-        <blockquote class="twitter-tweet">
-          <p lang="zxx" dir="ltr"><a href="https://t.co/2EoanAOvYL">https://t.co/2EoanAOvYL</a></p>&mdash; Tom Dörr
-          (@tom_doerr) <a href="https://twitter.com/tom_doerr/status/1853861836736881133?ref_src=twsrc%5Etfw">November
-            5, 2024</a>
-        </blockquote>
-
-
-        <blockquote class="twitter-tweet">
-          <p lang="ru" dir="ltr">NeoHtop – мощный и стильный менеджер процессов<a
-              href="https://t.co/uiGhE2YlFC">https://t.co/uiGhE2YlFC</a></p>&mdash; ITforNote (@itfornote) <a
-            href="https://twitter.com/itfornote/status/1855943550036299934?ref_src=twsrc%5Etfw">November 11, 2024</a>
-        </blockquote>
-
-
-        <blockquote class="twitter-tweet">
-          <p lang="en" dir="ltr">Discover NeoHtop, a modern task manager for macOS combining terminal power with a
-            user-friendly interface, built with Rust, Tauri &amp; Svelte.<br><br>{ author: <a
-              href="https://twitter.com/__abdenasser?ref_src=twsrc%5Etfw">@__abdenasser</a> } <a
-              href="https://twitter.com/hashtag/CodeNewbie?src=hash&amp;ref_src=twsrc%5Etfw">#CodeNewbie</a><a
-              href="https://t.co/rowekkvOUY">https://t.co/rowekkvOUY</a></p>&mdash; CodeNewbie (@CodeNewbies) <a
-            href="https://twitter.com/CodeNewbies/status/1854886849677824003?ref_src=twsrc%5Etfw">November 8, 2024</a>
-        </blockquote>
-
-
-        <blockquote class="twitter-tweet">
-          <p lang="de" dir="ltr">NeoHtop: Ein Systemmonitor für macOS <a
-              href="https://t.co/wUEMeCKpkv">https://t.co/wUEMeCKpkv</a></p>&mdash; Ramón Goeden 🤨 (@websenat) <a
-            href="https://twitter.com/websenat/status/1854134191480262993?ref_src=twsrc%5Etfw">November 6, 2024</a>
-        </blockquote>
-
-
-        <blockquote class="twitter-tweet">
-          <p lang="de" dir="ltr">NeoHtop: Ein Systemmonitor für macOS <a
-              href="https://t.co/RCjYWlC81x">https://t.co/RCjYWlC81x</a></p>&mdash; CaschysBlog (@CaschysBlog) <a
-            href="https://twitter.com/CaschysBlog/status/1854110661502017689?ref_src=twsrc%5Etfw">November 6, 2024</a>
-        </blockquote>
-
-
-        <blockquote class="twitter-tweet">
-          <p lang="en" dir="ltr">NeoHtop offers a modern interface with additional features like process pinning, smart
-            search, and themes while maintaining high performance through its Rust backend. It's designed to be more
-            user-friendly and efficient than traditional system monitors.<a
-              href="https://t.co/c4niSeqw0p">https://t.co/c4niSeqw0p</a> <a
-              href="https://t.co/hnqrfSiSFG">pic.twitter.com/hnqrfSiSFG</a></p>&mdash; Hustle Hacker (@HustleHackerAI)
-          <a href="https://twitter.com/HustleHackerAI/status/1854352028304040139?ref_src=twsrc%5Etfw">November 7,
-            2024</a>
-        </blockquote>
-
-
-        <blockquote class="twitter-tweet">
-          <p lang="ja" dir="ltr">NeoHtopめちゃかっこいい。macOSでも動く。Apple
-            Silicon版もちゃんとある。手元で動かしてみたけどアクティビティモニタより好きかも。<br><br>Abdenasser/neohtop: 💪🏻 htop on steroids <a
-              href="https://t.co/u70aTS1rKK">https://t.co/u70aTS1rKK</a> <a
-              href="https://t.co/c0iyjiW73q">pic.twitter.com/c0iyjiW73q</a></p>&mdash; Isao Shimizu (@isaoshimizu) <a
-            href="https://twitter.com/isaoshimizu/status/1854097990698586584?ref_src=twsrc%5Etfw">November 6, 2024</a>
-        </blockquote>
-
-
-        <blockquote class="twitter-tweet">
-          <p lang="ja" dir="ltr">見た目好みで使ってみてるシステムモニター、<a
-              href="https://t.co/7lHLB8WtVk">https://t.co/7lHLB8WtVk</a><br>トグルボタンのアクティブ状態をアイコンを45度傾けるという方法で示してて、特殊すぎて２度見した
-            <a href="https://t.co/JFC6ueyfBF">pic.twitter.com/JFC6ueyfBF</a>
-          </p>&mdash; UMERUMA (@umeruma) <a
-            href="https://twitter.com/umeruma/status/1855209294888902865?ref_src=twsrc%5Etfw">November 9, 2024</a>
-        </blockquote>
-
-
-        <blockquote class="twitter-tweet">
-          <p lang="en" dir="ltr">🖥️ <a
-              href="https://twitter.com/hashtag/NeoHtop?src=hash&amp;ref_src=twsrc%5Etfw">#NeoHtop</a>: Cross-platform
-            system monitor combining <a
-              href="https://twitter.com/hashtag/Svelte?src=hash&amp;ref_src=twsrc%5Etfw">#Svelte</a>, <a
-              href="https://twitter.com/hashtag/Rust?src=hash&amp;ref_src=twsrc%5Etfw">#Rust</a>, and <a
-              href="https://twitter.com/hashtag/Tauri?src=hash&amp;ref_src=twsrc%5Etfw">#Tauri</a> for a modern
-            monitoring experience <a
-              href="https://twitter.com/hashtag/opensource?src=hash&amp;ref_src=twsrc%5Etfw">#opensource</a> <a
-              href="https://twitter.com/hashtag/devops?src=hash&amp;ref_src=twsrc%5Etfw">#devops</a> <br><br>🚀 Key
-            features:<br>Real-time process monitoring<br>CPU &amp; memory usage tracking<br>Process search &amp;
-            filtering<br>Dark/light theme support<br><br>💻 Tech stack:…</p>&mdash; Micha(el) Bladowski 🇩🇪 🇺🇦
-          (@michabbb) <a href="https://twitter.com/michabbb/status/1853971838768173409?ref_src=twsrc%5Etfw">November 6,
-            2024</a>
-        </blockquote>
-
-      </div>
-    </section>
-
-    <section id="faq" class="faq">
-      <h2 class="section-title">Frequently Asked Questions</h2>
-      <div class="faq-list">
-        <div class="faq-item">
-          <button class="faq-question">
-            <span class="question-text">How does NeoHtop compare to Activity Monitor?</span>
-            <span class="faq-icon">⌄</span>
-          </button>
-          <div class="faq-answer">
-            <p>NeoHtop offers a modern interface with additional features like process pinning, smart search, and themes
-              while maintaining high performance through its Rust backend. It's designed to be more user-friendly and
-              efficient than traditional system monitors.</p>
-          </div>
-        </div>
-
-        <div class="faq-item">
-          <button class="faq-question">
-            <span class="question-text">Is NeoHtop resource intensive?</span>
-            <span class="faq-icon">⌄</span>
-          </button>
-          <div class="faq-answer">
-            <p>No, NeoHtop is built with Rust and optimized for minimal resource usage, typically using less than 1% CPU
-              and minimal memory. It's designed to be lightweight while monitoring your system.</p>
-          </div>
-        </div>
-
-        <div class="faq-item">
-          <button class="faq-question">
-            <span class="question-text">Does NeoHtop work on all macOS versions?</span>
-            <span class="faq-icon">⌄</span>
-          </button>
-          <div class="faq-answer">
-            <p>NeoHtop supports macOS 10.15 (Catalina) and newer versions. It's optimized for both Intel and Apple
-              Silicon Macs, with native support for both architectures.</p>
-          </div>
-        </div>
-
-        <div class="faq-item">
-          <button class="faq-question">
-            <span class="question-text">Can I customize the interface?</span>
-            <span class="faq-icon">⌄</span>
-          </button>
-          <div class="faq-answer">
-            <p>Yes, NeoHtop offers various customization options including:
-            <ul>
-              <li>Dark/Light theme switching</li>
-              <li>Customizable columns and metrics</li>
-              <li>Adjustable refresh rates</li>
-              <li>Process grouping options</li>
-            </ul>
-            </p>
-          </div>
-        </div>
-
-        <div class="faq-item">
-          <button class="faq-question">
-            <span class="question-text">Is NeoHtop open source?</span>
-            <span class="faq-icon">⌄</span>
-          </button>
-          <div class="faq-answer">
-            <p>Yes, NeoHtop is completely open source and available on GitHub. You can contribute to the project, report
-              issues, or suggest new features through our GitHub repository.</p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-88HFXRBNLS"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag() { dataLayer.push(arguments); }
-      gtag('js', new Date());
-
-      gtag('config', 'G-88HFXRBNLS');
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>
+      NeoHtop — Open-source system monitor for macOS, Linux &amp; Windows
+    </title>
+    <meta
+      name="description"
+      content="See what’s running on your machine. NeoHtop is a free, open-source desktop system monitor with process search, CPU and memory metrics, pinning, and themes."
+    />
+    <meta name="author" content="Abdenasser" />
+    <meta name="theme-color" content="#0c1012" />
+    <meta name="color-scheme" content="dark" />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+    <link rel="canonical" href="https://abdenasser.github.io/neohtop/" />
+    <link
+      rel="alternate"
+      type="text/markdown"
+      href="index.md"
+      title="Markdown version"
+    />
+    <link rel="describedby" href="llms.txt" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="NeoHtop" />
+    <meta property="og:url" content="https://abdenasser.github.io/neohtop/" />
+    <meta
+      property="og:title"
+      content="NeoHtop — Open-source system monitor for macOS, Linux &amp; Windows"
+    />
+    <meta
+      property="og:description"
+      content="See what’s running on your machine. NeoHtop is a free, open-source desktop system monitor with process search, CPU and memory metrics, pinning, and themes."
+    />
+    <meta
+      property="og:image"
+      content="https://abdenasser.github.io/neohtop/assets/neohtop-desktop.png"
+    />
+    <meta property="og:image:width" content="2784" />
+    <meta property="og:image:height" content="2024" />
+    <meta
+      property="og:image:alt"
+      content="NeoHtop desktop system monitor showing process metrics"
+    />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:creator" content="@__abdenasser" />
+    <meta
+      name="twitter:title"
+      content="NeoHtop — Open-source system monitor for macOS, Linux &amp; Windows"
+    />
+    <meta
+      name="twitter:description"
+      content="See what’s running on your machine. NeoHtop is a free, open-source desktop system monitor with process search, CPU and memory metrics, pinning, and themes."
+    />
+    <meta
+      name="twitter:image"
+      content="https://abdenasser.github.io/neohtop/assets/neohtop-desktop.png"
+    />
+    <link rel="icon" href="favicon.ico" />
+    <link rel="apple-touch-icon" href="assets/neohtop-icon.png" />
+    <link rel="stylesheet" href="styles.css" />
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "WebSite",
+            "@id": "https://abdenasser.github.io/neohtop/#website",
+            "name": "NeoHtop",
+            "url": "https://abdenasser.github.io/neohtop/"
+          },
+          {
+            "@type": "SoftwareApplication",
+            "@id": "https://abdenasser.github.io/neohtop/#desktop",
+            "name": "NeoHtop",
+            "url": "https://abdenasser.github.io/neohtop/",
+            "description": "Free, open-source desktop system monitor for macOS, Linux, and Windows.",
+            "applicationCategory": "UtilitiesApplication",
+            "operatingSystem": ["macOS", "Linux", "Windows"],
+            "license": "https://github.com/Abdenasser/neohtop/blob/main/LICENSE",
+            "isAccessibleForFree": true,
+            "offers": {
+              "@type": "Offer",
+              "price": "0",
+              "priceCurrency": "USD"
+            },
+            "codeRepository": "https://github.com/Abdenasser/neohtop",
+            "author": {
+              "@type": "Person",
+              "name": "Abdenasser",
+              "url": "https://github.com/Abdenasser"
+            },
+            "image": "https://abdenasser.github.io/neohtop/assets/neohtop-desktop.png"
+          },
+          {
+            "@type": "FAQPage",
+            "mainEntity": [
+              {
+                "@type": "Question",
+                "name": "What is NeoHtop?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "NeoHtop is a free, MIT-licensed desktop system monitor for macOS, Linux, and Windows. It displays local process, CPU, memory, storage, and network information. The desktop app is built with Rust, Tauri, and Svelte."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Is NeoHtop a replacement for htop or Activity Monitor?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "NeoHtop is a graphical alternative for exploring local processes, with search, filters, process pinning, and themes. Choose it if you prefer a desktop interface; use htop or NeoHtop CLI if you prefer working inside a terminal."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Does NeoHtop require an account?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "No account or cloud subscription is required for the free local desktop monitor. NeoHtop Pro is in development and is not available to buy or use yet."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Is the new process Tree view available in downloads?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Process families with combined CPU and RAM are in development for a future desktop release. The download buttons point only to the latest published GitHub release, which may not include this feature yet."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "How much CPU or memory does NeoHtop use?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Resource use depends on your operating system, process count, visible data, and refresh interval. We do not publish a universal CPU or memory benchmark. You can adjust the refresh interval or pause updates in the app."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Where can I report bugs or contribute?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Use GitHub Issues to report problems and the NeoHtop repository to contribute code. Include your operating system, app version, and steps to reproduce a bug."
+                }
+              }
+            ]
+          }
+        ]
+      }
     </script>
-    <script type="module" src="main.js"></script>
-  </main>
-  <footer class="footer">
-    <div class="footer-content">
-      <div class="footer-section">
-        <h3>NeoHtop</h3>
-        <p class="footer-description">
-          A modern system monitor built with Rust and Svelte.
-          Open source and free to use.
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header class="site-header">
+      <nav class="shell navigation" aria-label="Main navigation">
+        <a class="brand" href="./" aria-label="NeoHtop home"
+          ><img
+            src="assets/neohtop-icon.png"
+            width="32"
+            height="32"
+            alt=""
+          /><span>neohtop<span class="brand-cursor">_</span></span></a
+        ><button
+          class="menu-button"
+          aria-expanded="false"
+          aria-controls="navigation-links"
+        >
+          Menu <span aria-hidden="true">+</span>
+        </button>
+        <div class="nav-links" id="navigation-links">
+          <a href="./#features">Features</a
+          ><a href="install.html">Installation</a
+          ><a href="desktop-vs-cli.html">Desktop / CLI</a
+          ><a href="./#pro">Pro <span class="tiny-tag">IN DEV</span></a
+          ><a class="nav-github" href="https://github.com/Abdenasser/neohtop"
+            >GitHub <span aria-hidden="true">↗</span></a
+          >
+        </div>
+      </nav>
+    </header>
+    <main id="main">
+      <section class="hero shell">
+        <div class="hero-copy">
+          <p class="eyebrow">
+            <span class="status-dot"></span> YOUR SYSTEM. IN PLAIN SIGHT.
+          </p>
+          <h1>Know what’s<br />running <em>the show.</em></h1>
+          <p class="hero-description">
+            A system monitor for people who like to look under the hood. Explore
+            processes, track resources, and take back your desktop.
+          </p>
+          <div class="hero-actions">
+            <a class="button primary" href="#download"
+              >Get NeoHtop <span aria-hidden="true">↓</span></a
+            ><a
+              class="button quiet"
+              href="https://github.com/Abdenasser/neohtop"
+              >Explore the source <span aria-hidden="true">↗</span></a
+            >
+          </div>
+          <p class="hero-footnote">
+            Free &amp; open source <span>·</span> macOS / Linux / Windows
+          </p>
+          <div class="install-command">
+            <span class="prompt" aria-hidden="true">$</span
+            ><code id="brew-command">brew install --cask neohtop</code
+            ><button
+              class="copy-button"
+              data-copy="brew-command"
+              aria-label="Copy Homebrew install command"
+            >
+              Copy
+            </button>
+          </div>
+          <p class="command-note">
+            Community-maintained Homebrew cask.
+            <a href="install.html">All install options ↗</a>
+          </p>
+        </div>
+        <figure class="hero-visual">
+          <div class="window-bar">
+            <div class="window-dots" aria-hidden="true">
+              <i></i><i></i><i></i>
+            </div>
+            <span>neohtop — local machine</span
+            ><span class="window-status">● APP PREVIEW</span>
+          </div>
+          <img
+            src="assets/neohtop-desktop.png"
+            alt="NeoHtop desktop app showing CPU cores, memory, storage, network activity, and a searchable process table"
+            width="2784"
+            height="2024"
+            fetchpriority="high"
+          />
+          <figcaption>
+            <span>REAL PROCESSES. REAL CLARITY.</span
+            ><span>Rust + Tauri + Svelte</span>
+          </figcaption>
+        </figure>
+      </section>
+      <div class="platform-strip">
+        <div class="shell">
+          <span class="strip-label">FEELS AT HOME ON</span
+          ><span>macOS <small>Intel + Apple Silicon</small></span
+          ><span>Linux <small>.deb / .rpm / AppImage</small></span
+          ><span>Windows <small>x64</small></span
+          ><a href="https://github.com/Abdenasser/neohtop/blob/main/LICENSE"
+            >MIT licensed ↗</a
+          >
+        </div>
+      </div>
+      <section class="section shell" id="features">
+        <div class="section-heading">
+          <p class="eyebrow">01 / UNDER THE HOOD</p>
+          <h2>Less hunting.<br />More understanding.</h2>
+          <p>
+            A clear view of the work your machine is doing. From the process you
+            forgot about to the one eating your afternoon.
+          </p>
+        </div>
+        <div class="feature-grid">
+          <article class="feature-card feature-search">
+            <span class="feature-index">[ 01 ]</span>
+            <h3>Find the needle.<br />Skip the haystack.</h3>
+            <p>
+              Search by name, command, or PID. Combine terms with commas, use
+              regular expressions, and filter by CPU, memory, status, or
+              runtime.
+            </p>
+            <div class="search-demo" aria-label="Example search: node, docker">
+              <span aria-hidden="true">⌕</span><code>node, docker</code
+              ><span class="demo-cursor" aria-hidden="true">▌</span>
+            </div>
+            <div class="sample-results" aria-label="Illustrative process names">
+              <span><i></i> node <small>development server</small></span
+              ><span
+                ><i></i> com.docker.backend
+                <small>container runtime</small></span
+              ><span><i></i> node <small>language server</small></span>
+            </div>
+            <span class="example-label">ILLUSTRATIVE SEARCH</span>
+          </article>
+          <article class="feature-card">
+            <span class="feature-index">[ 02 ]</span>
+            <div class="meter-art" aria-hidden="true">
+              <span>CPU <b>▂▄▃▆▅▃▇▄▅▂▄▃</b></span
+              ><span>MEM <i>||||||||||||||||</i><small>||||||||</small></span>
+            </div>
+            <h3>Everything in view.</h3>
+            <p>
+              CPU cores, memory, storage, network I/O, and process details. Pin
+              important processes, choose your columns, and set your refresh
+              pace.
+            </p>
+            <span class="feature-note"
+              >A dashboard that speaks your language.</span
+            >
+          </article>
+          <article class="feature-card feature-personal">
+            <span class="feature-index">[ 03 ]</span>
+            <div class="theme-swatches" aria-hidden="true">
+              <i></i><i></i><i></i><i></i><i></i>
+            </div>
+            <h3>Your terminal energy.<br />Your desktop.</h3>
+            <p>
+              Dark, light, and colorful themes, a native window, and a Rust
+              backend. Make it feel like part of your setup.
+            </p>
+            <span class="feature-note"
+              >Built with Rust, Tauri, and Svelte.</span
+            >
+          </article>
+        </div>
+        <div class="next-feature">
+          <span class="tag">NEXT DESKTOP RELEASE</span>
+          <p>
+            <strong>Meet process families.</strong> Expand parent/child trees
+            and see their combined CPU and RAM. In development; not in the
+            current download.
+          </p>
+          <a href="https://github.com/Abdenasser/neohtop/pull/206"
+            >See the work ↗</a
+          >
+        </div>
+      </section>
+      <section class="cli-section">
+        <div class="shell cli-layout">
+          <div>
+            <p class="eyebrow">02 / SAME CURIOSITY. DIFFERENT SHELL.</p>
+            <h2>More of a<br /><span class="accent">terminal person?</span></h2>
+            <p>
+              Meet NeoHtop CLI, the separate Go-powered companion. Process
+              trees, CPU sparklines, memory bars, filters, and themes—inside
+              your terminal.
+            </p>
+            <a class="text-link" href="desktop-vs-cli.html"
+              >Find your flavor: Desktop vs CLI ↗</a
+            >
+          </div>
+          <div class="terminal">
+            <div class="terminal-title">
+              <span aria-hidden="true">● ● ●</span
+              ><span>~/your-next-favorite-tool</span>
+            </div>
+            <pre><span class="terminal-muted"># install the terminal companion</span>
+<span class="accent">$</span> npm install -g neohtop-cli
+
+<span class="terminal-muted"># take a look around</span>
+<span class="accent">$</span> neohtop-cli<span class="terminal-cursor" aria-hidden="true">▌</span></pre>
+            <div class="terminal-bottom">
+              <a href="https://github.com/Abdenasser/neohtop-cli"
+                >CLI source ↗</a
+              ><a href="https://www.npmjs.com/package/neohtop-cli"
+                >npm package ↗</a
+              >
+            </div>
+          </div>
+        </div>
+      </section>
+      <section class="section shell" id="download">
+        <div class="section-heading horizontal">
+          <div>
+            <p class="eyebrow">03 / MAKE YOURSELF AT HOME</p>
+            <h2>Your machine is waiting.</h2>
+          </div>
+          <div class="release-label">
+            <span class="status-dot"></span
+            ><span id="current-version" aria-live="polite"
+              >Latest published release</span
+            >
+          </div>
+        </div>
+        <p class="section-intro">
+          Official desktop builds come from GitHub Releases. Pick your platform
+          and architecture.
         </p>
+        <p id="release-status" class="release-status" role="status">
+          Links open the published release page. Available direct downloads load
+          when GitHub responds.
+        </p>
+        <div class="download-grid">
+          <article class="download-card">
+            <div class="platform-heading">
+              <span aria-hidden="true">⌘</span>
+              <h3>macOS</h3>
+              <span class="platform-ext">.dmg</span>
+            </div>
+            <a
+              class="download-button"
+              data-type="macos-silicon"
+              href="https://github.com/Abdenasser/neohtop/releases/latest"
+              ><span
+                ><strong>Apple Silicon</strong
+                ><small class="secondary">M-series Macs</small></span
+              ><span aria-hidden="true">↗</span></a
+            ><a
+              class="download-button"
+              data-type="macos-intel"
+              href="https://github.com/Abdenasser/neohtop/releases/latest"
+              ><span
+                ><strong>Intel</strong
+                ><small class="secondary">Intel-based Macs</small></span
+              ><span aria-hidden="true">↗</span></a
+            >
+          </article>
+          <article class="download-card">
+            <div class="platform-heading">
+              <span aria-hidden="true">⊞</span>
+              <h3>Windows</h3>
+              <span class="platform-ext">.exe</span>
+            </div>
+            <a
+              class="download-button"
+              data-type="windows"
+              href="https://github.com/Abdenasser/neohtop/releases/latest"
+              ><span
+                ><strong>Windows x64</strong
+                ><small class="secondary">Published .exe package</small></span
+              ><span aria-hidden="true">↗</span></a
+            >
+            <p class="download-note">
+              The published release may provide a portable app rather than an
+              installer.
+            </p>
+          </article>
+          <article class="download-card">
+            <div class="platform-heading">
+              <span aria-hidden="true">&gt;_</span>
+              <h3>Linux</h3>
+              <span class="platform-ext">x64 / ARM64</span>
+            </div>
+            <div class="linux-links">
+              <a
+                class="download-button"
+                data-type="linux-deb-x64"
+                href="https://github.com/Abdenasser/neohtop/releases/latest"
+                ><span
+                  ><strong>.deb · x64</strong
+                  ><small class="secondary">Debian / Ubuntu</small></span
+                ><span aria-hidden="true">↗</span></a
+              ><a
+                class="download-button"
+                data-type="linux-appimage-x64"
+                href="https://github.com/Abdenasser/neohtop/releases/latest"
+                ><span
+                  ><strong>AppImage · x64</strong
+                  ><small class="secondary">Portable package</small></span
+                ><span aria-hidden="true">↗</span></a
+              ><a
+                class="download-button"
+                data-type="linux-rpm-x64"
+                href="https://github.com/Abdenasser/neohtop/releases/latest"
+                ><span
+                  ><strong>.rpm · x64</strong
+                  ><small class="secondary"
+                    >Fedora / RPM distributions</small
+                  ></span
+                ><span aria-hidden="true">↗</span></a
+              ><a
+                class="download-button"
+                data-type="linux-deb-arm64"
+                href="https://github.com/Abdenasser/neohtop/releases/latest"
+                ><span
+                  ><strong>.deb · ARM64</strong
+                  ><small class="secondary">Debian / Ubuntu</small></span
+                ><span aria-hidden="true">↗</span></a
+              ><a
+                class="download-button"
+                data-type="linux-appimage-arm64"
+                href="https://github.com/Abdenasser/neohtop/releases/latest"
+                ><span
+                  ><strong>AppImage · ARM64</strong
+                  ><small class="secondary">Portable package</small></span
+                ><span aria-hidden="true">↗</span></a
+              ><a
+                class="download-button"
+                data-type="linux-rpm-arm64"
+                href="https://github.com/Abdenasser/neohtop/releases/latest"
+                ><span
+                  ><strong>.rpm · ARM64</strong
+                  ><small class="secondary"
+                    >Fedora / RPM distributions</small
+                  ></span
+                ><span aria-hidden="true">↗</span></a
+              >
+            </div>
+          </article>
+        </div>
+        <div class="download-bottom">
+          <a href="install.html">Installation &amp; troubleshooting ↗</a
+          ><a href="https://github.com/Abdenasser/neohtop/releases"
+            >All releases &amp; release notes ↗</a
+          >
+        </div>
+        <noscript
+          ><p class="notice">
+            JavaScript is off. Every download link opens GitHub Releases, where
+            you can choose an available package.
+          </p></noscript
+        >
+      </section>
+      <section class="pro-section shell" id="pro">
+        <div class="pro-mark" aria-hidden="true">
+          <img
+            src="assets/neohtop-icon.png"
+            width="96"
+            height="96"
+            alt=""
+          /><span>PRO_</span>
+        </div>
+        <div>
+          <p class="eyebrow">THE NEXT CHAPTER / IN DEVELOPMENT</p>
+          <h2>Beyond your<br />local machine.</h2>
+          <p>
+            We’re exploring NeoHtop Pro for developers and small teams who need
+            to understand more than one machine: remote monitoring, history, and
+            alerts.
+          </p>
+          <p class="pro-fineprint">
+            Pro is not available yet. Scope, pricing, and launch date are still
+            being worked out. The free, open-source local monitor stays at the
+            heart of NeoHtop.
+          </p>
+          <a class="button outline" href="https://github.com/Abdenasser/neohtop"
+            >Follow development on GitHub ↗</a
+          >
+        </div>
+      </section>
+      <section class="section shell faq-section" id="faq">
+        <div>
+          <p class="eyebrow">04 / A FEW GOOD QUESTIONS</p>
+          <h2>Read the<br />fine print.</h2>
+          <a class="text-link" href="install.html"
+            >Open the installation guide ↗</a
+          >
+        </div>
+        <div class="faq-list">
+          <details>
+            <summary>What is NeoHtop?<span aria-hidden="true">+</span></summary>
+            <p>
+              NeoHtop is a free, MIT-licensed desktop system monitor for macOS,
+              Linux, and Windows. It displays local process, CPU, memory,
+              storage, and network information. The desktop app is built with
+              Rust, Tauri, and Svelte.
+            </p>
+          </details>
+          <details>
+            <summary>
+              Is NeoHtop a replacement for htop or Activity Monitor?<span
+                aria-hidden="true"
+                >+</span
+              >
+            </summary>
+            <p>
+              NeoHtop is a graphical alternative for exploring local processes,
+              with search, filters, process pinning, and themes. Choose it if
+              you prefer a desktop interface; use htop or NeoHtop CLI if you
+              prefer working inside a terminal.
+            </p>
+          </details>
+          <details>
+            <summary>
+              Does NeoHtop require an account?<span aria-hidden="true">+</span>
+            </summary>
+            <p>
+              No account or cloud subscription is required for the free local
+              desktop monitor. NeoHtop Pro is in development and is not
+              available to buy or use yet.
+            </p>
+          </details>
+          <details>
+            <summary>
+              Is the new process Tree view available in downloads?<span
+                aria-hidden="true"
+                >+</span
+              >
+            </summary>
+            <p>
+              Process families with combined CPU and RAM are in development for
+              a future desktop release. The download buttons point only to the
+              latest published GitHub release, which may not include this
+              feature yet.
+            </p>
+          </details>
+          <details>
+            <summary>
+              How much CPU or memory does NeoHtop use?<span aria-hidden="true"
+                >+</span
+              >
+            </summary>
+            <p>
+              Resource use depends on your operating system, process count,
+              visible data, and refresh interval. We do not publish a universal
+              CPU or memory benchmark. You can adjust the refresh interval or
+              pause updates in the app.
+            </p>
+          </details>
+          <details>
+            <summary>
+              Where can I report bugs or contribute?<span aria-hidden="true"
+                >+</span
+              >
+            </summary>
+            <p>
+              Use GitHub Issues to report problems and the NeoHtop repository to
+              contribute code. Include your operating system, app version, and
+              steps to reproduce a bug.
+            </p>
+          </details>
+        </div>
+      </section>
+      <section class="closing shell">
+        <span class="eyebrow">OPEN SOURCE. OPEN INVITATION.</span>
+        <h2>Make it part of your setup.</h2>
+        <div>
+          <a class="button primary" href="#download">Download NeoHtop ↓</a
+          ><a class="button quiet" href="https://github.com/Abdenasser/neohtop"
+            >Star the repo ↗</a
+          >
+        </div>
+      </section>
+    </main>
+    <footer class="site-footer shell">
+      <div class="footer-top">
+        <a class="brand" href="./"
+          ><img
+            src="assets/neohtop-icon.png"
+            width="28"
+            height="28"
+            alt=""
+          /><span>neohtop_</span></a
+        >
+        <p>Built for the beautifully curious.</p>
+        <a href="https://github.com/sponsors/Abdenasser"
+          >Support the project ↗</a
+        >
       </div>
-
-      <div class="footer-section">
-        <h4>Links</h4>
-        <ul class="footer-links">
-          <li>
-            <a href="https://github.com/abdenasser/neohtop" target="_blank" rel="noopener">
-              <span class="icon">📦</span> GitHub Repository
-            </a>
-          </li>
-          <li>
-            <a href="https://github.com/abdenasser" target="_blank" rel="noopener">
-              <span class="icon">👨‍💻</span> Creator
-            </a>
-          </li>
-          <li>
-            <a href="https://github.com/abdenasser/neohtop-cli" target="_blank" rel="noopener">
-              <span class="icon">👻</span> NeoHtop CLI
-            </a>
-          </li>
-          <li>
-            <a href="https://github.com/abdenasser/neohtop/issues" target="_blank" rel="noopener">
-              <span class="icon">🐛</span> Report Issue
-            </a>
-          </li>
-        </ul>
+      <div class="footer-bottom">
+        <span
+          >Free software. MIT license. Made by
+          <a href="https://github.com/Abdenasser">Abdenasser</a>.</span
+        >
+        <div>
+          <a href="install.html">Docs</a
+          ><a href="https://github.com/Abdenasser/neohtop/issues"
+            >Report an issue</a
+          ><a href="llms.txt">llms.txt</a><a href="sitemap.xml">Sitemap</a>
+        </div>
       </div>
-
-      <div class="footer-section">
-        <h4>Tech Stack</h4>
-        <ul class="tech-stack-list">
-          <li>
-            <a href="https://www.rust-lang.org/" target="_blank" rel="noopener">
-              <span class="icon">🦀</span> Rust
-            </a>
-          </li>
-          <li>
-            <a href="https://tauri.app/" target="_blank" rel="noopener">
-              <span class="icon">⚡</span> Tauri
-            </a>
-          </li>
-          <li>
-            <a href="https://svelte.dev/" target="_blank" rel="noopener">
-              <span class="icon">🎯</span> Svelte
-            </a>
-          </li>
-        </ul>
-      </div>
-    </div>
-
-    <div class="footer-bottom">
-      <p>Made with <span class="heart">❤️</span> and <span class="coffee">☕</span> by
-        <a href="https://github.com/abdenasser" target="_blank" rel="noopener">Abdenasser</a>
-      </p>
-    </div>
-  </footer>
-</body>
-<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-
+    </footer>
+    <p class="sr-only" id="copy-status" role="status" aria-live="polite"></p>
+    <script type="module" src="main.js"></script>
+  </body>
 </html>

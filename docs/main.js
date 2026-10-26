@@ -1,175 +1,144 @@
-import { resolveDownloadAssets } from './downloads.js';
+import { resolveDownloadAssets } from "./downloads.js";
 
-// ===============================
-// Theme Management
-// ===============================
-const themeToggle = document.getElementById('themeToggle');
-const prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
-
-function setTheme(isDark) {
-  document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
-  themeToggle.querySelector('.theme-icon').textContent = isDark ? '☀️' : '🌙';
-  localStorage.setItem('theme', isDark ? 'dark' : 'light');
+document.documentElement.classList.add("js");
+const menu = document.querySelector(".menu-button");
+const links = document.querySelector(".nav-links");
+function closeMenu() {
+  links?.classList.remove("is-open");
+  menu?.setAttribute("aria-expanded", "false");
 }
-
-// Initialize theme
-const savedTheme = localStorage.getItem('theme');
-if (savedTheme) {
-  setTheme(savedTheme === 'dark');
-} else {
-  setTheme(prefersDark.matches);
-}
-
-// Theme event listeners
-themeToggle.addEventListener('click', () => {
-  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-  setTheme(!isDark);
+menu?.addEventListener("click", () => {
+  const open = menu.getAttribute("aria-expanded") !== "true";
+  menu.setAttribute("aria-expanded", String(open));
+  links?.classList.toggle("is-open", open);
 });
-
-prefersDark.addEventListener('change', (e) => {
-  if (!localStorage.getItem('theme')) {
-    setTheme(e.matches);
+links?.addEventListener("click", (event) => {
+  if (event.target.closest("a")) closeMenu();
+});
+document.addEventListener("keydown", (event) => {
+  if (
+    event.key === "Escape" &&
+    menu?.getAttribute("aria-expanded") === "true"
+  ) {
+    closeMenu();
+    menu.focus();
   }
 });
+document.addEventListener("click", (event) => {
+  if (!event.target.closest(".navigation")) closeMenu();
+});
 
-// ===============================
-// Version and Download Management
-// ===============================
-async function fetchDownloadStats() {
-  try {
-    const releasesResponse = await fetch('https://api.github.com/repos/abdenasser/neohtop/releases');
-    const releases = await releasesResponse.json();
-    const githubDownloads = releases.reduce((total, release) => {
-      const releaseDownloads = release.assets.reduce((sum, asset) =>
-        sum + asset.download_count, 0);
-      return total + releaseDownloads;
-    }, 0);
-
-    const brewResponse = await fetch('https://formulae.brew.sh/api/analytics/install/homebrew-core/365d.json');
-    const brewData = await brewResponse.json();
-    const brewInstalls = brewData.formulae?.neohtop?.[0]?.count || 0;
-
-    const totalDownloads = githubDownloads + brewInstalls;
-    document.getElementById('download-count').textContent = new Intl.NumberFormat().format(totalDownloads);
-  } catch (error) {
-    console.error('Failed to fetch download stats:', error);
-    document.getElementById('download-count').textContent = 'N/A';
-  }
-}
-
-async function updateVersion() {
-  try {
-    const response = await fetch('https://api.github.com/repos/Abdenasser/neohtop/releases/latest');
-    if (!response.ok) throw new Error(`Release request failed: ${response.status}`);
-    const data = await response.json();
-    const version = data.tag_name;
-    const versionNumber = version.match(/\d+\.\d+\.\d+/)?.[0];
-
-    if (versionNumber) {
-      document.getElementById('current-version').textContent = "v" + versionNumber;
-      updateDownloadLinks(data);
-    }
-  } catch (error) {
-    console.error('Failed to fetch version:', error);
-  }
-}
-
-function updateDownloadLinks(release) {
-  const platformUrls = resolveDownloadAssets(release);
-  document.querySelectorAll('.download-button').forEach(link => {
-    const platform = link.getAttribute('data-type');
-    if (platformUrls[platform]) {
-      link.href = platformUrls[platform];
-    } else {
-      link.removeAttribute('href');
-      link.setAttribute('aria-disabled', 'true');
-      link.tabIndex = -1;
-      link.querySelector('.secondary').textContent = 'Not available in this release';
+for (const button of document.querySelectorAll("[data-copy]")) {
+  button.addEventListener("click", async () => {
+    const command = document.getElementById(button.dataset.copy)?.textContent;
+    const status = document.getElementById("copy-status");
+    if (!command) return;
+    try {
+      await navigator.clipboard.writeText(command);
+      button.textContent = "Copied";
+      if (status) status.textContent = "Command copied to clipboard.";
+      setTimeout(() => {
+        button.textContent = "Copy";
+      }, 2000);
+    } catch {
+      if (status)
+        status.textContent =
+          "Copy unavailable. Select and copy the command manually.";
+      const selection = window.getSelection();
+      const range = document.createRange();
+      range.selectNodeContents(document.getElementById(button.dataset.copy));
+      selection?.removeAllRanges();
+      selection?.addRange(range);
     }
   });
 }
 
-// ===============================
-// UI Interactions
-// ===============================
-// FAQ Accordion
-document.querySelectorAll('.faq-question').forEach(button => {
-  button.addEventListener('click', () => {
-    const faqItem = button.parentElement;
-    const isActive = faqItem.classList.contains('active');
-    document.querySelectorAll('.faq-item').forEach(item => item.classList.remove('active'));
-    if (!isActive) faqItem.classList.add('active');
-  });
-});
+// Only published GitHub releases can provide download links. Static links remain
+// useful without JavaScript, with a blocked API, or while GitHub is rate limited.
+async function updateRelease() {
+  const version = document.getElementById("current-version");
+  const status = document.getElementById("release-status");
+  if (!version) return;
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 8000);
+  try {
+    const response = await fetch(
+      "https://api.github.com/repos/Abdenasser/neohtop/releases/latest",
+      {
+        signal: controller.signal,
+        headers: { Accept: "application/vnd.github+json" },
+      },
+    );
+    if (!response.ok) throw new Error("Release lookup unavailable");
+    const release = await response.json();
+    if (
+      release.draft ||
+      release.prerelease ||
+      !/^v\d+\.\d+\.\d+$/.test(release.tag_name)
+    ) {
+      throw new Error("Not a published stable release");
+    }
+    const assets = resolveDownloadAssets(release);
+    if (!Object.keys(assets).length)
+      throw new Error("No recognized release assets");
+    version.textContent = `${release.tag_name} · published release`;
+    for (const link of document.querySelectorAll(
+      ".download-button[data-type]",
+    )) {
+      const url = assets[link.dataset.type];
+      if (url) {
+        link.href = url;
+        link.dataset.version = release.tag_name;
+      } else {
+        link.removeAttribute("href");
+        link.setAttribute("aria-disabled", "true");
+        link.tabIndex = -1;
+        link.querySelector(".secondary").textContent = "Not in this release";
+      }
+    }
+    if (status)
+      status.textContent =
+        "Direct links use the assets in this published release. Development features may not be included.";
+  } catch {
+    if (status)
+      status.textContent =
+        "Live release lookup is unavailable. Download links open GitHub Releases so you can choose an available package.";
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+updateRelease();
 
-// Download tracking
-document.querySelectorAll('.download-button').forEach(button => {
-  button.addEventListener('click', (e) => {
-    if (button.getAttribute('aria-disabled') === 'true') {
-      e.preventDefault();
+// Preserve the site's existing analytics account. Loading or blocking analytics
+// never changes navigation, copy controls, or downloads.
+if (
+  /^https?:$/.test(location.protocol) &&
+  location.hostname !== "localhost" &&
+  location.hostname !== "127.0.0.1"
+) {
+  window.dataLayer = window.dataLayer || [];
+  window.gtag = function () {
+    window.dataLayer.push(arguments);
+  };
+  window.gtag("js", new Date());
+  window.gtag("config", "G-88HFXRBNLS");
+  const analytics = document.createElement("script");
+  analytics.async = true;
+  analytics.src = "https://www.googletagmanager.com/gtag/js?id=G-88HFXRBNLS";
+  document.head.append(analytics);
+}
+for (const link of document.querySelectorAll(".download-button")) {
+  link.addEventListener("click", (event) => {
+    if (link.getAttribute("aria-disabled") === "true") {
+      event.preventDefault();
       return;
     }
-    gtag('event', 'download', {
-      'event_category': 'App',
-      'event_label': button.getAttribute('data-type'),
-      'value': button.getAttribute('data-version')
-    });
-  });
-});
-
-// Smooth scroll
-document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-  anchor.addEventListener('click', function (e) {
-    e.preventDefault();
-    const target = document.querySelector(this.getAttribute('href'));
-    if (target) {
-      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    if (typeof window.gtag === "function") {
+      window.gtag("event", "download", {
+        event_category: "App",
+        event_label: link.dataset.type,
+        value: link.dataset.version || "release-page",
+      });
     }
   });
-});
-// ===============================
-// Animations
-// ===============================
-const observer = new IntersectionObserver(
-  (entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add('visible');
-      }
-    });
-  },
-  { threshold: 0.1 }
-);
-
-document.querySelectorAll('.feature, .step, .download-button').forEach(el => {
-  observer.observe(el);
-});
-
-// ===============================
-// Initialization
-// ===============================
-document.addEventListener('DOMContentLoaded', () => {
-  updateVersion();
-  fetchDownloadStats();
-});
-
-
-// ===============================
-// Mobile Navigation
-// ===============================
-
-document.addEventListener('DOMContentLoaded', () => {
-  const menuButton = document.querySelector('.menu-button');
-  const navLinks = document.querySelector('.nav-links');
-
-  menuButton.addEventListener('click', () => {
-    navLinks.classList.toggle('active');
-  });
-
-  // Close menu when clicking outside
-  document.addEventListener('click', (e) => {
-    if (!navLinks.contains(e.target) && !menuButton.contains(e.target)) {
-      navLinks.classList.remove('active');
-    }
-  });
-});
+}

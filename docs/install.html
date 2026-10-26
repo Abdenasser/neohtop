@@ -1,0 +1,328 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Install NeoHtop on macOS, Windows &amp; Linux — NeoHtop</title>
+    <meta
+      name="description"
+      content="Install NeoHtop from official GitHub releases. Choose Apple Silicon or Intel, Windows x64, and Linux .deb, .rpm, or AppImage packages; troubleshoot common issues."
+    />
+    <meta name="author" content="Abdenasser" />
+    <meta name="theme-color" content="#0c1012" />
+    <meta name="color-scheme" content="dark" />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+    <link
+      rel="canonical"
+      href="https://abdenasser.github.io/neohtop/install.html"
+    />
+    <link
+      rel="alternate"
+      type="text/markdown"
+      href="install.md"
+      title="Markdown version"
+    />
+    <link rel="describedby" href="llms.txt" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="NeoHtop" />
+    <meta
+      property="og:url"
+      content="https://abdenasser.github.io/neohtop/install.html"
+    />
+    <meta
+      property="og:title"
+      content="Install NeoHtop on macOS, Windows &amp; Linux — NeoHtop"
+    />
+    <meta
+      property="og:description"
+      content="Install NeoHtop from official GitHub releases. Choose Apple Silicon or Intel, Windows x64, and Linux .deb, .rpm, or AppImage packages; troubleshoot common issues."
+    />
+    <meta
+      property="og:image"
+      content="https://abdenasser.github.io/neohtop/assets/neohtop-desktop.png"
+    />
+    <meta property="og:image:width" content="2784" />
+    <meta property="og:image:height" content="2024" />
+    <meta
+      property="og:image:alt"
+      content="NeoHtop desktop system monitor showing process metrics"
+    />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:creator" content="@__abdenasser" />
+    <meta
+      name="twitter:title"
+      content="Install NeoHtop on macOS, Windows &amp; Linux — NeoHtop"
+    />
+    <meta
+      name="twitter:description"
+      content="Install NeoHtop from official GitHub releases. Choose Apple Silicon or Intel, Windows x64, and Linux .deb, .rpm, or AppImage packages; troubleshoot common issues."
+    />
+    <meta
+      name="twitter:image"
+      content="https://abdenasser.github.io/neohtop/assets/neohtop-desktop.png"
+    />
+    <link rel="icon" href="favicon.ico" />
+    <link rel="apple-touch-icon" href="assets/neohtop-icon.png" />
+    <link rel="stylesheet" href="styles.css" />
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "TechArticle",
+        "headline": "Install NeoHtop on macOS, Windows and Linux",
+        "url": "https://abdenasser.github.io/neohtop/install.html",
+        "about": { "@id": "https://abdenasser.github.io/neohtop/#desktop" }
+      }
+    </script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header class="site-header">
+      <nav class="shell navigation" aria-label="Main navigation">
+        <a class="brand" href="./" aria-label="NeoHtop home"
+          ><img
+            src="assets/neohtop-icon.png"
+            width="32"
+            height="32"
+            alt=""
+          /><span>neohtop<span class="brand-cursor">_</span></span></a
+        ><button
+          class="menu-button"
+          aria-expanded="false"
+          aria-controls="navigation-links"
+        >
+          Menu <span aria-hidden="true">+</span>
+        </button>
+        <div class="nav-links" id="navigation-links">
+          <a href="./#features">Features</a
+          ><a href="install.html">Installation</a
+          ><a href="desktop-vs-cli.html">Desktop / CLI</a
+          ><a href="./#pro">Pro <span class="tiny-tag">IN DEV</span></a
+          ><a class="nav-github" href="https://github.com/Abdenasser/neohtop"
+            >GitHub <span aria-hidden="true">↗</span></a
+          >
+        </div>
+      </nav>
+    </header>
+    <main id="main">
+      <article class="guide shell">
+        <p class="eyebrow">NEOHTOP / FIELD GUIDE 01</p>
+        <h1>From download<br />to <em>first process.</em></h1>
+        <p class="guide-lead">
+          Install the free NeoHtop desktop system monitor on macOS, Windows, or
+          Linux. Official binaries are published on GitHub Releases.
+        </p>
+        <div class="guide-toc">
+          <a href="#macos">macOS</a><a href="#windows">Windows</a
+          ><a href="#linux">Linux</a
+          ><a href="#troubleshooting">Troubleshooting</a
+          ><a href="#source">Build from source</a>
+        </div>
+        <aside class="notice">
+          <strong>Published builds vs. development</strong>
+          <p>
+            Downloads refer to the latest published release. Features being
+            built on the main branch, including the new desktop process-family
+            view, may not be available in that release. NeoHtop Pro is in
+            development and is not part of these downloads.
+          </p>
+        </aside>
+        <section id="macos">
+          <h2>Install NeoHtop on macOS</h2>
+          <ol>
+            <li>
+              Open the
+              <a href="https://github.com/Abdenasser/neohtop/releases/latest"
+                >latest published release</a
+              >.
+            </li>
+            <li>
+              Choose the Apple Silicon DMG for M-series Macs or the Intel DMG
+              for Intel-based Macs. In Apple menu → About This Mac, look for
+              “Chip” or “Processor.”
+            </li>
+            <li>Open the DMG and drag NeoHtop into Applications.</li>
+            <li>Launch NeoHtop from Applications.</li>
+          </ol>
+          <h3>Homebrew alternative</h3>
+          <p>
+            The community-maintained Homebrew cask offers another install path.
+            Its version and update timing can differ from the official releases.
+          </p>
+          <div class="install-command">
+            <span class="prompt" aria-hidden="true">$</span
+            ><code id="guide-brew">brew install --cask neohtop</code
+            ><button
+              class="copy-button"
+              data-copy="guide-brew"
+              aria-label="Copy Homebrew command"
+            >
+              Copy
+            </button>
+          </div>
+          <p>
+            If macOS cannot verify a download, confirm you obtained it from the
+            official repository and read the release notes. Do not disable
+            Gatekeeper or remove quarantine flags as a routine install step.
+          </p>
+        </section>
+        <section id="windows">
+          <h2>Install NeoHtop on Windows</h2>
+          <ol>
+            <li>
+              Find the Windows x64 <code>.exe</code> in the
+              <a href="https://github.com/Abdenasser/neohtop/releases/latest"
+                >latest release assets</a
+              >.
+            </li>
+            <li>
+              If its name ends in <code>-setup.exe</code>, run the installer and
+              follow its prompts.
+            </li>
+            <li>
+              Older published releases may provide a portable <code>.exe</code>.
+              Put that file in a folder you control and launch it there.
+            </li>
+          </ol>
+          <p>
+            Use a package listed for your architecture. Consult the release
+            notes for platform requirements and known issues.
+          </p>
+        </section>
+        <section id="linux">
+          <h2>Install NeoHtop on Linux</h2>
+          <p>
+            Choose the package for your distribution and CPU architecture. Run
+            <code>uname -m</code>: <code>x86_64</code> means x64, and
+            <code>aarch64</code> means ARM64. An architecture may be unavailable
+            in older releases.
+          </p>
+          <div class="guide-table">
+            <table>
+              <caption>
+                Linux package options
+              </caption>
+              <thead>
+                <tr>
+                  <th>Package</th>
+                  <th>Use it for</th>
+                  <th>Install approach</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>.deb</td>
+                  <td>Debian / Ubuntu</td>
+                  <td>
+                    Open it in your system’s package installer, or install the
+                    downloaded local file with apt.
+                  </td>
+                </tr>
+                <tr>
+                  <td>.rpm</td>
+                  <td>Fedora and compatible RPM distributions</td>
+                  <td>
+                    Use your distribution’s package manager to install the
+                    downloaded local file.
+                  </td>
+                </tr>
+                <tr>
+                  <td>AppImage</td>
+                  <td>A portable Linux app</td>
+                  <td>
+                    Make the downloaded file executable in its Properties, then
+                    open it.
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p>
+            AppImages still rely on system libraries and may require FUSE
+            support. “Portable” does not mean compatible with every distribution
+            or glibc version.
+          </p>
+        </section>
+        <section id="troubleshooting">
+          <h2>Troubleshooting</h2>
+          <h3>A Linux build reports a glibc error or opens a blank window</h3>
+          <p>
+            First check the release notes and your distribution version. The
+            next desktop release is being built on an older Ubuntu baseline,
+            with an AppImage check for the bundled Wayland library issue. Those
+            fixes are development work until a new release is published. Try an
+            appropriate native package if available, and include the exact error
+            when reporting a problem.
+          </p>
+          <h3>Some process details are missing</h3>
+          <p>
+            Operating-system permissions can restrict which details are visible.
+            See the repository’s platform-specific guidance before granting
+            elevated access. Normal use should start without administrator
+            privileges.
+          </p>
+          <h3>Need help?</h3>
+          <p>
+            <a href="https://github.com/Abdenasser/neohtop/issues"
+              >Open a GitHub issue</a
+            >
+            with your NeoHtop version, operating system, architecture, package
+            type, error text, and steps to reproduce. Redact credentials and
+            private command-line arguments from diagnostic output.
+          </p>
+        </section>
+        <section id="source">
+          <h2>Build the development version</h2>
+          <p>
+            Developers can build the current source with Node.js 22, stable
+            Rust, and the platform prerequisites for Tauri. This is a
+            development build and may differ from the published app.
+          </p>
+          <pre
+            class="code-block"
+          ><code>git clone https://github.com/Abdenasser/neohtop.git
+cd neohtop
+npm ci
+npm run tauri dev</code></pre>
+          <p>
+            Read the
+            <a href="https://github.com/Abdenasser/neohtop#development"
+              >repository’s development instructions</a
+            >
+            for platform setup and build commands.
+          </p>
+        </section>
+        <a class="button primary" href="./#download">Choose a download ↓</a>
+      </article>
+    </main>
+    <footer class="site-footer shell">
+      <div class="footer-top">
+        <a class="brand" href="./"
+          ><img
+            src="assets/neohtop-icon.png"
+            width="28"
+            height="28"
+            alt=""
+          /><span>neohtop_</span></a
+        >
+        <p>Built for the beautifully curious.</p>
+        <a href="https://github.com/sponsors/Abdenasser"
+          >Support the project ↗</a
+        >
+      </div>
+      <div class="footer-bottom">
+        <span
+          >Free software. MIT license. Made by
+          <a href="https://github.com/Abdenasser">Abdenasser</a>.</span
+        >
+        <div>
+          <a href="install.html">Docs</a
+          ><a href="https://github.com/Abdenasser/neohtop/issues"
+            >Report an issue</a
+          ><a href="llms.txt">llms.txt</a><a href="sitemap.xml">Sitemap</a>
+        </div>
+      </div>
+    </footer>
+    <p class="sr-only" id="copy-status" role="status" aria-live="polite"></p>
+    <script type="module" src="main.js"></script>
+  </body>
+</html>
