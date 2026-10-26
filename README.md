@@ -66,6 +66,7 @@
 
 ## Features
 - 🚀 Real-time process monitoring
+- 🌳 Expandable process trees with family CPU/RAM totals and search that keeps matching processes in context
 - 💻 CPU and Memory usage tracking
 - 🎨 Beautiful, modern UI with dark/light themes
 - 🔍 Advanced process search and filtering
@@ -81,6 +82,19 @@ Examples:
 - `arm, x86`: Returns processes with "arm" or "x86" in the name or command
 - `d$`: Lists daemons (processes ending with 'd')
 - `^(\w+\.)+\w+$`: Shows processes with reverse domain name notation (e.g., com.docker.vmnetd)
+
+### Process families
+
+Switch from **List** to **Tree** above the process table to expand parent/child
+relationships. Tree mode shows combined CPU usage and resident memory for each
+process family; CPU can exceed 100% across multiple cores, and shared memory can
+be counted more than once in the family RAM sum. List mode keeps individual
+process metrics.
+
+Search and filters match individual processes. Tree mode retains their parents
+and expands matching branches automatically, while family totals continue to
+include all descendants. Clear the search and filters to collapse those branches.
+Pages keep expanded families together, and your choice of List or Tree is saved.
 
 ## Tech Stack
 - **Frontend**: SvelteKit, TypeScript

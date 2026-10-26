@@ -33,6 +33,18 @@ export interface SystemStats {
   disk_free_bytes: number;
 }
 
+export interface ProcessTreeRow {
+  process: Process;
+  key: string;
+  depth: number;
+  childCount: number;
+  expanded: boolean;
+  rootIndex: number;
+  familyCpuUsage: number;
+  familyMemoryUsage: number;
+  familyProcessCount: number;
+}
+
 export interface Column {
   id: keyof Process;
   label: string;
@@ -77,6 +89,7 @@ export interface AppConfig {
     itemsPerPage: number;
     refreshRate: number;
     defaultStatusFilter: string;
+    processView?: "flat" | "tree";
   };
 }
 

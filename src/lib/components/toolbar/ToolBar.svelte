@@ -14,6 +14,7 @@
   export let currentPage: number;
   export let totalPages: number;
   export let totalResults: number;
+  export let resultLabel = "processes";
   export let columns: Array<{
     id: string;
     label: string;
@@ -56,6 +57,7 @@
         bind:currentPage
         {totalPages}
         {totalResults}
+        {resultLabel}
       />
     </div>
     <div class="toolbar-spacer" class:hidden={isAnyOverlayOpen}></div>

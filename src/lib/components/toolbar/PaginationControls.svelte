@@ -9,6 +9,7 @@
   export let currentPage: number;
   export let totalPages: number;
   export let totalResults: number;
+  export let resultLabel = "processes";
 
   let containerElement: HTMLDivElement;
   let overlayElement: HTMLDivElement;
@@ -153,7 +154,7 @@
     </button>
     <div class="page-info">
       <span>Page {currentPage} of {totalPages}</span>
-      <span class="results-info">({totalResults} processes)</span>
+      <span class="results-info">({totalResults} {resultLabel})</span>
     </div>
     <button
       class="btn-page"
