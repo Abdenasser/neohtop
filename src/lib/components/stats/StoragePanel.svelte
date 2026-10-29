@@ -11,6 +11,7 @@
   import { Progress } from "$lib/components/ui/progress/index.js";
   import StatItem from "./StatItem.svelte";
   import { formatBytes } from "$lib/utils";
+  import { formatUsagePercentage } from "$lib/utils/metrics.js";
   export let diskTotalBytes: number;
   export let diskUsedBytes: number;
   export let diskFreeBytes: number;
@@ -70,7 +71,7 @@
             aria-hidden="true"
           ></span>{percentage === null
             ? "Unavailable"
-            : `${percentage.toFixed(1)}% used`}</span
+            : `${formatUsagePercentage(diskUsedBytes, diskTotalBytes)} used`}</span
         ><span
           >{percentage === null
             ? ""
