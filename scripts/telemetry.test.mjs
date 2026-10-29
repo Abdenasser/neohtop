@@ -73,6 +73,7 @@ test("basic launches use distinct ephemeral IDs and contain no OS or network dat
   const a = gaPayload(basic),
     b = gaPayload(basic);
   assert.notEqual(a.client_id, b.client_id);
+  assert.match(a.client_id, /^\d+\.\d+$/);
   assert.equal(a.events[0].name, "desktop_open");
   assert.equal(a.events[0].params.collection_mode, "basic");
   assert.equal(a.events[0].params.platform, undefined);
@@ -89,10 +90,14 @@ test("usage retains the resettable ID and launch session, never arbitrary payloa
     event: "resource_view",
     value: "memory",
   });
-  assert.equal(payload.client_id, usage.client_id);
+  assert.equal(
+    payload.client_id,
+    `${Number.parseInt("c5ec001c", 16)}.${Number.parseInt("bb550808", 16)}`,
+  );
+  assert.match(payload.client_id, /^\d+\.\d+$/);
   assert.equal(payload.events[0].params.session_id, usage.session_id);
   assert.equal(payload.events[0].params.choice, "memory");
-  assert.equal(payload.events[0].params.platform, "macos");
+  assert.equal(payload.events[0].params.os_family, "macos");
 });
 test("relay refuses browser origins, oversized streams, invalid JSON and unsupported fields", async () => {
   assert.equal(
@@ -132,6 +137,7 @@ test("relay forwards only the allowlisted GA event, keeping secret and client he
       /^https:\/\/www.google-analytics.com\/mp\/collect\?/,
     );
     assert.ok(sent.url.includes("api_secret=synthetic-test-secret"));
+    assert.equal(sent.init.redirect, "manual");
     assert.deepEqual(sent.init.headers, { "content-type": "application/json" });
     assert.ok(!sent.init.body.includes("synthetic-test-secret"));
     assert.ok(!sent.init.body.includes("192.0.2.123"));
@@ -163,6 +169,40 @@ test("relay health is separate from event delivery and collection failures stay 
     });
     assert.equal(result.status, 502);
     assert.ok(!(await result.text()).includes("secret"));
+  } finally {
+    globalThis.fetch = original;
+  }
+});
+
+test("validation mode checks the payload with Google without recording a production event", async () => {
+  const original = globalThis.fetch;
+  let sent;
+  globalThis.fetch = async (url, init) => {
+    sent = { url: String(url), payload: JSON.parse(init.body) };
+    return Response.json({ validationMessages: [] });
+  };
+  try {
+    const env = {
+      GA_MEASUREMENT_ID: "G-TEST",
+      GA_API_SECRET: "synthetic",
+      GA_VALIDATION_ONLY: "true",
+    };
+    const result = await worker.fetch(request(basic), env);
+    assert.equal(result.status, 200);
+    assert.deepEqual(await result.json(), { validationMessages: [] });
+    assert.ok(
+      sent.url.startsWith("https://www.google-analytics.com/debug/mp/collect?"),
+    );
+    assert.equal(sent.payload.validation_behavior, "ENFORCE_RECOMMENDATIONS");
+    const health = await worker.fetch(
+      new Request("https://example.workers.dev/health"),
+      env,
+    );
+    assert.deepEqual(await health.json(), {
+      service: "NeoHtop analytics relay",
+      configured: true,
+      validation_only: true,
+    });
   } finally {
     globalThis.fetch = original;
   }

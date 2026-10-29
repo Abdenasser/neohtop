@@ -9,7 +9,7 @@ Cloudflare Worker using the free plan only. No KV, D1, paid services, request lo
 3. From the repository root: `npx wrangler deploy --config telemetry/wrangler.jsonc`. No routes or custom domain are necessary. Confirm `GET /health` works. This deployment returns 503 for events until configured.
 4. Set `GA_MEASUREMENT_ID` as a Worker variable. Set `GA_API_SECRET` as an encrypted Worker secret through Cloudflare's dashboard or `wrangler secret put GA_API_SECRET --config telemetry/wrangler.jsonc`. Enter the secret at the prompt; never pass it as a visible command argument. Redeploy preserving the secret if variables change.
 5. Set repository Actions variable `NEOHTOP_ANALYTICS_ENDPOINT` to the resulting `https://neohtop-analytics.<account-subdomain>.workers.dev/v1/events`. It is public configuration. All five package builds use it. Local builds omit it by default and send nothing. Release preparation must verify the variable and health check before tagging.
-6. Validate a synthetic basic event against GA's **debug** Measurement Protocol endpoint before enabling delivery. Do not send private process samples or fake production sessions. A 204 from the regular GA endpoint does not confirm a valid event. Check real launch delivery in GA Realtime after the configured build is launched.
+6. Initially set Worker variable `GA_VALIDATION_ONLY` to `true`, then POST a synthetic allowlisted event to `/v1/events`. This uses GA's **debug** Measurement Protocol endpoint and returns its validation result without recording a production event. Require an empty `validationMessages` array, then set the variable to `false` and redeploy. The tagged release preflight requires `/health` to report configured production mode. Do not send private process samples or fake production sessions. A 204 from the regular GA endpoint does not confirm a valid event. Check real launch delivery in GA Realtime after the configured build is launched.
 
 ## Schema and limits
 
@@ -18,3 +18,7 @@ Cloudflare Worker using the free plan only. No KV, D1, paid services, request lo
 There is no embedded secret in the public app; therefore this public endpoint cannot authenticate a genuine installation. Origin filtering is only browser abuse mitigation. For traffic spikes or invalid data, disable the Worker or rotate the server secret; do not enable paid billing automatically. Free-plan exhaustion drops analytics without affecting local monitoring. Logs/observability remain off; Cloudflare and Google still process transport data under their service policies.
 
 Tests: `npm run test:release` (Node 22+) and `cargo test --manifest-path src-tauri/Cargo.toml`. The first-launch disclosure and Settings Privacy pane must remain consistent with `docs/privacy.md`.
+
+## Reports
+
+The website uses `G-88HFXRBNLS`; desktop events use the separate **NeoHtop Desktop** Web stream (`G-W7DL0490Q8`) in the NeoHtop property. Filter by stream to compare desktop and website traffic. Use event counts for basic launches, never GA user counts as a count of installations. For feature analysis, register event-scoped custom dimensions for `desktop_version`, `collection_mode`, `choice` and `os_family` under Admin → Data display → Custom definitions. Allow 24–48 hours for custom dimensions to populate; avoid registering client/session IDs as dimensions.

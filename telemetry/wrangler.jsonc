@@ -3,10 +3,11 @@
   "main": "worker.js",
   "compatibility_date": "2026-10-29",
   "workers_dev": true,
+  "vars": {
+    "GA_MEASUREMENT_ID": "G-W7DL0490Q8",
+    "GA_VALIDATION_ONLY": "false",
+  },
   "observability": {
     "enabled": false,
-  },
-  "limits": {
-    "cpu_ms": 10,
   },
 }

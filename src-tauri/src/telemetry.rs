@@ -54,6 +54,19 @@ fn usage(id: &str, session_id: u64, event: &str, value: Option<&str>) -> Value {
     }
     payload
 }
+impl State {
+    fn first_launch(&mut self, now: u64) -> Option<Value> {
+        if self.started {
+            return None;
+        }
+        self.started = true;
+        self.session_id = now;
+        Some(match self.identity.as_deref().filter(|_| self.enabled) {
+            Some(id) => usage(id, self.session_id, "desktop_open", None),
+            None => basic(),
+        })
+    }
+}
 fn send(app: &AppHandle, payload: Value) {
     let Some(url) = endpoint() else { return };
     let handle = app.clone();
@@ -112,22 +125,7 @@ pub fn configure(app: &AppHandle, enabled: bool) -> Result<(), String> {
         }
     }
     state.enabled = enabled && configured;
-    let initial = if !state.started {
-        state.started = true;
-        state.session_id = crate::sampling::now_ms() / 1000;
-        Some(if state.enabled {
-            usage(
-                state.identity.as_deref().unwrap(),
-                state.session_id,
-                "desktop_open",
-                None,
-            )
-        } else {
-            basic()
-        })
-    } else {
-        None
-    };
+    let initial = state.first_launch(crate::sampling::now_ms() / 1000);
     drop(state);
     if let Some(payload) = initial {
         send(app, payload);
@@ -173,6 +171,32 @@ pub fn analytics_configured() -> bool {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn only_one_launch_is_counted_across_preference_and_consent_changes() {
+        let mut state = State::default();
+        assert_eq!(state.first_launch(100).unwrap()["mode"], "basic");
+        state.enabled = true;
+        state.identity = Some(Uuid::new_v4().to_string());
+        assert!(state.first_launch(200).is_none());
+        state.enabled = false;
+        state.identity = None;
+        assert!(state.first_launch(300).is_none());
+        assert_eq!(state.session_id, 100);
+    }
+    #[test]
+    fn opted_in_launch_and_features_share_one_session() {
+        let id = Uuid::new_v4().to_string();
+        let mut state = State {
+            enabled: true,
+            identity: Some(id.clone()),
+            ..State::default()
+        };
+        let launch = state.first_launch(100).unwrap();
+        let feature = usage(&id, state.session_id, "resource_view", Some("cpu"));
+        assert_eq!(launch["mode"], "usage");
+        assert_eq!(launch["session_id"], feature["session_id"]);
+        assert_eq!(launch["client_id"], feature["client_id"]);
+    }
     #[test]
     fn basic_open_has_no_identifier_or_machine_data() {
         let p = basic();

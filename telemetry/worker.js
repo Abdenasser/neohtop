@@ -67,17 +67,24 @@ export function validateEvent(value) {
 }
 export function gaPayload(event, random = () => crypto.randomUUID()) {
   const params = {
-    app_version: event.version,
+    desktop_version: event.version,
     collection_mode: event.mode,
     engagement_time_msec: 1,
   };
   if (event.mode === "usage") {
     params.session_id = event.session_id;
-    params.platform = event.platform;
+    params.os_family = event.platform;
     if (event.value !== undefined) params.choice = event.value;
   } else params.session_id = Math.floor(Date.now() / 1000);
+  const id = (event.mode === "basic" ? random() : event.client_id).replaceAll(
+    "-",
+    "",
+  );
+  // GA's Web Measurement Protocol requires two decimal numbers. Preserve 64
+  // random bits without sending the local UUID or deriving anything from hardware.
+  const clientId = `${Number.parseInt(id.slice(0, 8), 16)}.${Number.parseInt(id.slice(-8), 16)}`;
   return {
-    client_id: event.mode === "basic" ? random() : event.client_id,
+    client_id: clientId,
     non_personalized_ads: true,
     consent: { ad_user_data: "DENIED", ad_personalization: "DENIED" },
     events: [{ name: event.event, params }],
@@ -87,7 +94,16 @@ export default {
   async fetch(request, env) {
     const url = new URL(request.url);
     if (request.method === "GET" && url.pathname === "/health")
-      return reply(200, "NeoHtop analytics relay");
+      return Response.json(
+        {
+          service: "NeoHtop analytics relay",
+          configured:
+            /^G-[A-Z0-9]+$/.test(env.GA_MEASUREMENT_ID || "") &&
+            Boolean(env.GA_API_SECRET),
+          validation_only: env.GA_VALIDATION_ONLY === "true",
+        },
+        { headers },
+      );
     if (request.method !== "POST" || url.pathname !== "/v1/events")
       return reply(404, "Not found");
     if (request.headers.has("origin"))
@@ -134,25 +150,63 @@ export default {
       !env.GA_API_SECRET
     )
       return reply(503, "Analytics not configured");
-    const target = new URL("https://www.google-analytics.com/mp/collect");
+    const validation = env.GA_VALIDATION_ONLY === "true";
+    const target = new URL(
+      validation
+        ? "https://www.google-analytics.com/debug/mp/collect"
+        : "https://www.google-analytics.com/mp/collect",
+    );
     target.searchParams.set("measurement_id", env.GA_MEASUREMENT_ID);
     target.searchParams.set("api_secret", env.GA_API_SECRET);
     try {
       const response = await fetch(target, {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify(gaPayload(event)),
-        redirect: "error",
+        body: JSON.stringify({
+          ...gaPayload(event),
+          ...(validation
+            ? { validation_behavior: "ENFORCE_RECOMMENDATIONS" }
+            : {}),
+        }),
+        redirect: "manual",
         signal: AbortSignal.timeout(4000),
       });
+      if (validation) {
+        if (!response.ok)
+          return Response.json(
+            {
+              error: "Validation service refused the request",
+              status: response.status,
+            },
+            { status: 502, headers },
+          );
+        try {
+          return Response.json(await response.json(), { headers });
+        } catch {
+          return Response.json(
+            {
+              error: "Validation service returned a non-JSON response",
+              status: response.status,
+            },
+            { status: 502, headers },
+          );
+        }
+      }
       return response.ok
         ? new Response(null, {
             status: 204,
             headers: { "cache-control": "no-store" },
           })
         : reply(502, "Collection unavailable");
-    } catch {
-      return reply(502, "Collection unavailable");
+    } catch (error) {
+      return reply(
+        502,
+        validation
+          ? error?.name === "TimeoutError"
+            ? "Validation timed out"
+            : "Validation connection failed"
+          : "Collection unavailable",
+      );
     }
   },
 };
