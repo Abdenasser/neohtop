@@ -12,6 +12,7 @@
     "core:window:allow-maximize",
     "core:window:allow-minimize",
     "core:window:allow-close",
-    "shell:default"
+    "shell:default",
+    "core:window:allow-set-theme"
   ]
 }

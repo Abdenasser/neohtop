@@ -1,514 +1,223 @@
 <script lang="ts">
-  import { Modal } from "$lib/components";
-  import { formatBytes } from "$lib/utils";
+  import { tick } from "svelte";
   import type { Process } from "$lib/types";
-  import Fa from "svelte-fa";
+  import { formatBytes, formatDate } from "$lib/utils";
+  import ProcessIcon from "../process/ProcessIcon.svelte";
+  import { Button } from "$lib/components/ui/button/index.js";
+  import { Badge } from "$lib/components/ui/badge/index.js";
+  import { Progress } from "$lib/components/ui/progress/index.js";
+  import * as Sheet from "$lib/components/ui/sheet/index.js";
+  import * as Card from "$lib/components/ui/card/index.js";
+  import * as Table from "$lib/components/ui/table/index.js";
+  import * as Collapsible from "$lib/components/ui/collapsible/index.js";
   import {
-    faMemory,
-    faMicrochip,
-    faCodeFork,
-    faTerminal,
-    faList,
-  } from "@fortawesome/free-solid-svg-icons";
-
+    Cpu,
+    MemoryStick,
+    Terminal,
+    GitBranch,
+    ChevronDown,
+    ArrowUpRight,
+  } from "@lucide/svelte";
   export let show = false;
   export let process: Process | null = null;
   export let onClose: () => void;
   export let processes: Process[] = [];
   export let onShowDetails: (process: Process) => void;
-
-  $: childProcesses = process
-    ? processes.filter((p) => p.ppid === process.pid)
-    : [];
+  $: children = process ? processes.filter((p) => p.ppid === process.pid) : [];
+  $: parent = process
+    ? processes.find((p) => p.pid === process.ppid)
+    : undefined;
+  let detail: HTMLDivElement | null = null;
+  let inspectedIdentity = "";
+  $: if (process && show) {
+    const identity = `${process.pid}:${process.start_time}`;
+    if (identity !== inspectedIdentity) {
+      inspectedIdentity = identity;
+      void tick().then(() => {
+        detail?.scrollTo({ top: 0 });
+        detail?.querySelector<HTMLElement>("[data-slot=sheet-title]")?.focus();
+      });
+    }
+  }
 </script>
 
-<Modal
-  {show}
-  title={`${process ? process.name.slice(0, 10) : "Unknown Process"} - Process Details`}
-  maxWidth="1000px"
-  {onClose}
->
-  {#if process}
-    <div class="modal-content">
-      <!-- Header Stats -->
-      <div class="header-stats">
-        <div class="stat-item">
-          <div class="stat-label">PID</div>
-          <div class="stat-value">{process.pid}</div>
+<Sheet.Root
+  open={show}
+  onOpenChange={(open) => {
+    if (!open) onClose();
+  }}
+  ><Sheet.Content
+    bind:ref={detail}
+    class="gap-6 overflow-y-auto p-6 *:shrink-0 data-[side=right]:w-full data-[side=right]:sm:max-w-3xl"
+    ><Sheet.Header class="p-0"
+      ><div class="flex items-start gap-3 pr-8">
+        <div
+          class="flex size-12 shrink-0 items-center justify-center rounded-xl border border-border bg-muted"
+        >
+          <ProcessIcon
+            pid={process?.pid}
+            startTime={process?.start_time}
+            size={28}
+          />
         </div>
-        <div class="stat-item">
-          <div class="stat-label">Status</div>
-          <div
-            class="stat-value status"
-            class:running={process.status === "Running"}
+        <div class="min-w-0">
+          <Sheet.Title tabindex={-1} class="break-all text-xl outline-none"
+            >{process?.name || "Process no longer available"}</Sheet.Title
+          ><Sheet.Description
+            >{process
+              ? `PID ${process.pid} · ${process.status}`
+              : "This process is no longer in the latest snapshot. Close this panel or choose another process."}</Sheet.Description
           >
-            {process.status}
-          </div>
         </div>
-        <div class="stat-item">
-          <div class="stat-label">CPU</div>
-          <div class="stat-value">{process.cpu_usage.toFixed(1)}%</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-label">Memory</div>
-          <div class="stat-value">{formatBytes(process.memory_usage)}</div>
-        </div>
+      </div></Sheet.Header
+    >{#if process}<div class="grid grid-cols-2 gap-4">
+        <Card.Root size="sm" class="gap-2"
+          ><Card.Header
+            ><Card.Description class="flex items-center gap-2"
+              ><Cpu class="size-4" />CPU usage</Card.Description
+            ></Card.Header
+          ><Card.Content class="flex-1 justify-between gap-3"
+            ><p class="text-2xl font-semibold tabular-nums">
+              {process.cpu_usage.toFixed(1)}%
+            </p>
+            <Progress
+              value={Math.min(100, Math.max(0, process.cpu_usage))}
+              aria-label="Process CPU usage"
+              style={`--primary:var(--${process.cpu_usage > 80 ? "red" : process.cpu_usage > 50 ? "yellow" : "blue"})`}
+            /></Card.Content
+          ></Card.Root
+        ><Card.Root size="sm" class="gap-2"
+          ><Card.Header
+            ><Card.Description class="flex items-center gap-2"
+              ><MemoryStick class="size-4" />Resident memory</Card.Description
+            ></Card.Header
+          ><Card.Content class="flex-1 justify-between gap-3"
+            ><p class="text-2xl font-semibold tabular-nums">
+              {formatBytes(process.memory_usage)}
+            </p>
+            <p class="text-xs text-muted-foreground">
+              Virtual: {formatBytes(process.virtual_memory)}
+            </p></Card.Content
+          ></Card.Root
+        >
       </div>
-
-      <!-- Main Content -->
-      <div class="content-grid">
-        <!-- Left Column -->
-        <div class="content-column">
-          <!-- Process Info -->
-          <div class="card">
-            <div class="card-header">
-              <Fa icon={faMicrochip} />
-              <span>Process Information</span>
-            </div>
-            <div class="card-content">
-              <div class="info-grid">
-                <div class="info-item">
-                  <span class="info-label">Name</span>
-                  <span class="info-value">{process.name}</span>
-                </div>
-                <div class="info-item">
-                  <span class="info-label">User</span>
-                  <span class="info-value">{process.user}</span>
-                </div>
-                <div class="info-item">
-                  <span class="info-label">Parent PID</span>
-                  <!-- svelte-ignore a11y_click_events_have_key_events -->
-                  <!-- svelte-ignore a11y_no_static_element_interactions -->
-                  <span
-                    class="info-value clickable"
-                    on:click={() => {
-                      const parent = processes.find(
-                        (p) => p.pid === process.ppid,
-                      );
-                      if (parent) onShowDetails(parent);
-                    }}
-                  >
-                    {process.ppid}
-                  </span>
-                </div>
-                <div class="info-item">
-                  <span class="info-label">Session ID</span>
-                  <span class="info-value">{process.session_id}</span>
-                </div>
-              </div>
-            </div>
+      <Card.Root size="sm"
+        ><Card.Header
+          ><Card.Title class="text-sm">Process information</Card.Title
+          ></Card.Header
+        ><Card.Content class="grid grid-cols-2 gap-x-6 gap-y-4 text-sm"
+          >{#each [["Name", process.name], ["User", process.user], ["Session ID", process.session_id ?? "Unavailable"], ["Threads", process.threads ?? "Unavailable"], ["Started", formatDate(process.start_time)], ["Run time", `${Math.floor(process.run_time / 3600)}h ${Math.floor((process.run_time % 3600) / 60)}m ${process.run_time % 60}s`]] as [label, value]}<div
+              class="min-w-0"
+            >
+              <p class="text-xs text-muted-foreground">{label}</p>
+              <p class="mt-1 break-all" data-selectable>{value}</p>
+            </div>{/each}
+          <div>
+            <p class="text-xs text-muted-foreground">Parent process</p>
+            {#if parent}<Button
+                variant="link"
+                size="sm"
+                class="mt-1 h-auto whitespace-normal p-0 text-left text-xs"
+                onclick={() => parent && onShowDetails(parent)}
+                >{parent.name} · {process.ppid}<ArrowUpRight /></Button
+              >{:else}<p class="mt-1 text-xs" data-selectable>
+                {process.ppid} · not in this snapshot
+              </p>{/if}
           </div>
-
-          <!-- Resource Usage -->
-          <div class="card">
-            <div class="card-header">
-              <Fa icon={faMemory} />
-              <span>Resource Usage</span>
-            </div>
-            <div class="card-content">
-              <div class="resource-grid">
-                <div class="resource-item">
-                  <div class="resource-header">
-                    <span>CPU Usage</span>
-                    <span class="resource-value"
-                      >{process.cpu_usage.toFixed(1)}%</span
-                    >
-                  </div>
-                  <div class="progress-bar">
-                    <div
-                      class="progress-fill"
-                      style="width: {process.cpu_usage}%"
-                      class:high={process.cpu_usage > 50}
-                      class:critical={process.cpu_usage > 80}
-                    ></div>
-                  </div>
-                </div>
-                <div class="resource-item">
-                  <div class="resource-header">
-                    <span>Memory Usage</span>
-                  </div>
-                  <div class="memory-stats">
-                    <div>Physical: {formatBytes(process.memory_usage)}</div>
-                    <div>Virtual: {formatBytes(process.virtual_memory)}</div>
-                  </div>
-                </div>
-                <div class="resource-item">
-                  <div class="resource-header">
-                    <span>Disk I/O</span>
-                  </div>
-                  <div class="disk-stats">
-                    <div>Read: {formatBytes(process.disk_usage[0])}</div>
-                    <div>Written: {formatBytes(process.disk_usage[1])}</div>
-                  </div>
-                </div>
-              </div>
-            </div>
+          <div>
+            <p class="text-xs text-muted-foreground">Disk I/O</p>
+            <p class="mt-1 text-xs" data-selectable>
+              Read {formatBytes(process.disk_usage[0])} · Written {formatBytes(
+                process.disk_usage[1],
+              )}
+            </p>
+          </div></Card.Content
+        ></Card.Root
+      ><Card.Root size="sm"
+        ><Card.Header
+          ><Card.Title class="flex items-center gap-2 text-sm"
+            ><Terminal class="size-4" />Command & root</Card.Title
+          ></Card.Header
+        ><Card.Content class="gap-4"
+          ><div>
+            <p class="mb-2 text-xs text-muted-foreground">Command</p>
+            <pre
+              class="max-h-44 overflow-auto whitespace-pre-wrap break-all rounded-md border border-border bg-background p-3 font-mono text-xs"
+              data-selectable>{process.command || "Unavailable"}</pre>
           </div>
-        </div>
-
-        <!-- Right Column -->
-        <div class="content-column">
-          <!-- Command -->
-          <div class="card">
-            <div class="card-header">
-              <Fa icon={faTerminal} />
-              <span>Command</span>
-            </div>
-            <div class="card-content">
-              <div class="command-text">{process.command}</div>
-              <div class="path-text">{process.root}</div>
-            </div>
-          </div>
-
-          <!-- Child Processes -->
-          {#if childProcesses.length > 0}
-            <div class="card">
-              <div class="card-header">
-                <Fa icon={faCodeFork} />
-                <span>Child Processes ({childProcesses.length})</span>
-              </div>
-              <div class="card-content">
-                <table class="process-table">
-                  <thead>
-                    <tr>
-                      <th>Name</th>
-                      <th>PID</th>
-                      <th>CPU</th>
-                      <th>Memory</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {#each childProcesses as child}
-                      <tr
-                        class="clickable"
-                        on:click={() => onShowDetails(child)}
-                      >
-                        <td>{child.name}</td>
-                        <td>{child.pid}</td>
-                        <td>{child.cpu_usage.toFixed(1)}%</td>
-                        <td>{formatBytes(child.memory_usage)}</td>
-                      </tr>
-                    {/each}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          {/if}
-
-          <!-- Environment Variables -->
-          {#if process.environ.length > 0}
-            <div class="card">
-              <div class="card-header">
-                <Fa icon={faList} />
-                <span>Environment Variables</span>
-              </div>
-              <div class="card-content">
-                <div class="env-list">
-                  {#each process.environ as env}
-                    <div class="env-item">{env}</div>
-                  {/each}
-                </div>
-              </div>
-            </div>
-          {/if}
-        </div>
-      </div>
-    </div>
-  {/if}
-</Modal>
-
-<style>
-  /* Base Modal Content */
-  .modal-content {
-    display: flex;
-    flex-direction: column;
-    gap: 24px;
-    font-size: 13px;
-    color: var(--text);
-  }
-
-  /* Header Stats */
-  .header-stats {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-    gap: 16px;
-    padding: 16px;
-    background: var(--surface0);
-    border-radius: 8px;
-  }
-
-  .stat-item {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-  }
-
-  .stat-label {
-    font-size: 12px;
-    color: var(--subtext0);
-    font-weight: 500;
-  }
-
-  .stat-value {
-    font-size: 16px;
-    font-weight: 600;
-  }
-
-  .stat-value.status {
-    color: var(--subtext0);
-  }
-
-  .stat-value.status.running {
-    color: var(--green);
-  }
-
-  /* Main Content Grid */
-  .content-grid {
-    display: grid;
-    grid-template-columns: minmax(300px, 0.4fr) minmax(400px, 0.6fr);
-    gap: 24px;
-  }
-
-  .content-column {
-    display: flex;
-    flex-direction: column;
-    gap: 24px;
-    min-width: 0; /* Prevent overflow issues */
-  }
-
-  /* Cards */
-  .card {
-    background: var(--surface0);
-    border-radius: 8px;
-    overflow: hidden;
-    min-width: 0; /* Prevent overflow issues */
-  }
-
-  .card-header {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 12px 16px;
-    background: var(--surface1);
-    color: var(--subtext0);
-    font-weight: 500;
-  }
-
-  .card-header :global(svg) {
-    width: 14px;
-    height: 14px;
-    color: var(--blue);
-  }
-
-  .card-content {
-    padding: 16px;
-    overflow: auto;
-  }
-
-  /* Info Grid */
-  .info-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 16px;
-  }
-
-  .info-item {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-  }
-
-  .info-label {
-    color: var(--subtext0);
-    font-size: 12px;
-  }
-
-  .info-value {
-    color: var(--text);
-  }
-
-  .info-value.clickable {
-    cursor: pointer;
-    color: var(--blue);
-  }
-
-  .info-value.clickable:hover {
-    text-decoration: underline;
-  }
-
-  /* Resource Usage */
-  .resource-grid {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-  }
-
-  .resource-item {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
-
-  .resource-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    color: var(--subtext0);
-    font-size: 12px;
-  }
-
-  .resource-value {
-    color: var(--text);
-  }
-
-  /* Progress Bar */
-  .progress-bar {
-    height: 6px;
-    background: var(--surface1);
-    border-radius: 3px;
-    overflow: hidden;
-  }
-
-  .progress-fill {
-    height: 100%;
-    background: var(--blue);
-    transition: width 0.2s ease;
-  }
-
-  .progress-fill.high {
-    background: var(--yellow);
-  }
-
-  .progress-fill.critical {
-    background: var(--red);
-  }
-
-  /* Memory and Disk Stats */
-  .memory-stats,
-  .disk-stats {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
-    color: var(--text);
-  }
-
-  /* Command and Path */
-  .command-text,
-  .path-text {
-    word-break: break-all;
-    white-space: pre-wrap;
-  }
-
-  .path-text {
-    margin-top: 8px;
-    font-size: 12px;
-    color: var(--subtext0);
-  }
-
-  /* Process Table */
-  .process-table {
-    width: 100%;
-    border-collapse: collapse;
-  }
-
-  .process-table th {
-    text-align: left;
-    padding: 8px;
-    color: var(--subtext0);
-    font-weight: 500;
-    border-bottom: 1px solid var(--surface1);
-  }
-
-  .process-table td {
-    padding: 8px;
-    border-bottom: 1px solid var(--surface1);
-  }
-
-  .process-table tr:last-child td {
-    border-bottom: none;
-  }
-
-  .process-table tr.clickable {
-    cursor: pointer;
-  }
-
-  .process-table tr.clickable:hover {
-    background: var(--surface1);
-  }
-
-  /* Environment Variables */
-  .env-list {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    max-height: 200px;
-    overflow-y: auto;
-    margin: -16px;
-    padding: 16px;
-  }
-
-  .env-item {
-    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
-      "Liberation Mono", "Courier New", monospace;
-    padding: 4px 8px;
-    border-radius: 4px;
-    color: var(--subtext1);
-    font-size: 12px;
-  }
-
-  .env-item:hover {
-    background: var(--surface1);
-  }
-
-  /* Update scrollbar styles to match the container edges */
-  .env-list::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
-  }
-
-  .env-list::-webkit-scrollbar-track {
-    background: var(--surface0);
-    border-radius: 0;
-  }
-
-  .env-list::-webkit-scrollbar-thumb {
-    background: var(--surface2);
-    border-radius: 4px;
-    border: 2px solid var(--surface0);
-  }
-
-  .env-list::-webkit-scrollbar-thumb:hover {
-    background: var(--surface1);
-  }
-
-  /* Scrollbar Styles */
-  :global(.modal-content *::-webkit-scrollbar) {
-    width: 8px;
-    height: 8px;
-  }
-
-  :global(.modal-content *::-webkit-scrollbar-track) {
-    background: var(--mantle);
-    border-radius: 4px;
-  }
-
-  :global(.modal-content *::-webkit-scrollbar-thumb) {
-    background: var(--surface2);
-    border-radius: 4px;
-  }
-
-  :global(.modal-content *::-webkit-scrollbar-thumb:hover) {
-    background: var(--surface1);
-  }
-
-  /* Responsive Design */
-  @media (max-width: 900px) {
-    .content-grid {
-      grid-template-columns: 1fr;
-    }
-
-    .header-stats {
-      grid-template-columns: repeat(2, 1fr);
-    }
-  }
-</style>
+          <div>
+            <p class="text-xs text-muted-foreground">Root</p>
+            <p class="mt-1 break-all font-mono text-xs" data-selectable>
+              {process.root || "Unavailable"}
+            </p>
+          </div></Card.Content
+        ></Card.Root
+      ><Card.Root size="sm"
+        ><Card.Header
+          ><Card.Title class="flex items-center gap-2 text-sm"
+            ><GitBranch class="size-4" />Child processes<Badge
+              variant="secondary">{children.length}</Badge
+            ></Card.Title
+          ></Card.Header
+        ><Card.Content
+          >{#if children.length}<Table.Root
+              ><Table.Header
+                ><Table.Row
+                  ><Table.Head>Name</Table.Head><Table.Head>PID</Table.Head
+                  ><Table.Head class="text-right">CPU</Table.Head><Table.Head
+                    class="text-right">Memory</Table.Head
+                  ></Table.Row
+                ></Table.Header
+              ><Table.Body
+                >{#each children as child}<Table.Row
+                    ><Table.Cell
+                      ><Button
+                        variant="link"
+                        size="sm"
+                        class="h-auto max-w-64 justify-start whitespace-normal p-0 text-left text-xs"
+                        onclick={() => onShowDetails(child)}
+                        >{child.name}<ArrowUpRight class="size-3" /></Button
+                      ></Table.Cell
+                    ><Table.Cell class="font-mono text-xs"
+                      >{child.pid}</Table.Cell
+                    ><Table.Cell class="text-right font-mono text-xs"
+                      >{child.cpu_usage.toFixed(1)}%</Table.Cell
+                    ><Table.Cell class="text-right font-mono text-xs"
+                      >{formatBytes(child.memory_usage)}</Table.Cell
+                    ></Table.Row
+                  >{/each}</Table.Body
+              ></Table.Root
+            >{:else}<p class="text-sm text-muted-foreground">
+              No child process in the current snapshot.
+            </p>{/if}</Card.Content
+        ></Card.Root
+      ><Collapsible.Root
+        ><Collapsible.Trigger
+          class="flex w-full items-center justify-between gap-3 rounded-md border border-border bg-card p-4 text-sm font-medium focus-visible:outline-2 focus-visible:outline-ring"
+          >Environment variables ({process.environ.length})<ChevronDown
+            class="size-4"
+          /></Collapsible.Trigger
+        ><Collapsible.Content class="pt-3"
+          ><p class="mb-3 text-xs text-muted-foreground">
+            Values reported by the operating system for this process.
+          </p>
+          <div
+            class="max-h-72 overflow-auto rounded-md border border-border bg-card p-4"
+            data-selectable
+          >
+            {#each process.environ as env}<p
+                class="mb-2 whitespace-pre-wrap break-all font-mono text-xs last:mb-0"
+              >
+                {env}
+              </p>{:else}<p class="text-sm text-muted-foreground">
+                No accessible environment variables reported.
+              </p>{/each}
+          </div></Collapsible.Content
+        ></Collapsible.Root
+      >
+      <p class="text-xs text-muted-foreground">
+        Readings follow the process snapshot. Virtual address space is not
+        physical RAM; CPU can exceed 100% across cores.
+      </p>{/if}</Sheet.Content
+  ></Sheet.Root
+>

@@ -4,6 +4,7 @@ export interface Process {
   ppid: number;
   name: string;
   cpu_usage: number;
+  gpu_usage: number | null;
   memory_usage: number;
   status: string;
   user: string;
@@ -16,9 +17,41 @@ export interface Process {
   run_time: number;
   disk_usage: [number, number]; // [read_bytes, written_bytes]
   session_id?: number;
+  /** Local bound ports (TCP LISTEN + UDP). Empty unless a port search is active. */
+  ports: number[];
+}
+
+export interface ResourceDetailsData {
+  identity: {
+    cpu_model: string | null;
+    physical_cores: number | null;
+    architecture: string;
+    platform: string;
+    os_version: string | null;
+    kernel_version: string | null;
+  };
+  memory_unallocated: number;
+  swap_total: number;
+  swap_used: number;
+  volumes: {
+    name: string;
+    mount: string;
+    file_system: string;
+    total: number;
+    available: number;
+    read_only: boolean;
+  }[];
+  interfaces: {
+    name: string;
+    received: number | null;
+    sent: number | null;
+    received_total: number;
+    sent_total: number;
+  }[];
 }
 
 export interface SystemStats {
+  details: ResourceDetailsData;
   cpu_usage: number[];
   memory_total: number;
   memory_used: number;
@@ -26,11 +59,23 @@ export interface SystemStats {
   memory_cached: number;
   uptime: number;
   load_avg: [number, number, number];
-  network_rx_bytes: number;
-  network_tx_bytes: number;
+  network_rx_bytes: number | null;
+  network_tx_bytes: number | null;
   disk_total_bytes: number;
   disk_used_bytes: number;
   disk_free_bytes: number;
+}
+
+/** Volatile resource observations, timed at completion of the existing read. */
+export interface ResourceSample {
+  timestamp: number;
+  interval: number;
+  cpu: number | null;
+  memory: number | null;
+  received: number | null;
+  sent: number | null;
+  gpus: Record<string, number | null>;
+  gpu?: number | null;
 }
 
 export interface ProcessTreeRow {
@@ -90,6 +135,9 @@ export interface AppConfig {
     refreshRate: number;
     defaultStatusFilter: string;
     processView?: "flat" | "tree";
+    menuBarEnabled: boolean;
+    usageAnalytics: boolean;
+    keepRunning: boolean;
   };
 }
 
@@ -125,4 +173,46 @@ export interface ToolBarProps {
 export interface SortConfig {
   field: keyof Process;
   direction: "asc" | "desc";
+}
+
+export interface GpuDevice {
+  id: string;
+  name: string;
+  vendor: string;
+  utilization: number | null;
+  memory_used: number | null;
+  memory_total: number | null;
+  memory_kind: "shared" | "dedicated" | "unknown";
+  temperature: number | null;
+  power_watts: number | null;
+  core_clock_mhz: number | null;
+  cores: number | null;
+  source: string;
+}
+export interface MonitorSnapshot {
+  port_error?: string | null;
+  frame: {
+    captured_at: number;
+    sequence: number;
+    processes: Process[];
+    stats: SystemStats;
+    gpus: GpuDevice[];
+  };
+  history: ResourceSample[];
+  paused: boolean;
+  interval: number;
+  error: string | null;
+}
+export interface OverviewSnapshot {
+  captured_at: number;
+  stats: SystemStats;
+  gpus: GpuDevice[];
+  history: ResourceSample[];
+  processes: Pick<
+    Process,
+    "pid" | "start_time" | "name" | "cpu_usage" | "memory_usage"
+  >[];
+  paused: boolean;
+  interval: number;
+  error: string | null;
 }

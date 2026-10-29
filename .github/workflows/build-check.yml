@@ -33,6 +33,7 @@ concurrency:
 env:
   CARGO_TERM_COLOR: always
   CARGO_INCREMENTAL: 0
+  NEOHTOP_ANALYTICS_ENDPOINT: ${{ vars.NEOHTOP_ANALYTICS_ENDPOINT }}
 
 jobs:
   quality:
@@ -50,6 +51,7 @@ jobs:
       - run: npm ci
       - run: npm run format:check
       - run: npm run check
+      - run: npm run build:site
       - run: npm run test:release
       - run: npm run release:check
       - run: npm run build

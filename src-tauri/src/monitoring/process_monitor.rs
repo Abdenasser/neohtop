@@ -119,6 +119,8 @@ impl ProcessMonitor {
                         });
 
                 ProcessInfo {
+                    gpu_usage: None,
+                    ports: vec![],
                     pid: data.pid,
                     ppid: data.ppid.unwrap_or(0),
                     name: cached_info.name.clone(),

@@ -52,8 +52,10 @@ pub struct ProcessStaticInfo {
 
 /// Process information exposed to the frontend via Tauri
 /// Contains formatted and filtered process data for UI consumption
-#[derive(Serialize, Debug)]
+#[derive(Clone, Serialize, Debug)]
 pub struct ProcessInfo {
+    /// Driver-reported DRM engine activity; unknown and unsupported stay None.
+    pub gpu_usage: Option<f32>,
     /// Process ID
     pub pid: u32,
     /// Parent process ID
@@ -86,12 +88,15 @@ pub struct ProcessInfo {
     pub disk_usage: (u64, u64),
     /// Session ID of the process
     pub session_id: Option<u32>,
+    /// Local bound ports (TCP LISTEN + UDP). Empty when port collection is skipped.
+    pub ports: Vec<u16>,
 }
 
 /// System-wide statistics exposed to the frontend
 /// Provides overall system resource usage and performance metrics
-#[derive(Serialize, Debug)]
+#[derive(Clone, Serialize, Debug)]
 pub struct SystemStats {
+    pub details: ResourceDetails,
     /// CPU usage per core as percentage (0-100)
     pub cpu_usage: Vec<f32>,
     /// Total physical memory in bytes
@@ -107,13 +112,52 @@ pub struct SystemStats {
     /// Load averages for 1, 5, and 15 minutes
     pub load_avg: [f64; 3],
     /// Total bytes received over network
-    pub network_rx_bytes: u64,
+    pub network_rx_bytes: Option<u64>,
     /// Total bytes transmitted over network
-    pub network_tx_bytes: u64,
+    pub network_tx_bytes: Option<u64>,
     /// Total disk space in bytes
     pub disk_total_bytes: u64,
     /// Used disk space in bytes
     pub disk_used_bytes: u64,
     /// Free disk space in bytes
     pub disk_free_bytes: u64,
+}
+
+#[derive(Clone, Debug, Serialize)]
+pub struct SystemIdentity {
+    pub cpu_model: Option<String>,
+    pub physical_cores: Option<usize>,
+    pub architecture: String,
+    pub platform: String,
+    pub os_version: Option<String>,
+    pub kernel_version: Option<String>,
+}
+
+#[derive(Clone, Debug, Serialize)]
+pub struct VolumeDetails {
+    pub name: String,
+    pub mount: String,
+    pub file_system: String,
+    pub total: u64,
+    pub available: u64,
+    pub read_only: bool,
+}
+
+#[derive(Clone, Debug, Serialize)]
+pub struct InterfaceDetails {
+    pub name: String,
+    pub received: Option<u64>,
+    pub sent: Option<u64>,
+    pub received_total: u64,
+    pub sent_total: u64,
+}
+
+#[derive(Clone, Debug, Serialize)]
+pub struct ResourceDetails {
+    pub identity: SystemIdentity,
+    pub memory_unallocated: u64,
+    pub swap_total: u64,
+    pub swap_used: u64,
+    pub volumes: Vec<VolumeDetails>,
+    pub interfaces: Vec<InterfaceDetails>,
 }

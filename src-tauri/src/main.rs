@@ -5,8 +5,15 @@
 //! application, initializes plugins, and configures window effects.
 
 mod commands;
+mod companion;
+mod desktop;
+mod gpu;
 mod monitoring;
+mod native_icons;
+mod preferences;
+mod sampling;
 mod state;
+mod telemetry;
 mod ui;
 
 use state::AppState;
@@ -30,15 +37,57 @@ fn main() {
         .setup(|app| {
             let window = app.get_webview_window("main").unwrap();
             ui::setup_window_effects(&window).expect("Failed to apply window effects");
+            desktop::setup(app.handle())?;
             Ok(())
         })
         .plugin(tauri_plugin_shell::init())
         .plugin(tauri_plugin_os::init())
         .manage(AppState::new())
+        .manage(preferences::Preferences::default())
+        .manage(telemetry::Telemetry::default())
+        .manage(desktop::DesktopState::default())
+        .manage(std::sync::Mutex::new(companion::CompanionState::default()))
+        .on_window_event(companion::window_event)
         .invoke_handler(tauri::generate_handler![
+            telemetry::track_usage,
+            telemetry::analytics_configured,
+            preferences::read_preferences,
+            preferences::update_preferences,
+            desktop::open_settings,
+            desktop::settings_pane,
+            desktop::open_about,
             commands::get_processes,
+            commands::get_process_icons,
             commands::kill_process,
+            sampling::get_overview,
+            sampling::set_monitor_paused,
+            sampling::set_monitor_interval,
+            companion::configure_companion,
+            companion::show_companion,
+            companion::hide_companion,
+            companion::open_main_window,
+            companion::quit_app,
         ])
-        .run(tauri::generate_context!())
-        .expect("error while running tauri application");
+        .build(tauri::generate_context!())
+        .expect("error while building tauri application")
+        .run(|app, event| {
+            #[cfg(target_os = "macos")]
+            if let tauri::RunEvent::Reopen {
+                has_visible_windows,
+                ..
+            } = event
+            {
+                // Reactivating the app must not steal focus from Settings or About.
+                // Restore the monitor when all document windows are hidden instead.
+                let auxiliary_visible = ["settings", "about"].iter().any(|label| {
+                    app.get_webview_window(label)
+                        .is_some_and(|window| window.is_visible().unwrap_or(false))
+                });
+                if !has_visible_windows || !auxiliary_visible {
+                    let _ = companion::open_main(app);
+                }
+            }
+            #[cfg(not(target_os = "macos"))]
+            let _ = (app, event);
+        });
 }

@@ -1,20 +1,22 @@
 {
   "name": "neohtop",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "description": "",
   "type": "module",
   "scripts": {
     "dev": "vite dev",
-    "build": "vite build",
+    "build": "vite build && node scripts/check-shadcn-css.mjs",
     "preview": "vite preview",
     "check": "svelte-kit sync && svelte-check --tsconfig ./jsconfig.json",
     "check:watch": "svelte-kit sync && svelte-check --tsconfig ./jsconfig.json --watch",
+    "test:metrics": "node tests/format-usage-percentage.mjs",
     "tauri": "tauri",
-    "format": "prettier --write ./src ./scripts ./docs .github/workflows && cargo fmt --manifest-path src-tauri/Cargo.toml",
-    "format:check": "prettier --check ./src ./scripts ./docs .github/workflows && cargo fmt --manifest-path src-tauri/Cargo.toml -- --check",
+    "format": "prettier --write ./src ./scripts ./docs ./site ./telemetry .github/workflows && cargo fmt --manifest-path src-tauri/Cargo.toml",
+    "format:check": "prettier --check ./src ./scripts ./docs ./site ./telemetry .github/workflows && cargo fmt --manifest-path src-tauri/Cargo.toml -- --check",
     "release:check": "node scripts/release.mjs check-version",
-    "test:release": "node --test scripts/*.test.mjs",
-    "prepare": "husky install"
+    "test:release": "node --test scripts/*.test.mjs && npm run test:metrics",
+    "prepare": "husky install",
+    "build:site": "node scripts/build-site.mjs"
   },
   "license": "MIT",
   "dependencies": {
@@ -35,11 +37,21 @@
     "husky": "^8.0.0",
     "lint-staged": "^15.2.10",
     "prettier": "^3.3.3",
-    "prettier-plugin-svelte": "^3.2.7",
+    "prettier-plugin-svelte": "^4.1.1",
     "svelte": "^5.0.0",
     "svelte-check": "^4.0.0",
     "typescript": "^5.5.0",
-    "vite": "^6.3.5"
+    "vite": "^6.3.5",
+    "@tailwindcss/vite": "^4.3.3",
+    "tailwindcss": "^4.3.3",
+    "@lucide/svelte": "^1.63.0",
+    "bits-ui": "^2.20.0",
+    "@internationalized/date": "^3.12.0",
+    "tailwind-variants": "^3.3.1",
+    "cn": "^0.5.0",
+    "tw-animate-css": "^1.4.0",
+    "shadcn-svelte": "^1.7.1",
+    "layerchart": "^2.0.0"
   },
   "lint-staged": {
     "src/**/*.{js,ts,jsx,tsx,svelte}": [

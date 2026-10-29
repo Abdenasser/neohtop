@@ -24,6 +24,20 @@ jobs:
         env:
           RELEASE_TAG: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || '' }}
         run: node scripts/release.mjs check-version "$RELEASE_TAG"
+      - name: Verify the desktop analytics relay
+        if: startsWith(github.ref, 'refs/tags/')
+        env:
+          NEOHTOP_ANALYTICS_ENDPOINT: ${{ vars.NEOHTOP_ANALYTICS_ENDPOINT }}
+        run: |
+          node --input-type=module <<'JS'
+          const endpoint = new URL(process.env.NEOHTOP_ANALYTICS_ENDPOINT || '');
+          if (endpoint.protocol !== 'https:' || endpoint.pathname !== '/v1/events' || endpoint.search || endpoint.hash || endpoint.username || endpoint.password) throw new Error('Set the public desktop analytics relay URL before tagging.');
+          const health = new URL('/health', endpoint);
+          const response = await fetch(health, {signal: AbortSignal.timeout(10000)});
+          const state = await response.json();
+          if (!response.ok || state.configured !== true || state.validation_only !== false) throw new Error('The desktop relay must be configured for production before release.');
+          console.log('Desktop relay is configured for production.');
+          JS
       - name: Refuse changes to a published release
         if: startsWith(github.ref, 'refs/tags/')
         uses: actions/github-script@v7

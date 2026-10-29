@@ -1,5 +1,7 @@
 <script lang="ts">
-  import type { SystemStats } from "$lib/types";
+  import GpuPanel from "./GpuPanel.svelte";
+  import * as Tooltip from "$lib/components/ui/tooltip/index.js";
+  import type { SystemStats, ResourceSample, GpuDevice } from "$lib/types";
   import {
     CpuPanel,
     MemoryPanel,
@@ -7,46 +9,62 @@
     SystemPanel,
     NetworkPanel,
   } from "$lib/components";
-
   export let systemStats: SystemStats | null = null;
+  export let history: ResourceSample[] = [];
+  export let gpus: GpuDevice[] = [];
+  export let capturedAt = 0;
+  export let isFrozen = false;
+  export let unavailable = false;
 </script>
 
-<div class="dashboard-stats">
-  {#if systemStats}
-    <div class="stats-layout">
-      <CpuPanel cpuUsage={systemStats.cpu_usage} />
-
-      <MemoryPanel
+{#if systemStats}<Tooltip.Provider delayDuration={150}
+    ><section class="resource-grid shrink-0" aria-label="System resources">
+      <CpuPanel
+        stats={systemStats}
+        {capturedAt}
+        cpuUsage={systemStats.cpu_usage}
+        {history}
+        {isFrozen}
+        {unavailable}
+      /><MemoryPanel
+        stats={systemStats}
+        {capturedAt}
+        {history}
+        {isFrozen}
+        {unavailable}
         memoryTotal={systemStats.memory_total}
         memoryUsed={systemStats.memory_used}
         memoryFree={systemStats.memory_free}
-      />
-
-      <StoragePanel
+      /><GpuPanel
+        stats={systemStats}
+        {capturedAt}
+        {gpus}
+        {history}
+        {isFrozen}
+        {unavailable}
+      /><StoragePanel
+        stats={systemStats}
+        {capturedAt}
+        {isFrozen}
+        {unavailable}
         diskTotalBytes={systemStats.disk_total_bytes}
         diskUsedBytes={systemStats.disk_used_bytes}
         diskFreeBytes={systemStats.disk_free_bytes}
-      />
-
-      <SystemPanel uptime={systemStats.uptime} loadAvg={systemStats.load_avg} />
-
-      <NetworkPanel
+      /><SystemPanel
+        stats={systemStats}
+        {capturedAt}
+        {isFrozen}
+        {unavailable}
+        uptime={systemStats.uptime}
+        loadAvg={systemStats.load_avg}
+      /><NetworkPanel
+        stats={systemStats}
+        {capturedAt}
+        {history}
+        {isFrozen}
+        {unavailable}
         networkRxBytes={systemStats.network_rx_bytes}
         networkTxBytes={systemStats.network_tx_bytes}
       />
-    </div>
-  {/if}
-</div>
-
-<style>
-  .dashboard-stats {
-    padding: 0.5rem;
-    overflow-x: auto;
-  }
-
-  .stats-layout {
-    display: flex;
-    gap: 0.75rem;
-    width: 100%;
-  }
-</style>
+    </section></Tooltip.Provider
+  >{/if}

@@ -1,0 +1,21 @@
+{
+  "desktop_open": [],
+  "resource_view": ["cpu", "memory", "gpu", "storage", "system", "network"],
+  "theme_changed": [
+    "catppuccin",
+    "dracula",
+    "gruvbox",
+    "nord",
+    "bubblegum",
+    "synthwave",
+    "candyfloss",
+    "terminal",
+    "amber",
+    "glassy"
+  ],
+  "process_view_changed": ["flat", "tree"],
+  "companion_open": [],
+  "inspector_open": [],
+  "port_search": [],
+  "settings_open": []
+}

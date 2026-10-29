@@ -1,7 +1,10 @@
 <script lang="ts">
   import type { Process, Column, ProcessTreeRow } from "$lib/types";
   import { ProcessIcon, ActionButtons } from "$lib/components";
-
+  import { Button } from "$lib/components/ui/button/index.js";
+  import { Badge } from "$lib/components/ui/badge/index.js";
+  import * as Table from "$lib/components/ui/table/index.js";
+  import { ChevronRight, ChevronDown, Pin } from "@lucide/svelte";
   export let process: Process;
   export let columns: Column[];
   export let isPinned: boolean;
@@ -9,182 +12,102 @@
   export let tree: ProcessTreeRow | null = null;
   export let expansionLocked = false;
   export let onToggleExpand: (key: string) => void = () => {};
-
   export let onTogglePin: (command: string) => void;
   export let onShowDetails: (process: Process) => void;
   export let onKillProcess: (process: Process) => void;
+  const numeric = [
+    "cpu_usage",
+    "memory_usage",
+    "virtual_memory",
+    "disk_usage",
+    "run_time",
+  ];
 </script>
 
-<tr class:high-usage={isHighUsage} class:pinned={isPinned}>
-  {#each columns.filter((col) => col.visible) as column}
-    <td
-      class="truncate"
-      class:tree-name={tree !== null && column.id === "name"}
-    >
-      {#if column.id === "name"}
-        <div
-          class="name-cell"
-          style:padding-left={tree
-            ? `${Math.min(tree.depth, 10) * 16}px`
-            : undefined}
-        >
-          {#if tree}
-            {#if tree.childCount > 0}
-              <button
-                class="branch-toggle"
-                disabled={expansionLocked}
-                title={expansionLocked
-                  ? "Clear search and filters to collapse this branch"
-                  : undefined}
-                aria-expanded={tree.expanded}
-                aria-label={`${tree.expanded ? "Collapse" : "Expand"} ${process.name} children`}
-                on:click={() => tree && onToggleExpand(tree.key)}
-                >{tree.expanded ? "▾" : "▸"}</button
-              >
-            {:else}
-              <span class="branch-spacer" aria-hidden="true"></span>
-            {/if}
-          {/if}
-          <ProcessIcon processName={process.name} />
-          <span class="process-name" title={process.name}>{process.name}</span>
-          {#if tree && tree.familyProcessCount > 1}
-            <span
-              class="child-count"
-              title={`${tree.familyProcessCount} processes in this family`}
-              >{tree.familyProcessCount}</span
-            >
-          {/if}
-        </div>
-      {:else if tree && column.id === "cpu_usage"}
-        <span title={`Combined CPU for ${tree.familyProcessCount} processes`}
-          >{tree.familyCpuUsage.toFixed(1)}%</span
-        >
-      {:else if tree && column.id === "memory_usage"}
-        <span
-          title="Sum of resident memory for this process and all descendants. Shared pages may be counted more than once."
-          >{(tree.familyMemoryUsage / (1024 * 1024)).toFixed(1)} MB</span
-        >
-      {:else if column.format}
-        {@html column.format(process[column.id])}
-      {:else}
-        {process[column.id]}
-      {/if}
-    </td>
-  {/each}
-  <ActionButtons
+<Table.Row data-pinned={isPinned} data-high-usage={isHighUsage}
+  >{#each columns.filter((c) => c.visible) as column}<Table.Cell
+      class={`${numeric.includes(column.id) ? "text-right font-mono text-xs" : ""} ${column.id === "name" ? "pl-4" : ""} ${tree && column.id === "name" ? "tree-name" : ""}`}
+      ><div
+        class={column.id === "name" ? "" : "max-w-72 truncate"}
+        title={column.id === "name"
+          ? undefined
+          : column.format
+            ? column.format(process[column.id])
+            : String(process[column.id] ?? "")}
+      >
+        {#if column.id === "name"}<div
+            class="flex min-w-0 items-center gap-2"
+            style:padding-left={tree
+              ? `${Math.min(tree.depth, 10) * 16}px`
+              : undefined}
+          >
+            {#if tree}{#if tree.childCount > 0}<Button
+                  variant="ghost"
+                  size="icon-xs"
+                  disabled={expansionLocked}
+                  aria-expanded={tree.expanded}
+                  aria-label={`${tree.expanded ? "Collapse" : "Expand"} ${process.name} children`}
+                  title={expansionLocked
+                    ? "Clear search and filters to collapse this branch"
+                    : undefined}
+                  onclick={() => tree && onToggleExpand(tree.key)}
+                  >{#if tree.expanded}<ChevronDown />{:else}<ChevronRight
+                    />{/if}</Button
+                >{:else}<span class="size-6 shrink-0" aria-hidden="true"
+                ></span>{/if}{/if}<ProcessIcon
+              pid={process.pid}
+              startTime={process.start_time}
+            /><Button
+              variant="link"
+              class="h-auto min-w-0 shrink justify-start truncate p-0 text-left text-[13px] font-normal text-foreground"
+              title={process.name}
+              onclick={() => onShowDetails(process)}
+              ><span class="max-w-64 truncate">{process.name}</span></Button
+            >{#if tree && tree.familyProcessCount > 1}<Badge
+                variant="secondary"
+                class="px-1.5 text-[10px] font-normal"
+                title={`${tree.familyProcessCount} processes in this family`}
+                >{tree.familyProcessCount}</Badge
+              >{/if}{#if isPinned}<Pin
+                class="size-3 shrink-0 fill-primary/20 text-primary"
+              />{/if}
+          </div>
+        {:else if column.id === "cpu_usage"}{@const cpu =
+            tree?.familyCpuUsage ?? process.cpu_usage}<span
+            class={cpu > 50
+              ? "rounded bg-destructive/10 px-1.5 py-1 text-destructive"
+              : ""}
+            title={tree
+              ? `Combined CPU for ${tree.familyProcessCount} processes`
+              : undefined}>{cpu.toFixed(1)}%</span
+          >
+        {:else if tree && column.id === "memory_usage"}<span
+            title="Sum of resident memory for this process and all descendants; shared pages may overlap."
+            >{(tree.familyMemoryUsage / (1024 * 1024)).toFixed(1)} MB</span
+          >
+        {:else if column.id === "status"}<span
+            class="flex items-center gap-1.5 text-xs text-muted-foreground"
+            ><span
+              class="size-1.5 shrink-0 rounded-full"
+              style:background={process.status === "Running"
+                ? "var(--status-running)"
+                : process.status === "Zombie" || process.status === "Stopped"
+                  ? "var(--status-stopped)"
+                  : "var(--status-idle)"}
+            ></span>{process.status}</span
+          >
+        {:else if column.format}{column.format(process[column.id])}
+        {:else}<span
+            class={["pid", "ppid", "user", "session_id"].includes(column.id)
+              ? "font-mono text-xs text-muted-foreground"
+              : ""}>{process[column.id] ?? "—"}</span
+          >{/if}
+      </div></Table.Cell
+    >{/each}<ActionButtons
     {process}
     {isPinned}
     {onTogglePin}
     {onShowDetails}
     {onKillProcess}
-  />
-</tr>
-
-<style>
-  td {
-    padding: 6px 12px;
-    border-bottom: 1px solid var(--surface0);
-    color: var(--text);
-    z-index: 1;
-  }
-
-  .truncate {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 0;
-  }
-
-  tr:hover {
-    background-color: var(--surface0);
-  }
-
-  .high-usage {
-    background-color: color-mix(in srgb, var(--red) 10%, transparent);
-  }
-
-  .high-usage:hover {
-    background-color: color-mix(in srgb, var(--red) 15%, transparent);
-  }
-
-  tr.pinned {
-    background-color: color-mix(in srgb, var(--blue) 10%, transparent);
-  }
-
-  tr.pinned:hover {
-    background-color: color-mix(in srgb, var(--blue) 15%, transparent);
-  }
-
-  .name-cell {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .tree-name {
-    position: sticky;
-    left: 0;
-    z-index: 2;
-    background: var(--base);
-    border-right: 1px solid var(--surface0);
-  }
-
-  .high-usage .tree-name {
-    background: color-mix(in srgb, var(--red) 10%, var(--base));
-  }
-
-  .pinned .tree-name {
-    background: color-mix(in srgb, var(--blue) 10%, var(--base));
-  }
-
-  tr:hover .tree-name {
-    background: var(--surface0);
-  }
-
-  .process-name {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    min-width: 0;
-  }
-
-  .branch-toggle,
-  .branch-spacer {
-    width: 18px;
-    height: 24px;
-    flex-shrink: 0;
-  }
-
-  .branch-toggle {
-    padding: 0;
-    border: 0;
-    border-radius: 4px;
-    background: transparent;
-    color: var(--subtext0);
-    cursor: pointer;
-    font-size: 15px;
-  }
-
-  .branch-toggle:hover:not(:disabled) {
-    color: var(--blue);
-    background: var(--surface0);
-  }
-
-  .branch-toggle:disabled {
-    cursor: default;
-    opacity: 0.6;
-  }
-
-  .branch-toggle:focus-visible {
-    outline: 2px solid var(--blue);
-    outline-offset: 2px;
-  }
-
-  .child-count {
-    border-radius: 4px;
-    padding: 1px 5px;
-    background: var(--surface0);
-    color: var(--subtext0);
-    font-size: 10px;
-    flex-shrink: 0;
-  }
-</style>
+  /></Table.Row
+>

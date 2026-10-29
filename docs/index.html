@@ -1,19 +1,14 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="dark" data-theme="catppuccin">
   <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>
-      NeoHtop — Open-source system monitor for macOS, Linux &amp; Windows
-    </title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="color-scheme" content="dark" />
+    <title>NeoHtop — Your system. In plain sight.</title>
     <meta
       name="description"
-      content="See what’s running on your machine. NeoHtop is a free, open-source desktop system monitor with process search, CPU and memory metrics, pinning, and themes."
+      content="A free, open-source system monitor for macOS, Linux and Windows. Explore processes, GPU stats, resource charts, 24 themes and a menu-bar companion."
     />
-    <meta name="author" content="Abdenasser" />
-    <meta name="theme-color" content="#0c1012" />
-    <meta name="color-scheme" content="dark" />
-    <meta name="robots" content="index, follow, max-image-preview:large" />
     <link rel="canonical" href="https://abdenasser.github.io/neohtop/" />
     <link
       rel="alternate"
@@ -22,74 +17,68 @@
       title="Markdown version"
     />
     <link rel="describedby" href="llms.txt" />
+    <link rel="icon" href="favicon.ico" />
+    <link rel="apple-touch-icon" href="assets/neohtop-icon.png" />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="NeoHtop" />
     <meta property="og:url" content="https://abdenasser.github.io/neohtop/" />
     <meta
       property="og:title"
-      content="NeoHtop — Open-source system monitor for macOS, Linux &amp; Windows"
+      content="NeoHtop — Your system. In plain sight."
     />
     <meta
       property="og:description"
-      content="See what’s running on your machine. NeoHtop is a free, open-source desktop system monitor with process search, CPU and memory metrics, pinning, and themes."
+      content="A free, open-source system monitor for macOS, Linux and Windows. Explore processes, GPU stats, resource charts, 24 themes and a menu-bar companion."
     />
     <meta
       property="og:image"
       content="https://abdenasser.github.io/neohtop/assets/neohtop-desktop.png"
     />
-    <meta property="og:image:width" content="2784" />
-    <meta property="og:image:height" content="2024" />
+    <meta property="og:image:width" content="1280" />
+    <meta property="og:image:height" content="900" />
     <meta
       property="og:image:alt"
-      content="NeoHtop desktop system monitor showing process metrics"
+      content="NeoHtop in Catppuccin with resource charts and a searchable process table"
     />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:creator" content="@__abdenasser" />
     <meta
       name="twitter:title"
-      content="NeoHtop — Open-source system monitor for macOS, Linux &amp; Windows"
+      content="NeoHtop — Your system. In plain sight."
     />
     <meta
       name="twitter:description"
-      content="See what’s running on your machine. NeoHtop is a free, open-source desktop system monitor with process search, CPU and memory metrics, pinning, and themes."
+      content="A free, open-source system monitor for macOS, Linux and Windows. Explore processes, GPU stats, resource charts, 24 themes and a menu-bar companion."
     />
     <meta
       name="twitter:image"
       content="https://abdenasser.github.io/neohtop/assets/neohtop-desktop.png"
     />
-    <link rel="icon" href="favicon.ico" />
-    <link rel="apple-touch-icon" href="assets/neohtop-icon.png" />
-    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="assets/site-style-D0fZ53CT.css" />
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
         "@graph": [
           {
             "@type": "WebSite",
-            "@id": "https://abdenasser.github.io/neohtop/#website",
             "name": "NeoHtop",
             "url": "https://abdenasser.github.io/neohtop/"
           },
           {
+            "@context": "https://schema.org",
             "@type": "SoftwareApplication",
-            "@id": "https://abdenasser.github.io/neohtop/#desktop",
             "name": "NeoHtop",
-            "url": "https://abdenasser.github.io/neohtop/",
-            "description": "Free, open-source desktop system monitor for macOS, Linux, and Windows.",
+            "softwareVersion": "1.3.0",
             "applicationCategory": "UtilitiesApplication",
             "operatingSystem": ["macOS", "Linux", "Windows"],
+            "description": "A free, open-source system monitor for macOS, Linux and Windows. Explore processes, GPU stats, resource charts, 24 themes and a menu-bar companion.",
+            "url": "https://abdenasser.github.io/neohtop/",
             "license": "https://github.com/Abdenasser/neohtop/blob/main/LICENSE",
             "isAccessibleForFree": true,
             "offers": {
               "@type": "Offer",
               "price": "0",
               "priceCurrency": "USD"
-            },
-            "codeRepository": "https://github.com/Abdenasser/neohtop",
-            "author": {
-              "@type": "Person",
-              "name": "Abdenasser",
-              "url": "https://github.com/Abdenasser"
             },
             "image": "https://abdenasser.github.io/neohtop/assets/neohtop-desktop.png"
           },
@@ -98,50 +87,58 @@
             "mainEntity": [
               {
                 "@type": "Question",
-                "name": "What is NeoHtop?",
+                "name": "Does NeoHtop send analytics?",
                 "acceptedAnswer": {
                   "@type": "Answer",
-                  "text": "NeoHtop is a free, MIT-licensed desktop system monitor for macOS, Linux, and Windows. It displays local process, CPU, memory, storage, and network information. The desktop app is built with Rust, Tauri, and Svelte."
+                  "text": "Official v1.3.0 builds send a basic app-open count and version without a persistent identifier. Optional feature usage is off by default in Settings → Privacy. Process and system readings stay local. See the Privacy link for details; website analytics is separate."
                 }
               },
               {
                 "@type": "Question",
-                "name": "Is NeoHtop a replacement for htop or Activity Monitor?",
+                "name": "Is NeoHtop free? Do I need an account?",
                 "acceptedAnswer": {
                   "@type": "Answer",
-                  "text": "NeoHtop is a graphical alternative for exploring local processes, with search, filters, process pinning, and themes. Choose it if you prefer a desktop interface; use htop or NeoHtop CLI if you prefer working inside a terminal."
+                  "text": "NeoHtop is free, MIT-licensed and open source. Local desktop monitoring requires no account or cloud subscription. Pro is postponed and is not available to buy or install."
                 }
               },
               {
                 "@type": "Question",
-                "name": "Does NeoHtop require an account?",
+                "name": "Will it read my graphics card?",
                 "acceptedAnswer": {
                   "@type": "Answer",
-                  "text": "No account or cloud subscription is required for the free local desktop monitor. NeoHtop Pro is in development and is not available to buy or use yet."
+                  "text": "GPU support depends on your operating system and driver. NeoHtop reads macOS IORegistry, AMD sysfs and NVIDIA NVML, with DXGI/DRM inventory for other adapters. Missing counters stay unavailable. Per-process GPU engine accounting is limited to supported Linux DRM drivers."
                 }
               },
               {
                 "@type": "Question",
-                "name": "Is the new process Tree view available in downloads?",
+                "name": "Are all 24 themes still here?",
                 "acceptedAnswer": {
                   "@type": "Answer",
-                  "text": "Process families with combined CPU and RAM are in development for a future desktop release. The download buttons point only to the latest published GitHub release, which may not include this feature yet."
+                  "text": "Yes. The original themes remain, including Catppuccin, Dracula, Nord, Tokyo Night, light palettes, retro choices and High Contrast. Glassy needs supported native effects on macOS or Windows."
                 }
               },
               {
                 "@type": "Question",
-                "name": "How much CPU or memory does NeoHtop use?",
+                "name": "What does the menu-bar companion do?",
                 "acceptedAnswer": {
                   "@type": "Answer",
-                  "text": "Resource use depends on your operating system, process count, visible data, and refresh interval. We do not publish a universal CPU or memory benchmark. You can adjust the refresh interval or pause updates in the app."
+                  "text": "It shows CPU, RAM, GPU, network, free storage and the five busiest processes. It shares samples, pause and themes with the main window, and stops polling while hidden. Tray behavior varies by Linux desktop."
                 }
               },
               {
                 "@type": "Question",
-                "name": "Where can I report bugs or contribute?",
+                "name": "Does this include process trees and local-port search?",
                 "acceptedAnswer": {
                   "@type": "Answer",
-                  "text": "Use GitHub Issues to report problems and the NeoHtop repository to contribute code. Include your operating system, app version, and steps to reproduce a bug."
+                  "text": "Version 1.3.0 includes expandable families with combined CPU/RAM and explicit :3000 or port:443 searches. Family RAM may double-count shared pages, and socket visibility depends on OS permissions. Older releases can differ."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "How is it different from NeoHtop CLI?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Desktop is the Rust/Tauri/Svelte graphical app. NeoHtop CLI is a separate Go/Charm terminal application. Both are local, open-source monitors with independent feature sets and releases."
                 }
               }
             ]
@@ -151,505 +148,1665 @@
     </script>
   </head>
   <body>
-    <a class="skip-link" href="#main">Skip to content</a>
+    <!--[--><a class="skip-link" href="#main">Skip to content</a>
     <header class="site-header">
-      <nav class="shell navigation" aria-label="Main navigation">
+      <div class="site-shell header-row">
         <a class="brand" href="./" aria-label="NeoHtop home"
-          ><img
-            src="assets/neohtop-icon.png"
-            width="32"
-            height="32"
-            alt=""
-          /><span>neohtop<span class="brand-cursor">_</span></span></a
-        ><button
-          class="menu-button"
-          aria-expanded="false"
-          aria-controls="navigation-links"
-        >
-          Menu <span aria-hidden="true">+</span>
-        </button>
-        <div class="nav-links" id="navigation-links">
-          <a href="./#features">Features</a
-          ><a href="install.html">Installation</a
-          ><a href="desktop-vs-cli.html">Desktop / CLI</a
-          ><a href="./#pro">Pro <span class="tiny-tag">IN DEV</span></a
-          ><a class="nav-github" href="https://github.com/Abdenasser/neohtop"
-            >GitHub <span aria-hidden="true">↗</span></a
-          >
-        </div>
-      </nav>
-    </header>
-    <main id="main">
-      <section class="hero shell">
-        <div class="hero-copy">
-          <p class="eyebrow">
-            <span class="status-dot"></span> YOUR SYSTEM. IN PLAIN SIGHT.
-          </p>
-          <h1>Know what’s<br />running <em>the show.</em></h1>
-          <p class="hero-description">
-            A system monitor for people who like to look under the hood. Explore
-            processes, track resources, and take back your desktop.
-          </p>
-          <div class="hero-actions">
-            <a class="button primary" href="#download"
-              >Get NeoHtop <span aria-hidden="true">↓</span></a
-            ><a
-              class="button quiet"
-              href="https://github.com/Abdenasser/neohtop"
-              >Explore the source <span aria-hidden="true">↗</span></a
-            >
-          </div>
-          <p class="hero-footnote">
-            Free &amp; open source <span>·</span> macOS / Linux / Windows
-          </p>
-          <div class="install-command">
-            <span class="prompt" aria-hidden="true">$</span
-            ><code id="brew-command">brew install --cask neohtop</code
-            ><button
-              class="copy-button"
-              data-copy="brew-command"
-              aria-label="Copy Homebrew install command"
-            >
-              Copy
-            </button>
-          </div>
-          <p class="command-note">
-            Community-maintained Homebrew cask.
-            <a href="install.html">All install options ↗</a>
-          </p>
-        </div>
-        <figure class="hero-visual">
-          <div class="window-bar">
-            <div class="window-dots" aria-hidden="true">
-              <i></i><i></i><i></i>
-            </div>
-            <span>neohtop — local machine</span
-            ><span class="window-status">● APP PREVIEW</span>
-          </div>
-          <img
-            src="assets/neohtop-desktop.png"
-            alt="NeoHtop desktop app showing CPU cores, memory, storage, network activity, and a searchable process table"
-            width="2784"
-            height="2024"
-            fetchpriority="high"
-          />
-          <figcaption>
-            <span>REAL PROCESSES. REAL CLARITY.</span
-            ><span>Rust + Tauri + Svelte</span>
-          </figcaption>
-        </figure>
-      </section>
-      <div class="platform-strip">
-        <div class="shell">
-          <span class="strip-label">FEELS AT HOME ON</span
-          ><span>macOS <small>Intel + Apple Silicon</small></span
-          ><span>Linux <small>.deb / .rpm / AppImage</small></span
-          ><span>Windows <small>x64</small></span
-          ><a href="https://github.com/Abdenasser/neohtop/blob/main/LICENSE"
-            >MIT licensed ↗</a
-          >
-        </div>
-      </div>
-      <section class="section shell" id="features">
-        <div class="section-heading">
-          <p class="eyebrow">01 / UNDER THE HOOD</p>
-          <h2>Less hunting.<br />More understanding.</h2>
-          <p>
-            A clear view of the work your machine is doing. From the process you
-            forgot about to the one eating your afternoon.
-          </p>
-        </div>
-        <div class="feature-grid">
-          <article class="feature-card feature-search">
-            <span class="feature-index">[ 01 ]</span>
-            <h3>Find the needle.<br />Skip the haystack.</h3>
-            <p>
-              Search by name, command, or PID. Combine terms with commas, use
-              regular expressions, and filter by CPU, memory, status, or
-              runtime.
-            </p>
-            <div class="search-demo" aria-label="Example search: node, docker">
-              <span aria-hidden="true">⌕</span><code>node, docker</code
-              ><span class="demo-cursor" aria-hidden="true">▌</span>
-            </div>
-            <div class="sample-results" aria-label="Illustrative process names">
-              <span><i></i> node <small>development server</small></span
-              ><span
-                ><i></i> com.docker.backend
-                <small>container runtime</small></span
-              ><span><i></i> node <small>language server</small></span>
-            </div>
-            <span class="example-label">ILLUSTRATIVE SEARCH</span>
-          </article>
-          <article class="feature-card">
-            <span class="feature-index">[ 02 ]</span>
-            <div class="meter-art" aria-hidden="true">
-              <span>CPU <b>▂▄▃▆▅▃▇▄▅▂▄▃</b></span
-              ><span>MEM <i>||||||||||||||||</i><small>||||||||</small></span>
-            </div>
-            <h3>Everything in view.</h3>
-            <p>
-              CPU cores, memory, storage, network I/O, and process details. Pin
-              important processes, choose your columns, and set your refresh
-              pace.
-            </p>
-            <span class="feature-note"
-              >A dashboard that speaks your language.</span
-            >
-          </article>
-          <article class="feature-card feature-personal">
-            <span class="feature-index">[ 03 ]</span>
-            <div class="theme-swatches" aria-hidden="true">
-              <i></i><i></i><i></i><i></i><i></i>
-            </div>
-            <h3>Your terminal energy.<br />Your desktop.</h3>
-            <p>
-              Dark, light, and colorful themes, a native window, and a Rust
-              backend. Make it feel like part of your setup.
-            </p>
-            <span class="feature-note"
-              >Built with Rust, Tauri, and Svelte.</span
-            >
-          </article>
-        </div>
-        <div class="next-feature">
-          <span class="tag">NEXT DESKTOP RELEASE</span>
-          <p>
-            <strong>Meet process families.</strong> Expand parent/child trees
-            and see their combined CPU and RAM. In development; not in the
-            current download.
-          </p>
-          <a href="https://github.com/Abdenasser/neohtop/pull/206"
-            >See the work ↗</a
-          >
-        </div>
-      </section>
-      <section class="cli-section">
-        <div class="shell cli-layout">
-          <div>
-            <p class="eyebrow">02 / SAME CURIOSITY. DIFFERENT SHELL.</p>
-            <h2>More of a<br /><span class="accent">terminal person?</span></h2>
-            <p>
-              Meet NeoHtop CLI, the separate Go-powered companion. Process
-              trees, CPU sparklines, memory bars, filters, and themes—inside
-              your terminal.
-            </p>
-            <a class="text-link" href="desktop-vs-cli.html"
-              >Find your flavor: Desktop vs CLI ↗</a
-            >
-          </div>
-          <div class="terminal">
-            <div class="terminal-title">
-              <span aria-hidden="true">● ● ●</span
-              ><span>~/your-next-favorite-tool</span>
-            </div>
-            <pre><span class="terminal-muted"># install the terminal companion</span>
-<span class="accent">$</span> npm install -g neohtop-cli
-
-<span class="terminal-muted"># take a look around</span>
-<span class="accent">$</span> neohtop-cli<span class="terminal-cursor" aria-hidden="true">▌</span></pre>
-            <div class="terminal-bottom">
-              <a href="https://github.com/Abdenasser/neohtop-cli"
-                >CLI source ↗</a
-              ><a href="https://www.npmjs.com/package/neohtop-cli"
-                >npm package ↗</a
-              >
-            </div>
-          </div>
-        </div>
-      </section>
-      <section class="section shell" id="download">
-        <div class="section-heading horizontal">
-          <div>
-            <p class="eyebrow">03 / MAKE YOURSELF AT HOME</p>
-            <h2>Your machine is waiting.</h2>
-          </div>
-          <div class="release-label">
-            <span class="status-dot"></span
-            ><span id="current-version" aria-live="polite"
-              >Latest published release</span
-            >
-          </div>
-        </div>
-        <p class="section-intro">
-          Official desktop builds come from GitHub Releases. Pick your platform
-          and architecture.
-        </p>
-        <p id="release-status" class="release-status" role="status">
-          Links open the published release page. Available direct downloads load
-          when GitHub responds.
-        </p>
-        <div class="download-grid">
-          <article class="download-card">
-            <div class="platform-heading">
-              <span aria-hidden="true">⌘</span>
-              <h3>macOS</h3>
-              <span class="platform-ext">.dmg</span>
-            </div>
-            <a
-              class="download-button"
-              data-type="macos-silicon"
-              href="https://github.com/Abdenasser/neohtop/releases/latest"
-              ><span
-                ><strong>Apple Silicon</strong
-                ><small class="secondary">M-series Macs</small></span
-              ><span aria-hidden="true">↗</span></a
-            ><a
-              class="download-button"
-              data-type="macos-intel"
-              href="https://github.com/Abdenasser/neohtop/releases/latest"
-              ><span
-                ><strong>Intel</strong
-                ><small class="secondary">Intel-based Macs</small></span
-              ><span aria-hidden="true">↗</span></a
-            >
-          </article>
-          <article class="download-card">
-            <div class="platform-heading">
-              <span aria-hidden="true">⊞</span>
-              <h3>Windows</h3>
-              <span class="platform-ext">.exe</span>
-            </div>
-            <a
-              class="download-button"
-              data-type="windows"
-              href="https://github.com/Abdenasser/neohtop/releases/latest"
-              ><span
-                ><strong>Windows x64</strong
-                ><small class="secondary">Published .exe package</small></span
-              ><span aria-hidden="true">↗</span></a
-            >
-            <p class="download-note">
-              The published release may provide a portable app rather than an
-              installer.
-            </p>
-          </article>
-          <article class="download-card">
-            <div class="platform-heading">
-              <span aria-hidden="true">&gt;_</span>
-              <h3>Linux</h3>
-              <span class="platform-ext">x64 / ARM64</span>
-            </div>
-            <div class="linux-links">
-              <a
-                class="download-button"
-                data-type="linux-deb-x64"
-                href="https://github.com/Abdenasser/neohtop/releases/latest"
-                ><span
-                  ><strong>.deb · x64</strong
-                  ><small class="secondary">Debian / Ubuntu</small></span
-                ><span aria-hidden="true">↗</span></a
-              ><a
-                class="download-button"
-                data-type="linux-appimage-x64"
-                href="https://github.com/Abdenasser/neohtop/releases/latest"
-                ><span
-                  ><strong>AppImage · x64</strong
-                  ><small class="secondary">Portable package</small></span
-                ><span aria-hidden="true">↗</span></a
-              ><a
-                class="download-button"
-                data-type="linux-rpm-x64"
-                href="https://github.com/Abdenasser/neohtop/releases/latest"
-                ><span
-                  ><strong>.rpm · x64</strong
-                  ><small class="secondary"
-                    >Fedora / RPM distributions</small
-                  ></span
-                ><span aria-hidden="true">↗</span></a
-              ><a
-                class="download-button"
-                data-type="linux-deb-arm64"
-                href="https://github.com/Abdenasser/neohtop/releases/latest"
-                ><span
-                  ><strong>.deb · ARM64</strong
-                  ><small class="secondary">Debian / Ubuntu</small></span
-                ><span aria-hidden="true">↗</span></a
-              ><a
-                class="download-button"
-                data-type="linux-appimage-arm64"
-                href="https://github.com/Abdenasser/neohtop/releases/latest"
-                ><span
-                  ><strong>AppImage · ARM64</strong
-                  ><small class="secondary">Portable package</small></span
-                ><span aria-hidden="true">↗</span></a
-              ><a
-                class="download-button"
-                data-type="linux-rpm-arm64"
-                href="https://github.com/Abdenasser/neohtop/releases/latest"
-                ><span
-                  ><strong>.rpm · ARM64</strong
-                  ><small class="secondary"
-                    >Fedora / RPM distributions</small
-                  ></span
-                ><span aria-hidden="true">↗</span></a
-              >
-            </div>
-          </article>
-        </div>
-        <div class="download-bottom">
-          <a href="install.html">Installation &amp; troubleshooting ↗</a
-          ><a href="https://github.com/Abdenasser/neohtop/releases"
-            >All releases &amp; release notes ↗</a
-          >
-        </div>
-        <noscript
-          ><p class="notice">
-            JavaScript is off. Every download link opens GitHub Releases, where
-            you can choose an available package.
-          </p></noscript
-        >
-      </section>
-      <section class="pro-section shell" id="pro">
-        <div class="pro-mark" aria-hidden="true">
-          <img
-            src="assets/neohtop-icon.png"
-            width="96"
-            height="96"
-            alt=""
-          /><span>PRO_</span>
-        </div>
-        <div>
-          <p class="eyebrow">THE NEXT CHAPTER / IN DEVELOPMENT</p>
-          <h2>Beyond your<br />local machine.</h2>
-          <p>
-            We’re exploring NeoHtop Pro for developers and small teams who need
-            to understand more than one machine: remote monitoring, history, and
-            alerts.
-          </p>
-          <p class="pro-fineprint">
-            Pro is not available yet. Scope, pricing, and launch date are still
-            being worked out. The free, open-source local monitor stays at the
-            heart of NeoHtop.
-          </p>
-          <a class="button outline" href="https://github.com/Abdenasser/neohtop"
-            >Follow development on GitHub ↗</a
-          >
-        </div>
-      </section>
-      <section class="section shell faq-section" id="faq">
-        <div>
-          <p class="eyebrow">04 / A FEW GOOD QUESTIONS</p>
-          <h2>Read the<br />fine print.</h2>
-          <a class="text-link" href="install.html"
-            >Open the installation guide ↗</a
-          >
-        </div>
-        <div class="faq-list">
-          <details>
-            <summary>What is NeoHtop?<span aria-hidden="true">+</span></summary>
-            <p>
-              NeoHtop is a free, MIT-licensed desktop system monitor for macOS,
-              Linux, and Windows. It displays local process, CPU, memory,
-              storage, and network information. The desktop app is built with
-              Rust, Tauri, and Svelte.
-            </p>
-          </details>
-          <details>
-            <summary>
-              Is NeoHtop a replacement for htop or Activity Monitor?<span
-                aria-hidden="true"
-                >+</span
-              >
-            </summary>
-            <p>
-              NeoHtop is a graphical alternative for exploring local processes,
-              with search, filters, process pinning, and themes. Choose it if
-              you prefer a desktop interface; use htop or NeoHtop CLI if you
-              prefer working inside a terminal.
-            </p>
-          </details>
-          <details>
-            <summary>
-              Does NeoHtop require an account?<span aria-hidden="true">+</span>
-            </summary>
-            <p>
-              No account or cloud subscription is required for the free local
-              desktop monitor. NeoHtop Pro is in development and is not
-              available to buy or use yet.
-            </p>
-          </details>
-          <details>
-            <summary>
-              Is the new process Tree view available in downloads?<span
-                aria-hidden="true"
-                >+</span
-              >
-            </summary>
-            <p>
-              Process families with combined CPU and RAM are in development for
-              a future desktop release. The download buttons point only to the
-              latest published GitHub release, which may not include this
-              feature yet.
-            </p>
-          </details>
-          <details>
-            <summary>
-              How much CPU or memory does NeoHtop use?<span aria-hidden="true"
-                >+</span
-              >
-            </summary>
-            <p>
-              Resource use depends on your operating system, process count,
-              visible data, and refresh interval. We do not publish a universal
-              CPU or memory benchmark. You can adjust the refresh interval or
-              pause updates in the app.
-            </p>
-          </details>
-          <details>
-            <summary>
-              Where can I report bugs or contribute?<span aria-hidden="true"
-                >+</span
-              >
-            </summary>
-            <p>
-              Use GitHub Issues to report problems and the NeoHtop repository to
-              contribute code. Include your operating system, app version, and
-              steps to reproduce a bug.
-            </p>
-          </details>
-        </div>
-      </section>
-      <section class="closing shell">
-        <span class="eyebrow">OPEN SOURCE. OPEN INVITATION.</span>
-        <h2>Make it part of your setup.</h2>
-        <div>
-          <a class="button primary" href="#download">Download NeoHtop ↓</a
-          ><a class="button quiet" href="https://github.com/Abdenasser/neohtop"
-            >Star the repo ↗</a
-          >
-        </div>
-      </section>
-    </main>
-    <footer class="site-footer shell">
-      <div class="footer-top">
-        <a class="brand" href="./"
           ><img
             src="assets/neohtop-icon.png"
             width="28"
             height="28"
             alt=""
-          /><span>neohtop_</span></a
+          /><span>NeoHtop</span
+          ><!----><span
+            data-slot="badge"
+            class="h-5 gap-1 rounded-4xl border border-transparent px-2 py-0.5 text-xs font-medium transition-all has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&amp;>svg]:size-3! group/badge inline-flex w-fit shrink-0 items-center justify-center overflow-hidden whitespace-nowrap focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 [&amp;>svg]:pointer-events-none bg-secondary text-secondary-foreground [a]:hover:bg-secondary/80 version-badge"
+            ><!---->1.3<!----><!----></span
+          ><!----><!----></a
         >
-        <p>Built for the beautifully curious.</p>
-        <a href="https://github.com/sponsors/Abdenasser"
-          >Support the project ↗</a
-        >
+        <nav aria-label="Main navigation">
+          <a href="./#features">Features</a><a href="./#themes">Themes</a
+          ><a href="install.html">Install</a
+          ><a
+            href="https://github.com/Abdenasser/neohtop/blob/main/CHANGELOG.md"
+            >Changelog<svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="lucide lucide-arrow-up-right lucide-icon size-3"
+              aria-hidden="true"
+            >
+              <!--[--><!---->
+              <path d="M7 7h10v10"><!----></path>
+              <!----><!---->
+              <path d="M7 17 17 7"><!----></path>
+              <!----><!--]--><!----></svg
+            ><!----></a
+          >
+        </nav>
+        <!--[0--><a
+          data-slot="button"
+          class="focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:aria-invalid:border-destructive/50 border border-transparent bg-clip-padding text-sm font-medium focus-visible:ring-3 aria-invalid:ring-3 active:not-aria-[haspopup]:translate-y-px [&amp;_svg:not([class*='size-'])]:size-4 group/button inline-flex shrink-0 items-center justify-center whitespace-nowrap transition-all outline-none select-none disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:shrink-0 bg-primary text-primary-foreground hover:bg-primary/80 h-8 gap-1 rounded-[min(var(--radius-md),10px)] px-2.5 in-data-[slot=button-group]:rounded-md has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5"
+          href="./#download"
+          ><svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            class="lucide lucide-arrow-down lucide-icon"
+            aria-hidden="true"
+          >
+            <!--[--><!---->
+            <path d="M12 5v14"><!----></path>
+            <!----><!---->
+            <path d="m19 12-7 7-7-7"><!----></path>
+            <!----><!--]--><!----></svg
+          ><!---->Download<!----></a
+        ><!--]--><!---->
       </div>
-      <div class="footer-bottom">
-        <span
-          >Free software. MIT license. Made by
-          <a href="https://github.com/Abdenasser">Abdenasser</a>.</span
+    </header>
+    <main id="main">
+      <!--[0-->
+      <section class="site-shell hero">
+        <!----><span
+          data-slot="badge"
+          class="h-5 gap-1 rounded-4xl border px-2 py-0.5 text-xs font-medium transition-all has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&amp;>svg]:size-3! group/badge inline-flex w-fit shrink-0 items-center justify-center overflow-hidden whitespace-nowrap focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 [&amp;>svg]:pointer-events-none border-border text-foreground [a]:hover:bg-muted [a]:hover:text-muted-foreground release-badge"
+          ><span class="status-dot"></span>NeoHtop 1.3<span
+            class="badge-divider"
+            >/</span
+          >More to explore.<!----><!----></span
+        ><!----><!---->
+        <h1>Your system.<br /><span>In plain sight.</span></h1>
+        <p class="hero-description">
+          A modern system monitor for people who like to look under the hood.<br
+            class="desktop-break"
+          />
+          Find the process. Follow the spike. Keep the essentials in your menu
+          bar.
+        </p>
+        <div class="hero-actions">
+          <!--[0--><a
+            data-slot="button"
+            class="focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:aria-invalid:border-destructive/50 rounded-md border border-transparent bg-clip-padding text-sm font-medium focus-visible:ring-3 aria-invalid:ring-3 active:not-aria-[haspopup]:translate-y-px [&amp;_svg:not([class*='size-'])]:size-4 group/button inline-flex shrink-0 items-center justify-center whitespace-nowrap transition-all outline-none select-none disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:shrink-0 bg-primary text-primary-foreground hover:bg-primary/80 h-10 gap-1.5 px-2.5 has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2 hero-download"
+            href="#download"
+            ><svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="lucide lucide-arrow-down lucide-icon"
+              aria-hidden="true"
+            >
+              <!--[--><!---->
+              <path d="M12 5v14"><!----></path>
+              <!----><!---->
+              <path d="m19 12-7 7-7-7"><!----></path>
+              <!----><!--]--><!----></svg
+            ><!---->Download NeoHtop<!----></a
+          ><!--]--><!----><!--[0--><a
+            data-slot="button"
+            class="focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:aria-invalid:border-destructive/50 rounded-md border bg-clip-padding text-sm font-medium focus-visible:ring-3 aria-invalid:ring-3 active:not-aria-[haspopup]:translate-y-px [&amp;_svg:not([class*='size-'])]:size-4 group/button inline-flex shrink-0 items-center justify-center whitespace-nowrap transition-all outline-none select-none disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:shrink-0 border-border bg-background hover:bg-muted hover:text-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50 aria-expanded:bg-muted aria-expanded:text-foreground shadow-xs h-10 gap-1.5 px-2.5 has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2"
+            href="https://github.com/Abdenasser/neohtop"
+            target="_blank"
+            rel="noopener noreferrer"
+            ><svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="lucide lucide-arrow-up-right lucide-icon"
+              aria-hidden="true"
+            >
+              <!--[--><!---->
+              <path d="M7 7h10v10"><!----></path>
+              <!----><!---->
+              <path d="M7 17 17 7"><!----></path>
+              <!----><!--]--><!----></svg
+            ><!---->Explore the source<!----></a
+          ><!--]--><!---->
+        </div>
+        <p class="hero-footnote">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            class="lucide lucide-check lucide-icon"
+            aria-hidden="true"
+          >
+            <!--[--><!---->
+            <path d="M20 6 9 17l-5-5"><!----></path>
+            <!----><!--]--><!----></svg
+          ><!---->Free &amp; open source<span>·</span>macOS, Linux &amp;
+          Windows<span>·</span>No account required
+        </p>
+      </section>
+      <section
+        class="product-stage site-shell-wide"
+        aria-label="NeoHtop desktop and menu-bar overview"
+      >
+        <figure class="desktop-preview">
+          <img
+            src="assets/neohtop-desktop.png"
+            alt="NeoHtop in Catppuccin, showing CPU, memory and GPU charts, storage, network and processes"
+            width="1280"
+            height="900"
+            fetchpriority="high"
+          />
+          <figcaption>
+            <span
+              ><span class="status-dot"></span>Catppuccin. The familiar ghost. A
+              fresh desktop.</span
+            ><a
+              href="https://github.com/Abdenasser/neohtop/blob/main/docs/screenshots/README.md"
+              >More screenshots<svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="lucide lucide-arrow-up-right lucide-icon"
+                aria-hidden="true"
+              >
+                <!--[--><!---->
+                <path d="M7 7h10v10"><!----></path>
+                <!----><!---->
+                <path d="M7 17 17 7"><!----></path>
+                <!----><!--]--><!----></svg
+              ><!----></a
+            >
+          </figcaption>
+        </figure>
+        <figure class="companion-preview">
+          <img
+            src="screenshots/menubar-overview-system.png"
+            width="400"
+            height="630"
+            alt="The NeoHtop ghost icon in the macOS menu bar with its rounded resource overview open"
+          />
+          <figcaption>A whole monitor in your menu bar.</figcaption>
+        </figure>
+      </section>
+      <section
+        class="site-shell platform-line"
+        aria-label="Platforms and project facts"
+      >
+        <span>Built for your desktop.</span><strong>macOS</strong
+        ><strong>Linux</strong><strong>Windows</strong
+        ><span class="platform-divider"></span><span>Rust + Tauri + Svelte</span
+        ><a href="https://github.com/Abdenasser/neohtop/blob/main/LICENSE"
+          >MIT licensed<svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            class="lucide lucide-arrow-up-right lucide-icon"
+            aria-hidden="true"
+          >
+            <!--[--><!---->
+            <path d="M7 7h10v10"><!----></path>
+            <!----><!---->
+            <path d="M7 17 17 7"><!----></path>
+            <!----><!--]--><!----></svg
+          ><!----></a
         >
+      </section>
+      <section id="features" class="site-shell section-block">
+        <div class="section-heading">
+          <p class="eyebrow">A CLOSER LOOK</p>
+          <h2>
+            Follow your curiosity.<br /><span>Find what’s going on.</span>
+          </h2>
+          <p>
+            From a busy core to the process behind it. One clear place to
+            explore your machine.
+          </p>
+        </div>
+        <div class="feature-grid">
+          <!--[-->
+          <div
+            data-slot="card"
+            data-size="sm"
+            class="ring-border bg-card text-card-foreground gap-(--card-spacing) overflow-hidden rounded-xl py-(--card-spacing) text-sm shadow-xs ring-1 [--card-spacing:--spacing(6)] has-[>img:first-child]:pt-0 data-[size=sm]:[--card-spacing:--spacing(4)] *:[img:first-child]:rounded-t-xl *:[img:last-child]:rounded-b-xl group/card flex flex-col feature-card"
+          >
+            <div
+              data-slot="card-header"
+              class="gap-1 rounded-t-xl px-(--card-spacing) [.border-b]:pb-(--card-spacing) group/card-header @container/card-header grid auto-rows-min items-start has-data-[slot=card-action]:grid-cols-[1fr_auto] has-data-[slot=card-description]:grid-rows-[auto_auto]"
+            >
+              <span class="feature-icon" style="--feature-color: var(--chart-1)"
+                ><svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="lucide lucide-git-branch lucide-icon size-5"
+                  aria-hidden="true"
+                >
+                  <!--[--><!---->
+                  <path d="M15 6a9 9 0 0 0-9 9V3"><!----></path>
+                  <!----><!---->
+                  <circle cx="18" cy="6" r="3"><!----></circle>
+                  <!----><!---->
+                  <circle cx="6" cy="18" r="3"><!----></circle>
+                  <!----><!--]--><!----></svg
+                ><!----></span
+              >
+              <div
+                data-slot="card-title"
+                class="cn-font-heading text-base leading-normal font-medium group-data-[size=sm]/card:text-sm"
+              >
+                <!---->Find the whole story.<!---->
+              </div>
+              <!----><!---->
+            </div>
+            <!---->
+            <div
+              data-slot="card-content"
+              class="flex flex-col gap-3 px-(--card-spacing)"
+            >
+              <p>
+                Expand process families, follow their combined CPU and RAM, and
+                keep matching children in context as you search.
+              </p>
+              <span class="feature-detail"
+                >Process trees, search, filters &amp; pinning</span
+              ><!---->
+            </div>
+            <!----><!---->
+          </div>
+          <div
+            data-slot="card"
+            data-size="sm"
+            class="ring-border bg-card text-card-foreground gap-(--card-spacing) overflow-hidden rounded-xl py-(--card-spacing) text-sm shadow-xs ring-1 [--card-spacing:--spacing(6)] has-[>img:first-child]:pt-0 data-[size=sm]:[--card-spacing:--spacing(4)] *:[img:first-child]:rounded-t-xl *:[img:last-child]:rounded-b-xl group/card flex flex-col feature-card"
+          >
+            <div
+              data-slot="card-header"
+              class="gap-1 rounded-t-xl px-(--card-spacing) [.border-b]:pb-(--card-spacing) group/card-header @container/card-header grid auto-rows-min items-start has-data-[slot=card-action]:grid-cols-[1fr_auto] has-data-[slot=card-description]:grid-rows-[auto_auto]"
+            >
+              <span class="feature-icon" style="--feature-color: var(--chart-2)"
+                ><svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="lucide lucide-activity lucide-icon size-5"
+                  aria-hidden="true"
+                >
+                  <!--[--><!---->
+                  <path
+                    d="M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.49 12H2"
+                  >
+                    <!---->
+                  </path>
+                  <!----><!--]--><!----></svg
+                ><!----></span
+              >
+              <div
+                data-slot="card-title"
+                class="cn-font-heading text-base leading-normal font-medium group-data-[size=sm]/card:text-sm"
+              >
+                <!---->Get to know your GPU.<!---->
+              </div>
+              <!----><!---->
+            </div>
+            <!---->
+            <div
+              data-slot="card-content"
+              class="flex flex-col gap-3 px-(--card-spacing)"
+            >
+              <p>
+                See utilization, memory and the diagnostics your graphics driver
+                exposes. Choose an adapter and go deeper.
+              </p>
+              <span class="feature-detail"
+                >Apple silicon, AMD &amp; NVIDIA · driver dependent</span
+              ><!---->
+            </div>
+            <!----><!---->
+          </div>
+          <div
+            data-slot="card"
+            data-size="sm"
+            class="ring-border bg-card text-card-foreground gap-(--card-spacing) overflow-hidden rounded-xl py-(--card-spacing) text-sm shadow-xs ring-1 [--card-spacing:--spacing(6)] has-[>img:first-child]:pt-0 data-[size=sm]:[--card-spacing:--spacing(4)] *:[img:first-child]:rounded-t-xl *:[img:last-child]:rounded-b-xl group/card flex flex-col feature-card"
+          >
+            <div
+              data-slot="card-header"
+              class="gap-1 rounded-t-xl px-(--card-spacing) [.border-b]:pb-(--card-spacing) group/card-header @container/card-header grid auto-rows-min items-start has-data-[slot=card-action]:grid-cols-[1fr_auto] has-data-[slot=card-description]:grid-rows-[auto_auto]"
+            >
+              <span class="feature-icon" style="--feature-color: var(--chart-4)"
+                ><svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="lucide lucide-monitor lucide-icon size-5"
+                  aria-hidden="true"
+                >
+                  <!--[--><!---->
+                  <rect width="20" height="14" x="2" y="3" rx="2"><!----></rect>
+                  <!----><!---->
+                  <line x1="8" x2="16" y1="21" y2="21"><!----></line>
+                  <!----><!---->
+                  <line x1="12" x2="12" y1="17" y2="21"><!----></line>
+                  <!----><!--]--><!----></svg
+                ><!----></span
+              >
+              <div
+                data-slot="card-title"
+                class="cn-font-heading text-base leading-normal font-medium group-data-[size=sm]/card:text-sm"
+              >
+                <!---->A little window. A lot inside.<!---->
+              </div>
+              <!----><!---->
+            </div>
+            <!---->
+            <div
+              data-slot="card-content"
+              class="flex flex-col gap-3 px-(--card-spacing)"
+            >
+              <p>
+                Your essential readings and busiest processes, a click away in
+                the menu bar. Jump straight from a process to its inspector.
+              </p>
+              <span class="feature-detail"
+                >One sample, pause state &amp; theme across windows</span
+              ><!---->
+            </div>
+            <!----><!---->
+          </div>
+          <div
+            data-slot="card"
+            data-size="sm"
+            class="ring-border bg-card text-card-foreground gap-(--card-spacing) overflow-hidden rounded-xl py-(--card-spacing) text-sm shadow-xs ring-1 [--card-spacing:--spacing(6)] has-[>img:first-child]:pt-0 data-[size=sm]:[--card-spacing:--spacing(4)] *:[img:first-child]:rounded-t-xl *:[img:last-child]:rounded-b-xl group/card flex flex-col feature-card"
+          >
+            <div
+              data-slot="card-header"
+              class="gap-1 rounded-t-xl px-(--card-spacing) [.border-b]:pb-(--card-spacing) group/card-header @container/card-header grid auto-rows-min items-start has-data-[slot=card-action]:grid-cols-[1fr_auto] has-data-[slot=card-description]:grid-rows-[auto_auto]"
+            >
+              <span class="feature-icon" style="--feature-color: var(--chart-3)"
+                ><svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="lucide lucide-search lucide-icon size-5"
+                  aria-hidden="true"
+                >
+                  <!--[--><!---->
+                  <path d="m21 21-4.34-4.34"><!----></path>
+                  <!----><!---->
+                  <circle cx="11" cy="11" r="8"><!----></circle>
+                  <!----><!--]--><!----></svg
+                ><!----></span
+              >
+              <div
+                data-slot="card-title"
+                class="cn-font-heading text-base leading-normal font-medium group-data-[size=sm]/card:text-sm"
+              >
+                <!---->Who’s holding that port?<!---->
+              </div>
+              <!----><!---->
+            </div>
+            <!---->
+            <div
+              data-slot="card-content"
+              class="flex flex-col gap-3 px-(--card-spacing)"
+            >
+              <p>
+                Type :3000 or port:443 to find a local TCP listener or bound UDP
+                socket. Socket scans run only when you ask.
+              </p>
+              <span class="feature-detail"
+                >Keep bare numbers for process IDs</span
+              ><!---->
+            </div>
+            <!----><!---->
+          </div>
+          <div
+            data-slot="card"
+            data-size="sm"
+            class="ring-border bg-card text-card-foreground gap-(--card-spacing) overflow-hidden rounded-xl py-(--card-spacing) text-sm shadow-xs ring-1 [--card-spacing:--spacing(6)] has-[>img:first-child]:pt-0 data-[size=sm]:[--card-spacing:--spacing(4)] *:[img:first-child]:rounded-t-xl *:[img:last-child]:rounded-b-xl group/card flex flex-col feature-card"
+          >
+            <div
+              data-slot="card-header"
+              class="gap-1 rounded-t-xl px-(--card-spacing) [.border-b]:pb-(--card-spacing) group/card-header @container/card-header grid auto-rows-min items-start has-data-[slot=card-action]:grid-cols-[1fr_auto] has-data-[slot=card-description]:grid-rows-[auto_auto]"
+            >
+              <span class="feature-icon" style="--feature-color: var(--chart-5)"
+                ><svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="lucide lucide-layers lucide-layers-3 lucide-icon size-5"
+                  aria-hidden="true"
+                >
+                  <!--[--><!---->
+                  <path
+                    d="M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83z"
+                  >
+                    <!---->
+                  </path>
+                  <!----><!---->
+                  <path
+                    d="M2 12a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 12"
+                  >
+                    <!---->
+                  </path>
+                  <!----><!---->
+                  <path
+                    d="M2 17a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 17"
+                  >
+                    <!---->
+                  </path>
+                  <!----><!--]--><!----></svg
+                ><!----></span
+              >
+              <div
+                data-slot="card-title"
+                class="cn-font-heading text-base leading-normal font-medium group-data-[size=sm]/card:text-sm"
+              >
+                <!---->Every card opens a door.<!---->
+              </div>
+              <!----><!---->
+            </div>
+            <!---->
+            <div
+              data-slot="card-content"
+              class="flex flex-col gap-3 px-(--card-spacing)"
+            >
+              <p>
+                CPU cores, memory breakdowns, graphics adapters, mounted volumes
+                and network interfaces. Inspect the reading behind the number.
+              </p>
+              <span class="feature-detail"
+                >Six resource views, with useful details</span
+              ><!---->
+            </div>
+            <!----><!---->
+          </div>
+          <div
+            data-slot="card"
+            data-size="sm"
+            class="ring-border bg-card text-card-foreground gap-(--card-spacing) overflow-hidden rounded-xl py-(--card-spacing) text-sm shadow-xs ring-1 [--card-spacing:--spacing(6)] has-[>img:first-child]:pt-0 data-[size=sm]:[--card-spacing:--spacing(4)] *:[img:first-child]:rounded-t-xl *:[img:last-child]:rounded-b-xl group/card flex flex-col feature-card"
+          >
+            <div
+              data-slot="card-header"
+              class="gap-1 rounded-t-xl px-(--card-spacing) [.border-b]:pb-(--card-spacing) group/card-header @container/card-header grid auto-rows-min items-start has-data-[slot=card-action]:grid-cols-[1fr_auto] has-data-[slot=card-description]:grid-rows-[auto_auto]"
+            >
+              <span class="feature-icon" style="--feature-color: var(--chart-1)"
+                ><svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="lucide lucide-settings-2 lucide-icon size-5"
+                  aria-hidden="true"
+                >
+                  <!--[--><!---->
+                  <path d="M14 17H5"><!----></path>
+                  <!----><!---->
+                  <path d="M19 7h-9"><!----></path>
+                  <!----><!---->
+                  <circle cx="17" cy="17" r="3"><!----></circle>
+                  <!----><!---->
+                  <circle cx="7" cy="7" r="3"><!----></circle>
+                  <!----><!--]--><!----></svg
+                ><!----></span
+              >
+              <div
+                data-slot="card-title"
+                class="cn-font-heading text-base leading-normal font-medium group-data-[size=sm]/card:text-sm"
+              >
+                <!---->Made for your desktop.<!---->
+              </div>
+              <!----><!---->
+            </div>
+            <!---->
+            <div
+              data-slot="card-content"
+              class="flex flex-col gap-3 px-(--card-spacing)"
+            >
+              <p>
+                Native process icons, clear controls, saved preferences and a
+                refresh pace you choose. The ghost fills in when an icon is
+                unavailable.
+              </p>
+              <span class="feature-detail"
+                >Rust + Tauri + Svelte + shadcn-svelte</span
+              ><!---->
+            </div>
+            <!----><!---->
+          </div>
+          <!--]-->
+        </div>
+      </section>
+      <section class="site-shell section-block resource-section">
+        <div class="section-heading">
+          <p class="eyebrow">THE NUMBER IS JUST THE START</p>
+          <h2>Open a card.<br /><span>Get the useful details.</span></h2>
+          <p>
+            Explore individual cores, inspect a short history and follow the
+            readings that matter.
+          </p>
+        </div>
+        <figure class="detail-preview">
+          <img
+            src="screenshots/cpu-details.jpg"
+            width="1280"
+            height="900"
+            alt="CPU details with per-core activity and a utilization history"
+            loading="lazy"
+          />
+        </figure>
+        <div class="resource-labels">
+          <!----><span
+            data-slot="badge"
+            class="h-5 gap-1 rounded-4xl border border-transparent px-2 py-0.5 text-xs font-medium transition-all has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&amp;>svg]:size-3! group/badge inline-flex w-fit shrink-0 items-center justify-center overflow-hidden whitespace-nowrap focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 [&amp;>svg]:pointer-events-none bg-secondary text-secondary-foreground [a]:hover:bg-secondary/80"
+            ><svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="lucide lucide-cpu lucide-icon"
+              aria-hidden="true"
+            >
+              <!--[--><!---->
+              <path d="M12 20v2"><!----></path>
+              <!----><!---->
+              <path d="M12 2v2"><!----></path>
+              <!----><!---->
+              <path d="M17 20v2"><!----></path>
+              <!----><!---->
+              <path d="M17 2v2"><!----></path>
+              <!----><!---->
+              <path d="M2 12h2"><!----></path>
+              <!----><!---->
+              <path d="M2 17h2"><!----></path>
+              <!----><!---->
+              <path d="M2 7h2"><!----></path>
+              <!----><!---->
+              <path d="M20 12h2"><!----></path>
+              <!----><!---->
+              <path d="M20 17h2"><!----></path>
+              <!----><!---->
+              <path d="M20 7h2"><!----></path>
+              <!----><!---->
+              <path d="M7 20v2"><!----></path>
+              <!----><!---->
+              <path d="M7 2v2"><!----></path>
+              <!----><!---->
+              <rect x="4" y="4" width="16" height="16" rx="2"><!----></rect>
+              <!----><!---->
+              <rect x="8" y="8" width="8" height="8" rx="1"><!----></rect>
+              <!----><!--]--><!----></svg
+            ><!---->CPU<!----><!----></span
+          ><!----><!----><!----><span
+            data-slot="badge"
+            class="h-5 gap-1 rounded-4xl border border-transparent px-2 py-0.5 text-xs font-medium transition-all has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&amp;>svg]:size-3! group/badge inline-flex w-fit shrink-0 items-center justify-center overflow-hidden whitespace-nowrap focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 [&amp;>svg]:pointer-events-none bg-secondary text-secondary-foreground [a]:hover:bg-secondary/80"
+            ><svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="lucide lucide-memory-stick lucide-icon"
+              aria-hidden="true"
+            >
+              <!--[--><!---->
+              <path d="M12 12v-2"><!----></path>
+              <!----><!---->
+              <path d="M12 18v-2"><!----></path>
+              <!----><!---->
+              <path d="M16 12v-2"><!----></path>
+              <!----><!---->
+              <path d="M16 18v-2"><!----></path>
+              <!----><!---->
+              <path d="M2 11h1.5"><!----></path>
+              <!----><!---->
+              <path d="M20 18v-2"><!----></path>
+              <!----><!---->
+              <path d="M20.5 11H22"><!----></path>
+              <!----><!---->
+              <path d="M4 18v-2"><!----></path>
+              <!----><!---->
+              <path d="M8 12v-2"><!----></path>
+              <!----><!---->
+              <path d="M8 18v-2"><!----></path>
+              <!----><!---->
+              <rect x="2" y="6" width="20" height="10" rx="2"><!----></rect>
+              <!----><!--]--><!----></svg
+            ><!---->Memory<!----><!----></span
+          ><!----><!----><!----><span
+            data-slot="badge"
+            class="h-5 gap-1 rounded-4xl border border-transparent px-2 py-0.5 text-xs font-medium transition-all has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&amp;>svg]:size-3! group/badge inline-flex w-fit shrink-0 items-center justify-center overflow-hidden whitespace-nowrap focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 [&amp;>svg]:pointer-events-none bg-secondary text-secondary-foreground [a]:hover:bg-secondary/80"
+            ><svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="lucide lucide-activity lucide-icon"
+              aria-hidden="true"
+            >
+              <!--[--><!---->
+              <path
+                d="M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.49 12H2"
+              >
+                <!---->
+              </path>
+              <!----><!--]--><!----></svg
+            ><!---->Graphics<!----><!----></span
+          ><!----><!----><!----><span
+            data-slot="badge"
+            class="h-5 gap-1 rounded-4xl border border-transparent px-2 py-0.5 text-xs font-medium transition-all has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&amp;>svg]:size-3! group/badge inline-flex w-fit shrink-0 items-center justify-center overflow-hidden whitespace-nowrap focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 [&amp;>svg]:pointer-events-none bg-secondary text-secondary-foreground [a]:hover:bg-secondary/80"
+            ><svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="lucide lucide-hard-drive lucide-icon"
+              aria-hidden="true"
+            >
+              <!--[--><!---->
+              <path d="M10 16h.01"><!----></path>
+              <!----><!---->
+              <path
+                d="M2.212 11.577a2 2 0 0 0-.212.896V18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-5.527a2 2 0 0 0-.212-.896L18.55 5.11A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"
+              >
+                <!---->
+              </path>
+              <!----><!---->
+              <path d="M21.946 12.013H2.054"><!----></path>
+              <!----><!---->
+              <path d="M6 16h.01"><!----></path>
+              <!----><!--]--><!----></svg
+            ><!---->Storage<!----><!----></span
+          ><!----><!----><!----><span
+            data-slot="badge"
+            class="h-5 gap-1 rounded-4xl border border-transparent px-2 py-0.5 text-xs font-medium transition-all has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&amp;>svg]:size-3! group/badge inline-flex w-fit shrink-0 items-center justify-center overflow-hidden whitespace-nowrap focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 [&amp;>svg]:pointer-events-none bg-secondary text-secondary-foreground [a]:hover:bg-secondary/80"
+            ><svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="lucide lucide-monitor lucide-icon"
+              aria-hidden="true"
+            >
+              <!--[--><!---->
+              <rect width="20" height="14" x="2" y="3" rx="2"><!----></rect>
+              <!----><!---->
+              <line x1="8" x2="16" y1="21" y2="21"><!----></line>
+              <!----><!---->
+              <line x1="12" x2="12" y1="17" y2="21"><!----></line>
+              <!----><!--]--><!----></svg
+            ><!---->System<!----><!----></span
+          ><!----><!----><!----><span
+            data-slot="badge"
+            class="h-5 gap-1 rounded-4xl border border-transparent px-2 py-0.5 text-xs font-medium transition-all has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&amp;>svg]:size-3! group/badge inline-flex w-fit shrink-0 items-center justify-center overflow-hidden whitespace-nowrap focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 [&amp;>svg]:pointer-events-none bg-secondary text-secondary-foreground [a]:hover:bg-secondary/80"
+            ><svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="lucide lucide-network lucide-icon"
+              aria-hidden="true"
+            >
+              <!--[--><!---->
+              <rect x="16" y="16" width="6" height="6" rx="1"><!----></rect>
+              <!----><!---->
+              <rect x="2" y="16" width="6" height="6" rx="1"><!----></rect>
+              <!----><!---->
+              <rect x="9" y="2" width="6" height="6" rx="1"><!----></rect>
+              <!----><!---->
+              <path d="M5 16v-3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3"><!----></path>
+              <!----><!---->
+              <path d="M12 12V8"><!----></path>
+              <!----><!--]--><!----></svg
+            ><!---->Network<!----><!----></span
+          ><!----><!---->
+        </div>
+        <p class="section-note">
+          Charts keep roughly two minutes in memory. Gaps show paused or missing
+          readings. GPU diagnostics depend on your driver.
+        </p>
+      </section>
+      <section id="themes" class="site-shell section-block">
+        <div
+          data-slot="card"
+          data-size="default"
+          class="ring-border bg-card text-card-foreground gap-(--card-spacing) overflow-hidden rounded-xl py-(--card-spacing) text-sm shadow-xs ring-1 [--card-spacing:--spacing(6)] has-[>img:first-child]:pt-0 data-[size=sm]:[--card-spacing:--spacing(4)] *:[img:first-child]:rounded-t-xl *:[img:last-child]:rounded-b-xl group/card flex flex-col theme-card"
+        >
+          <div
+            data-slot="card-content"
+            class="flex flex-col gap-3 px-(--card-spacing) theme-content"
+          >
+            <div class="theme-copy">
+              <!----><span
+                data-slot="badge"
+                class="h-5 gap-1 rounded-4xl border px-2 py-0.5 text-xs font-medium transition-all has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&amp;>svg]:size-3! group/badge inline-flex w-fit shrink-0 items-center justify-center overflow-hidden whitespace-nowrap focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 [&amp;>svg]:pointer-events-none border-border text-foreground [a]:hover:bg-muted [a]:hover:text-muted-foreground"
+                ><svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="lucide lucide-palette lucide-icon"
+                  aria-hidden="true"
+                >
+                  <!--[--><!---->
+                  <path
+                    d="M12 22a1 1 0 0 1 0-20 10 9 0 0 1 10 9 5 5 0 0 1-5 5h-2.25a1.75 1.75 0 0 0-1.4 2.8l.3.4a1.75 1.75 0 0 1-1.4 2.8z"
+                  >
+                    <!---->
+                  </path>
+                  <!----><!---->
+                  <circle cx="13.5" cy="6.5" r=".5" fill="currentColor">
+                    <!---->
+                  </circle>
+                  <!----><!---->
+                  <circle cx="17.5" cy="10.5" r=".5" fill="currentColor">
+                    <!---->
+                  </circle>
+                  <!----><!---->
+                  <circle cx="6.5" cy="12.5" r=".5" fill="currentColor">
+                    <!---->
+                  </circle>
+                  <!----><!---->
+                  <circle cx="8.5" cy="7.5" r=".5" fill="currentColor">
+                    <!---->
+                  </circle>
+                  <!----><!--]--><!----></svg
+                ><!---->24 original themes<!----><!----></span
+              ><!----><!---->
+              <h2>
+                Still your setup.<br /><span>Still your atmosphere.</span>
+              </h2>
+              <p>
+                Catppuccin, front and center. Light, dark, colorful and retro
+                when you want a change. The themes you love, with consistent
+                controls and a searchable gallery.
+              </p>
+              <div class="theme-chips">
+                <!--[--><!----><span
+                  data-slot="badge"
+                  class="h-5 gap-1 rounded-4xl border border-transparent px-2 py-0.5 text-xs font-medium transition-all has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&amp;>svg]:size-3! group/badge inline-flex w-fit shrink-0 items-center justify-center overflow-hidden whitespace-nowrap focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 [&amp;>svg]:pointer-events-none bg-secondary text-secondary-foreground [a]:hover:bg-secondary/80 theme-chip"
+                  ><span class="swatch-group"
+                    ><!--[--><i style="background: #89b4fa"></i
+                    ><i style="background: #f38ba8"></i
+                    ><i style="background: #a6e3a1"></i
+                    ><!--]--></span
+                  >Catppuccin<!----><!----></span
+                ><!----><!----><span
+                  data-slot="badge"
+                  class="h-5 gap-1 rounded-4xl border border-transparent px-2 py-0.5 text-xs font-medium transition-all has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&amp;>svg]:size-3! group/badge inline-flex w-fit shrink-0 items-center justify-center overflow-hidden whitespace-nowrap focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 [&amp;>svg]:pointer-events-none bg-secondary text-secondary-foreground [a]:hover:bg-secondary/80 theme-chip"
+                  ><span class="swatch-group"
+                    ><!--[--><i style="background: #bd93f9"></i
+                    ><i style="background: #ff79c6"></i
+                    ><i style="background: #50fa7b"></i
+                    ><!--]--></span
+                  >Dracula<!----><!----></span
+                ><!----><!----><span
+                  data-slot="badge"
+                  class="h-5 gap-1 rounded-4xl border border-transparent px-2 py-0.5 text-xs font-medium transition-all has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&amp;>svg]:size-3! group/badge inline-flex w-fit shrink-0 items-center justify-center overflow-hidden whitespace-nowrap focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 [&amp;>svg]:pointer-events-none bg-secondary text-secondary-foreground [a]:hover:bg-secondary/80 theme-chip"
+                  ><span class="swatch-group"
+                    ><!--[--><i style="background: #7aa2f7"></i
+                    ><i style="background: #bb9af7"></i
+                    ><i style="background: #9ece6a"></i
+                    ><!--]--></span
+                  >Tokyo Night<!----><!----></span
+                ><!----><!----><span
+                  data-slot="badge"
+                  class="h-5 gap-1 rounded-4xl border border-transparent px-2 py-0.5 text-xs font-medium transition-all has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&amp;>svg]:size-3! group/badge inline-flex w-fit shrink-0 items-center justify-center overflow-hidden whitespace-nowrap focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 [&amp;>svg]:pointer-events-none bg-secondary text-secondary-foreground [a]:hover:bg-secondary/80 theme-chip"
+                  ><span class="swatch-group"
+                    ><!--[--><i style="background: #81a1c1"></i
+                    ><i style="background: #bf616a"></i
+                    ><i style="background: #a3be8c"></i
+                    ><!--]--></span
+                  >Nord<!----><!----></span
+                ><!----><!----><span
+                  data-slot="badge"
+                  class="h-5 gap-1 rounded-4xl border border-transparent px-2 py-0.5 text-xs font-medium transition-all has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&amp;>svg]:size-3! group/badge inline-flex w-fit shrink-0 items-center justify-center overflow-hidden whitespace-nowrap focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 [&amp;>svg]:pointer-events-none bg-secondary text-secondary-foreground [a]:hover:bg-secondary/80 theme-chip"
+                  ><span class="swatch-group"
+                    ><!--[--><i style="background: #0969da"></i
+                    ><i style="background: #cf222e"></i
+                    ><i style="background: #1a7f37"></i
+                    ><!--]--></span
+                  >GitHub Light<!----><!----></span
+                ><!----><!----><span
+                  data-slot="badge"
+                  class="h-5 gap-1 rounded-4xl border border-transparent px-2 py-0.5 text-xs font-medium transition-all has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&amp;>svg]:size-3! group/badge inline-flex w-fit shrink-0 items-center justify-center overflow-hidden whitespace-nowrap focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 [&amp;>svg]:pointer-events-none bg-secondary text-secondary-foreground [a]:hover:bg-secondary/80 theme-chip"
+                  ><span class="swatch-group"
+                    ><!--[--><i style="background: #83a598"></i
+                    ><i style="background: #fb4934"></i
+                    ><i style="background: #b8bb26"></i
+                    ><!--]--></span
+                  >Gruvbox<!----><!----></span
+                ><!----><!--]-->
+              </div>
+            </div>
+            <figure>
+              <img
+                src="screenshots/themes.jpg"
+                width="640"
+                height="640"
+                alt="The searchable NeoHtop theme gallery, with GitHub Light selected"
+                loading="lazy"
+              />
+            </figure>
+            <!---->
+          </div>
+          <!---->
+        </div>
+        <!---->
+      </section>
+      <section id="download" class="site-shell section-block download-section">
+        <div class="section-heading">
+          <p class="eyebrow">MAKE YOURSELF AT HOME</p>
+          <h2>Meet your next<br /><span>favorite desktop utility.</span></h2>
+          <p>
+            Free, local and open source. Choose your system and get a clearer
+            view.
+          </p>
+          <!----><span
+            data-slot="badge"
+            class="h-5 gap-1 rounded-4xl border px-2 py-0.5 text-xs font-medium transition-all has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&amp;>svg]:size-3! group/badge inline-flex w-fit shrink-0 items-center justify-center overflow-hidden whitespace-nowrap focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 [&amp;>svg]:pointer-events-none border-border text-foreground [a]:hover:bg-muted [a]:hover:text-muted-foreground"
+            id="current-version"
+            ><!---->Latest published release<!----><!----></span
+          ><!----><!---->
+        </div>
+        <div class="download-grid">
+          <!--[-->
+          <div
+            data-slot="card"
+            data-size="sm"
+            class="ring-border bg-card text-card-foreground gap-(--card-spacing) overflow-hidden rounded-xl py-(--card-spacing) text-sm shadow-xs ring-1 [--card-spacing:--spacing(6)] has-[>img:first-child]:pt-0 data-[size=sm]:[--card-spacing:--spacing(4)] *:[img:first-child]:rounded-t-xl *:[img:last-child]:rounded-b-xl group/card flex flex-col download-card"
+          >
+            <div
+              data-slot="card-header"
+              class="gap-1 rounded-t-xl px-(--card-spacing) [.border-b]:pb-(--card-spacing) group/card-header @container/card-header grid auto-rows-min items-start has-data-[slot=card-action]:grid-cols-[1fr_auto] has-data-[slot=card-description]:grid-rows-[auto_auto]"
+            >
+              <div
+                data-slot="card-title"
+                class="cn-font-heading text-base leading-normal font-medium group-data-[size=sm]/card:text-sm"
+              >
+                <!---->macOS<!---->
+              </div>
+              <!---->
+              <p
+                data-slot="card-description"
+                class="text-muted-foreground text-sm"
+              >
+                <!---->Apple Silicon<!---->
+              </p>
+              <!----><!---->
+            </div>
+            <!---->
+            <div
+              data-slot="card-content"
+              class="flex flex-col gap-3 px-(--card-spacing)"
+            >
+              <!--[--><!--[0--><a
+                data-slot="button"
+                class="focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:aria-invalid:border-destructive/50 rounded-md border bg-clip-padding text-sm font-medium focus-visible:ring-3 aria-invalid:ring-3 active:not-aria-[haspopup]:translate-y-px [&amp;_svg:not([class*='size-'])]:size-4 group/button inline-flex shrink-0 items-center justify-center whitespace-nowrap transition-all outline-none select-none disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:shrink-0 border-border bg-background hover:bg-muted hover:text-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50 aria-expanded:bg-muted aria-expanded:text-foreground shadow-xs h-9 gap-1.5 px-2.5 in-data-[slot=button-group]:rounded-md has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2 download-button"
+                href="https://github.com/Abdenasser/neohtop/releases/latest"
+                data-type="macos-silicon"
+                ><span class="download-label"
+                  >Apple Silicon<span class="secondary">DMG</span></span
+                ><svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="lucide lucide-arrow-down lucide-icon"
+                  aria-hidden="true"
+                >
+                  <!--[--><!---->
+                  <path d="M12 5v14"><!----></path>
+                  <!----><!---->
+                  <path d="m19 12-7 7-7-7"><!----></path>
+                  <!----><!--]--><!----></svg
+                ><!----><!----></a
+              ><!--]--><!--[0--><a
+                data-slot="button"
+                class="focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:aria-invalid:border-destructive/50 rounded-md border bg-clip-padding text-sm font-medium focus-visible:ring-3 aria-invalid:ring-3 active:not-aria-[haspopup]:translate-y-px [&amp;_svg:not([class*='size-'])]:size-4 group/button inline-flex shrink-0 items-center justify-center whitespace-nowrap transition-all outline-none select-none disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:shrink-0 border-border bg-background hover:bg-muted hover:text-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50 aria-expanded:bg-muted aria-expanded:text-foreground shadow-xs h-9 gap-1.5 px-2.5 in-data-[slot=button-group]:rounded-md has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2 download-button"
+                href="https://github.com/Abdenasser/neohtop/releases/latest"
+                data-type="macos-intel"
+                ><span class="download-label"
+                  >Intel<span class="secondary">DMG</span></span
+                ><svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="lucide lucide-arrow-down lucide-icon"
+                  aria-hidden="true"
+                >
+                  <!--[--><!---->
+                  <path d="M12 5v14"><!----></path>
+                  <!----><!---->
+                  <path d="m19 12-7 7-7-7"><!----></path>
+                  <!----><!--]--><!----></svg
+                ><!----><!----></a
+              ><!--]--><!--]--><!---->
+            </div>
+            <!----><!---->
+          </div>
+          <div
+            data-slot="card"
+            data-size="sm"
+            class="ring-border bg-card text-card-foreground gap-(--card-spacing) overflow-hidden rounded-xl py-(--card-spacing) text-sm shadow-xs ring-1 [--card-spacing:--spacing(6)] has-[>img:first-child]:pt-0 data-[size=sm]:[--card-spacing:--spacing(4)] *:[img:first-child]:rounded-t-xl *:[img:last-child]:rounded-b-xl group/card flex flex-col download-card"
+          >
+            <div
+              data-slot="card-header"
+              class="gap-1 rounded-t-xl px-(--card-spacing) [.border-b]:pb-(--card-spacing) group/card-header @container/card-header grid auto-rows-min items-start has-data-[slot=card-action]:grid-cols-[1fr_auto] has-data-[slot=card-description]:grid-rows-[auto_auto]"
+            >
+              <div
+                data-slot="card-title"
+                class="cn-font-heading text-base leading-normal font-medium group-data-[size=sm]/card:text-sm"
+              >
+                <!---->Windows<!---->
+              </div>
+              <!---->
+              <p
+                data-slot="card-description"
+                class="text-muted-foreground text-sm"
+              >
+                <!---->64-bit<!---->
+              </p>
+              <!----><!---->
+            </div>
+            <!---->
+            <div
+              data-slot="card-content"
+              class="flex flex-col gap-3 px-(--card-spacing)"
+            >
+              <!--[--><!--[0--><a
+                data-slot="button"
+                class="focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:aria-invalid:border-destructive/50 rounded-md border bg-clip-padding text-sm font-medium focus-visible:ring-3 aria-invalid:ring-3 active:not-aria-[haspopup]:translate-y-px [&amp;_svg:not([class*='size-'])]:size-4 group/button inline-flex shrink-0 items-center justify-center whitespace-nowrap transition-all outline-none select-none disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:shrink-0 border-border bg-background hover:bg-muted hover:text-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50 aria-expanded:bg-muted aria-expanded:text-foreground shadow-xs h-9 gap-1.5 px-2.5 in-data-[slot=button-group]:rounded-md has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2 download-button"
+                href="https://github.com/Abdenasser/neohtop/releases/latest"
+                data-type="windows"
+                ><span class="download-label"
+                  >Windows x64<span class="secondary">Installer</span></span
+                ><svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="lucide lucide-arrow-down lucide-icon"
+                  aria-hidden="true"
+                >
+                  <!--[--><!---->
+                  <path d="M12 5v14"><!----></path>
+                  <!----><!---->
+                  <path d="m19 12-7 7-7-7"><!----></path>
+                  <!----><!--]--><!----></svg
+                ><!----><!----></a
+              ><!--]--><!--]--><!---->
+            </div>
+            <!----><!---->
+          </div>
+          <div
+            data-slot="card"
+            data-size="sm"
+            class="ring-border bg-card text-card-foreground gap-(--card-spacing) overflow-hidden rounded-xl py-(--card-spacing) text-sm shadow-xs ring-1 [--card-spacing:--spacing(6)] has-[>img:first-child]:pt-0 data-[size=sm]:[--card-spacing:--spacing(4)] *:[img:first-child]:rounded-t-xl *:[img:last-child]:rounded-b-xl group/card flex flex-col download-card"
+          >
+            <div
+              data-slot="card-header"
+              class="gap-1 rounded-t-xl px-(--card-spacing) [.border-b]:pb-(--card-spacing) group/card-header @container/card-header grid auto-rows-min items-start has-data-[slot=card-action]:grid-cols-[1fr_auto] has-data-[slot=card-description]:grid-rows-[auto_auto]"
+            >
+              <div
+                data-slot="card-title"
+                class="cn-font-heading text-base leading-normal font-medium group-data-[size=sm]/card:text-sm"
+              >
+                <!---->Linux<!---->
+              </div>
+              <!---->
+              <p
+                data-slot="card-description"
+                class="text-muted-foreground text-sm"
+              >
+                <!---->x86_64 &amp; ARM64<!---->
+              </p>
+              <!----><!---->
+            </div>
+            <!---->
+            <div
+              data-slot="card-content"
+              class="flex flex-col gap-3 px-(--card-spacing)"
+            >
+              <!--[--><!--[0--><a
+                data-slot="button"
+                class="focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:aria-invalid:border-destructive/50 rounded-md border bg-clip-padding text-sm font-medium focus-visible:ring-3 aria-invalid:ring-3 active:not-aria-[haspopup]:translate-y-px [&amp;_svg:not([class*='size-'])]:size-4 group/button inline-flex shrink-0 items-center justify-center whitespace-nowrap transition-all outline-none select-none disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:shrink-0 border-border bg-background hover:bg-muted hover:text-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50 aria-expanded:bg-muted aria-expanded:text-foreground shadow-xs h-9 gap-1.5 px-2.5 in-data-[slot=button-group]:rounded-md has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2 download-button"
+                href="https://github.com/Abdenasser/neohtop/releases/latest"
+                data-type="linux-deb-x64"
+                ><span class="download-label"
+                  >x86_64<span class="secondary">.deb</span></span
+                ><svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="lucide lucide-arrow-down lucide-icon"
+                  aria-hidden="true"
+                >
+                  <!--[--><!---->
+                  <path d="M12 5v14"><!----></path>
+                  <!----><!---->
+                  <path d="m19 12-7 7-7-7"><!----></path>
+                  <!----><!--]--><!----></svg
+                ><!----><!----></a
+              ><!--]--><!--[0--><a
+                data-slot="button"
+                class="focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:aria-invalid:border-destructive/50 rounded-md border bg-clip-padding text-sm font-medium focus-visible:ring-3 aria-invalid:ring-3 active:not-aria-[haspopup]:translate-y-px [&amp;_svg:not([class*='size-'])]:size-4 group/button inline-flex shrink-0 items-center justify-center whitespace-nowrap transition-all outline-none select-none disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:shrink-0 border-border bg-background hover:bg-muted hover:text-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50 aria-expanded:bg-muted aria-expanded:text-foreground shadow-xs h-9 gap-1.5 px-2.5 in-data-[slot=button-group]:rounded-md has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2 download-button"
+                href="https://github.com/Abdenasser/neohtop/releases/latest"
+                data-type="linux-rpm-x64"
+                ><span class="download-label"
+                  >x86_64<span class="secondary">.rpm</span></span
+                ><svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="lucide lucide-arrow-down lucide-icon"
+                  aria-hidden="true"
+                >
+                  <!--[--><!---->
+                  <path d="M12 5v14"><!----></path>
+                  <!----><!---->
+                  <path d="m19 12-7 7-7-7"><!----></path>
+                  <!----><!--]--><!----></svg
+                ><!----><!----></a
+              ><!--]--><!--[0--><a
+                data-slot="button"
+                class="focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:aria-invalid:border-destructive/50 rounded-md border bg-clip-padding text-sm font-medium focus-visible:ring-3 aria-invalid:ring-3 active:not-aria-[haspopup]:translate-y-px [&amp;_svg:not([class*='size-'])]:size-4 group/button inline-flex shrink-0 items-center justify-center whitespace-nowrap transition-all outline-none select-none disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:shrink-0 border-border bg-background hover:bg-muted hover:text-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50 aria-expanded:bg-muted aria-expanded:text-foreground shadow-xs h-9 gap-1.5 px-2.5 in-data-[slot=button-group]:rounded-md has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2 download-button"
+                href="https://github.com/Abdenasser/neohtop/releases/latest"
+                data-type="linux-appimage-x64"
+                ><span class="download-label"
+                  >x86_64<span class="secondary">AppImage</span></span
+                ><svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="lucide lucide-arrow-down lucide-icon"
+                  aria-hidden="true"
+                >
+                  <!--[--><!---->
+                  <path d="M12 5v14"><!----></path>
+                  <!----><!---->
+                  <path d="m19 12-7 7-7-7"><!----></path>
+                  <!----><!--]--><!----></svg
+                ><!----><!----></a
+              ><!--]--><!--[0--><a
+                data-slot="button"
+                class="focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:aria-invalid:border-destructive/50 rounded-md border bg-clip-padding text-sm font-medium focus-visible:ring-3 aria-invalid:ring-3 active:not-aria-[haspopup]:translate-y-px [&amp;_svg:not([class*='size-'])]:size-4 group/button inline-flex shrink-0 items-center justify-center whitespace-nowrap transition-all outline-none select-none disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:shrink-0 border-border bg-background hover:bg-muted hover:text-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50 aria-expanded:bg-muted aria-expanded:text-foreground shadow-xs h-9 gap-1.5 px-2.5 in-data-[slot=button-group]:rounded-md has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2 download-button"
+                href="https://github.com/Abdenasser/neohtop/releases/latest"
+                data-type="linux-deb-arm64"
+                ><span class="download-label"
+                  >ARM64<span class="secondary">.deb</span></span
+                ><svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="lucide lucide-arrow-down lucide-icon"
+                  aria-hidden="true"
+                >
+                  <!--[--><!---->
+                  <path d="M12 5v14"><!----></path>
+                  <!----><!---->
+                  <path d="m19 12-7 7-7-7"><!----></path>
+                  <!----><!--]--><!----></svg
+                ><!----><!----></a
+              ><!--]--><!--[0--><a
+                data-slot="button"
+                class="focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:aria-invalid:border-destructive/50 rounded-md border bg-clip-padding text-sm font-medium focus-visible:ring-3 aria-invalid:ring-3 active:not-aria-[haspopup]:translate-y-px [&amp;_svg:not([class*='size-'])]:size-4 group/button inline-flex shrink-0 items-center justify-center whitespace-nowrap transition-all outline-none select-none disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:shrink-0 border-border bg-background hover:bg-muted hover:text-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50 aria-expanded:bg-muted aria-expanded:text-foreground shadow-xs h-9 gap-1.5 px-2.5 in-data-[slot=button-group]:rounded-md has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2 download-button"
+                href="https://github.com/Abdenasser/neohtop/releases/latest"
+                data-type="linux-rpm-arm64"
+                ><span class="download-label"
+                  >ARM64<span class="secondary">.rpm</span></span
+                ><svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="lucide lucide-arrow-down lucide-icon"
+                  aria-hidden="true"
+                >
+                  <!--[--><!---->
+                  <path d="M12 5v14"><!----></path>
+                  <!----><!---->
+                  <path d="m19 12-7 7-7-7"><!----></path>
+                  <!----><!--]--><!----></svg
+                ><!----><!----></a
+              ><!--]--><!--[0--><a
+                data-slot="button"
+                class="focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:aria-invalid:border-destructive/50 rounded-md border bg-clip-padding text-sm font-medium focus-visible:ring-3 aria-invalid:ring-3 active:not-aria-[haspopup]:translate-y-px [&amp;_svg:not([class*='size-'])]:size-4 group/button inline-flex shrink-0 items-center justify-center whitespace-nowrap transition-all outline-none select-none disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:shrink-0 border-border bg-background hover:bg-muted hover:text-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50 aria-expanded:bg-muted aria-expanded:text-foreground shadow-xs h-9 gap-1.5 px-2.5 in-data-[slot=button-group]:rounded-md has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2 download-button"
+                href="https://github.com/Abdenasser/neohtop/releases/latest"
+                data-type="linux-appimage-arm64"
+                ><span class="download-label"
+                  >ARM64<span class="secondary">AppImage</span></span
+                ><svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="lucide lucide-arrow-down lucide-icon"
+                  aria-hidden="true"
+                >
+                  <!--[--><!---->
+                  <path d="M12 5v14"><!----></path>
+                  <!----><!---->
+                  <path d="m19 12-7 7-7-7"><!----></path>
+                  <!----><!--]--><!----></svg
+                ><!----><!----></a
+              ><!--]--><!--]--><!---->
+            </div>
+            <!----><!---->
+          </div>
+          <!--]-->
+        </div>
+        <p id="release-status" role="status" class="section-note">
+          Links open the published release page. Direct downloads load from the
+          actual release assets.
+        </p>
+        <div class="download-help">
+          <!--[0--><a
+            data-slot="button"
+            class="focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:aria-invalid:border-destructive/50 rounded-md border border-transparent bg-clip-padding text-sm font-medium focus-visible:ring-3 aria-invalid:ring-3 active:not-aria-[haspopup]:translate-y-px [&amp;_svg:not([class*='size-'])]:size-4 group/button inline-flex shrink-0 items-center justify-center whitespace-nowrap transition-all outline-none select-none disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:shrink-0 hover:bg-muted hover:text-foreground dark:hover:bg-muted/50 aria-expanded:bg-muted aria-expanded:text-foreground h-9 gap-1.5 px-2.5 in-data-[slot=button-group]:rounded-md has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2"
+            href="install.html"
+            ><!---->Installation &amp; troubleshooting<svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="lucide lucide-arrow-up-right lucide-icon"
+              aria-hidden="true"
+            >
+              <!--[--><!---->
+              <path d="M7 7h10v10"><!----></path>
+              <!----><!---->
+              <path d="M7 17 17 7"><!----></path>
+              <!----><!--]--><!----></svg
+            ><!----><!----></a
+          ><!--]--><!----><!--[0--><a
+            data-slot="button"
+            class="focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:aria-invalid:border-destructive/50 rounded-md border border-transparent bg-clip-padding text-sm font-medium focus-visible:ring-3 aria-invalid:ring-3 active:not-aria-[haspopup]:translate-y-px [&amp;_svg:not([class*='size-'])]:size-4 group/button inline-flex shrink-0 items-center justify-center whitespace-nowrap transition-all outline-none select-none disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:shrink-0 hover:bg-muted hover:text-foreground dark:hover:bg-muted/50 aria-expanded:bg-muted aria-expanded:text-foreground h-9 gap-1.5 px-2.5 in-data-[slot=button-group]:rounded-md has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2"
+            href="https://github.com/Abdenasser/neohtop/releases"
+            ><!---->All release notes<svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="lucide lucide-arrow-up-right lucide-icon"
+              aria-hidden="true"
+            >
+              <!--[--><!---->
+              <path d="M7 7h10v10"><!----></path>
+              <!----><!---->
+              <path d="M7 17 17 7"><!----></path>
+              <!----><!--]--><!----></svg
+            ><!----><!----></a
+          ><!--]--><!---->
+        </div>
+        <div
+          data-slot="card"
+          data-size="sm"
+          class="ring-border bg-card text-card-foreground gap-(--card-spacing) overflow-hidden rounded-xl py-(--card-spacing) text-sm shadow-xs ring-1 [--card-spacing:--spacing(6)] has-[>img:first-child]:pt-0 data-[size=sm]:[--card-spacing:--spacing(4)] *:[img:first-child]:rounded-t-xl *:[img:last-child]:rounded-b-xl group/card flex flex-col brew-card"
+        >
+          <div
+            data-slot="card-content"
+            class="flex flex-col gap-3 px-(--card-spacing)"
+          >
+            <div>
+              <strong>Prefer Homebrew?</strong>
+              <p>
+                Community-maintained; updates can follow a separate schedule.
+              </p>
+            </div>
+            <code id="brew-command">brew install --cask neohtop</code
+            ><!--[-1--><button
+              data-slot="button"
+              class="focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:aria-invalid:border-destructive/50 border bg-clip-padding text-sm font-medium focus-visible:ring-3 aria-invalid:ring-3 active:not-aria-[haspopup]:translate-y-px [&amp;_svg:not([class*='size-'])]:size-4 group/button inline-flex shrink-0 items-center justify-center whitespace-nowrap transition-all outline-none select-none disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:shrink-0 border-border bg-background hover:bg-muted hover:text-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50 aria-expanded:bg-muted aria-expanded:text-foreground shadow-xs h-8 gap-1 rounded-[min(var(--radius-md),10px)] px-2.5 in-data-[slot=button-group]:rounded-md has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5"
+              type="button"
+              data-copy="brew-command"
+            >
+              <!---->Copy<!----></button
+            ><!--]--><!----><!---->
+          </div>
+          <!---->
+        </div>
+        <!----><span id="copy-status" class="sr-only" role="status"></span>
+      </section>
+      <section id="faq" class="site-shell section-block faq-section">
+        <div class="section-heading">
+          <p class="eyebrow">GOOD TO KNOW</p>
+          <h2>A few useful answers.</h2>
+        </div>
+        <div class="faq-list">
+          <!--[-->
+          <div
+            data-slot="card"
+            data-size="sm"
+            class="ring-border bg-card text-card-foreground gap-(--card-spacing) overflow-hidden rounded-xl py-(--card-spacing) text-sm shadow-xs ring-1 [--card-spacing:--spacing(6)] has-[>img:first-child]:pt-0 data-[size=sm]:[--card-spacing:--spacing(4)] *:[img:first-child]:rounded-t-xl *:[img:last-child]:rounded-b-xl group/card flex flex-col"
+          >
+            <div
+              data-slot="card-content"
+              class="flex flex-col gap-3 px-(--card-spacing)"
+            >
+              <details>
+                <summary>
+                  Does NeoHtop send analytics?<span aria-hidden="true">+</span>
+                </summary>
+                <p>
+                  Official v1.3.0 builds send a basic app-open count and version
+                  without a persistent identifier. Optional feature usage is off
+                  by default in Settings → Privacy. Process and system readings
+                  stay local. See the Privacy link for details; website
+                  analytics is separate.
+                </p>
+              </details>
+              <!---->
+            </div>
+            <!---->
+          </div>
+          <div
+            data-slot="card"
+            data-size="sm"
+            class="ring-border bg-card text-card-foreground gap-(--card-spacing) overflow-hidden rounded-xl py-(--card-spacing) text-sm shadow-xs ring-1 [--card-spacing:--spacing(6)] has-[>img:first-child]:pt-0 data-[size=sm]:[--card-spacing:--spacing(4)] *:[img:first-child]:rounded-t-xl *:[img:last-child]:rounded-b-xl group/card flex flex-col"
+          >
+            <div
+              data-slot="card-content"
+              class="flex flex-col gap-3 px-(--card-spacing)"
+            >
+              <details>
+                <summary>
+                  Is NeoHtop free? Do I need an account?<span aria-hidden="true"
+                    >+</span
+                  >
+                </summary>
+                <p>
+                  NeoHtop is free, MIT-licensed and open source. Local desktop
+                  monitoring requires no account or cloud subscription. Pro is
+                  postponed and is not available to buy or install.
+                </p>
+              </details>
+              <!---->
+            </div>
+            <!---->
+          </div>
+          <div
+            data-slot="card"
+            data-size="sm"
+            class="ring-border bg-card text-card-foreground gap-(--card-spacing) overflow-hidden rounded-xl py-(--card-spacing) text-sm shadow-xs ring-1 [--card-spacing:--spacing(6)] has-[>img:first-child]:pt-0 data-[size=sm]:[--card-spacing:--spacing(4)] *:[img:first-child]:rounded-t-xl *:[img:last-child]:rounded-b-xl group/card flex flex-col"
+          >
+            <div
+              data-slot="card-content"
+              class="flex flex-col gap-3 px-(--card-spacing)"
+            >
+              <details>
+                <summary>
+                  Will it read my graphics card?<span aria-hidden="true"
+                    >+</span
+                  >
+                </summary>
+                <p>
+                  GPU support depends on your operating system and driver.
+                  NeoHtop reads macOS IORegistry, AMD sysfs and NVIDIA NVML,
+                  with DXGI/DRM inventory for other adapters. Missing counters
+                  stay unavailable. Per-process GPU engine accounting is limited
+                  to supported Linux DRM drivers.
+                </p>
+              </details>
+              <!---->
+            </div>
+            <!---->
+          </div>
+          <div
+            data-slot="card"
+            data-size="sm"
+            class="ring-border bg-card text-card-foreground gap-(--card-spacing) overflow-hidden rounded-xl py-(--card-spacing) text-sm shadow-xs ring-1 [--card-spacing:--spacing(6)] has-[>img:first-child]:pt-0 data-[size=sm]:[--card-spacing:--spacing(4)] *:[img:first-child]:rounded-t-xl *:[img:last-child]:rounded-b-xl group/card flex flex-col"
+          >
+            <div
+              data-slot="card-content"
+              class="flex flex-col gap-3 px-(--card-spacing)"
+            >
+              <details>
+                <summary>
+                  Are all 24 themes still here?<span aria-hidden="true">+</span>
+                </summary>
+                <p>
+                  Yes. The original themes remain, including Catppuccin,
+                  Dracula, Nord, Tokyo Night, light palettes, retro choices and
+                  High Contrast. Glassy needs supported native effects on macOS
+                  or Windows.
+                </p>
+              </details>
+              <!---->
+            </div>
+            <!---->
+          </div>
+          <div
+            data-slot="card"
+            data-size="sm"
+            class="ring-border bg-card text-card-foreground gap-(--card-spacing) overflow-hidden rounded-xl py-(--card-spacing) text-sm shadow-xs ring-1 [--card-spacing:--spacing(6)] has-[>img:first-child]:pt-0 data-[size=sm]:[--card-spacing:--spacing(4)] *:[img:first-child]:rounded-t-xl *:[img:last-child]:rounded-b-xl group/card flex flex-col"
+          >
+            <div
+              data-slot="card-content"
+              class="flex flex-col gap-3 px-(--card-spacing)"
+            >
+              <details>
+                <summary>
+                  What does the menu-bar companion do?<span aria-hidden="true"
+                    >+</span
+                  >
+                </summary>
+                <p>
+                  It shows CPU, RAM, GPU, network, free storage and the five
+                  busiest processes. It shares samples, pause and themes with
+                  the main window, and stops polling while hidden. Tray behavior
+                  varies by Linux desktop.
+                </p>
+              </details>
+              <!---->
+            </div>
+            <!---->
+          </div>
+          <div
+            data-slot="card"
+            data-size="sm"
+            class="ring-border bg-card text-card-foreground gap-(--card-spacing) overflow-hidden rounded-xl py-(--card-spacing) text-sm shadow-xs ring-1 [--card-spacing:--spacing(6)] has-[>img:first-child]:pt-0 data-[size=sm]:[--card-spacing:--spacing(4)] *:[img:first-child]:rounded-t-xl *:[img:last-child]:rounded-b-xl group/card flex flex-col"
+          >
+            <div
+              data-slot="card-content"
+              class="flex flex-col gap-3 px-(--card-spacing)"
+            >
+              <details>
+                <summary>
+                  Does this include process trees and local-port search?<span
+                    aria-hidden="true"
+                    >+</span
+                  >
+                </summary>
+                <p>
+                  Version 1.3.0 includes expandable families with combined
+                  CPU/RAM and explicit :3000 or port:443 searches. Family RAM
+                  may double-count shared pages, and socket visibility depends
+                  on OS permissions. Older releases can differ.
+                </p>
+              </details>
+              <!---->
+            </div>
+            <!---->
+          </div>
+          <div
+            data-slot="card"
+            data-size="sm"
+            class="ring-border bg-card text-card-foreground gap-(--card-spacing) overflow-hidden rounded-xl py-(--card-spacing) text-sm shadow-xs ring-1 [--card-spacing:--spacing(6)] has-[>img:first-child]:pt-0 data-[size=sm]:[--card-spacing:--spacing(4)] *:[img:first-child]:rounded-t-xl *:[img:last-child]:rounded-b-xl group/card flex flex-col"
+          >
+            <div
+              data-slot="card-content"
+              class="flex flex-col gap-3 px-(--card-spacing)"
+            >
+              <details>
+                <summary>
+                  How is it different from NeoHtop CLI?<span aria-hidden="true"
+                    >+</span
+                  >
+                </summary>
+                <p>
+                  Desktop is the Rust/Tauri/Svelte graphical app. NeoHtop CLI is
+                  a separate Go/Charm terminal application. Both are local,
+                  open-source monitors with independent feature sets and
+                  releases.
+                </p>
+              </details>
+              <!---->
+            </div>
+            <!---->
+          </div>
+          <!--]-->
+        </div>
+      </section>
+      <section id="pro" class="site-shell project-note">
         <div>
-          <a href="install.html">Docs</a
-          ><a href="https://github.com/Abdenasser/neohtop/issues"
-            >Report an issue</a
-          ><a href="llms.txt">llms.txt</a><a href="sitemap.xml">Sitemap</a>
+          <img src="assets/neohtop-icon.png" width="40" height="40" alt="" />
+          <div>
+            <h2>Open source at the core.</h2>
+            <p>
+              NeoHtop Pro is postponed. This release is the free local desktop
+              app.
+            </p>
+          </div>
+        </div>
+        <!--[0--><a
+          data-slot="button"
+          class="focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:aria-invalid:border-destructive/50 rounded-md border bg-clip-padding text-sm font-medium focus-visible:ring-3 aria-invalid:ring-3 active:not-aria-[haspopup]:translate-y-px [&amp;_svg:not([class*='size-'])]:size-4 group/button inline-flex shrink-0 items-center justify-center whitespace-nowrap transition-all outline-none select-none disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:shrink-0 border-border bg-background hover:bg-muted hover:text-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50 aria-expanded:bg-muted aria-expanded:text-foreground shadow-xs h-9 gap-1.5 px-2.5 in-data-[slot=button-group]:rounded-md has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2"
+          href="https://github.com/sponsors/Abdenasser"
+          ><!---->Support development<svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            class="lucide lucide-arrow-up-right lucide-icon"
+            aria-hidden="true"
+          >
+            <!--[--><!---->
+            <path d="M7 7h10v10"><!----></path>
+            <!----><!---->
+            <path d="M7 17 17 7"><!----></path>
+            <!----><!--]--><!----></svg
+          ><!----><!----></a
+        ><!--]--><!---->
+      </section>
+      <!--]-->
+    </main>
+    <footer class="site-footer">
+      <div class="site-shell">
+        <div class="footer-top">
+          <a class="brand" href="./"
+            ><img
+              src="assets/neohtop-icon.png"
+              width="24"
+              height="24"
+              alt=""
+            />NeoHtop</a
+          >
+          <p>Your system. In plain sight.</p>
+          <nav aria-label="Footer">
+            <a href="https://github.com/Abdenasser/neohtop">GitHub</a
+            ><a href="privacy.html">Privacy</a
+            ><a href="desktop-vs-cli.html">Desktop vs CLI</a
+            ><a href="https://www.buymeacoffee.com/abdenasser"
+              >Buy me a coffee<svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="lucide lucide-arrow-up-right lucide-icon"
+                aria-hidden="true"
+              >
+                <!--[--><!---->
+                <path d="M7 7h10v10"><!----></path>
+                <!----><!---->
+                <path d="M7 17 17 7"><!----></path>
+                <!----><!--]--><!----></svg
+              ><!----></a
+            >
+          </nav>
+        </div>
+        <div class="footer-bottom">
+          <span>Made by Abdenasser. Free under the MIT license.</span>
+          <div>
+            <a href="index.md">Read as Markdown</a
+            ><a href="llms.txt">llms.txt</a><a href="sitemap.xml">Sitemap</a>
+          </div>
         </div>
       </div>
     </footer>
-    <p class="sr-only" id="copy-status" role="status" aria-live="polite"></p>
+    <!--]-->
     <script type="module" src="main.js"></script>
   </body>
 </html>

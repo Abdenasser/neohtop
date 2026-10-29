@@ -1,37 +1,44 @@
 # NeoHtop: open-source desktop system monitor
 
-NeoHtop is a free, MIT-licensed graphical system monitor for macOS, Linux, and Windows. The desktop app is built with Rust, Tauri, and Svelte. No account is required for local monitoring.
+NeoHtop is a free, MIT-licensed system monitor for macOS, Linux, and Windows, built with Rust, Tauri, Svelte, and shadcn-svelte. Local monitoring requires no account or subscription.
 
-## Desktop capabilities
+## What’s new in v1.3.0
 
-- Local process metrics and detailed process information.
-- CPU, memory, storage, and network I/O panels.
-- Process search by name, command, and PID; comma-separated terms and regular expressions.
-- Filters for CPU, memory, status, and runtime.
-- Process pinning, configurable columns, refresh controls, and themes.
+- Refreshed desktop controls with all 24 themes, light/dark choices and native process icons.
+- Process families with combined CPU/RAM, search, pinning, filters and configurable columns.
+- On-demand local-port search using `:3000` or `port:443`; bare numbers still match PIDs.
+- CPU, memory, GPU, storage, system and network cards with detailed sheets. CPU, memory, GPU and network include two-minute in-memory histories.
+- A menu-bar/system-tray companion with shared pause, interval, theme and process shortcuts.
+- Separate Settings and About windows; automatic preference migration and saving.
+- Driver-dependent GPU utilization, memory, sensors, power and core clock. Optional per-process GPU engine activity is supported through Linux DRM counters.
+- Linux x86_64/ARM64 packages, Intel/Apple Silicon DMGs and a Windows x64 installer, with release checksums and a build manifest.
 
-Resource consumption depends on the operating system, process count, refresh interval, and visible data. There is no universal published CPU or memory benchmark.
+GPU support varies by driver, and operating-system permissions can restrict process/socket details. Missing counters remain unavailable. Family CPU can exceed 100% across cores, and family RAM may double-count shared pages. The app does not provide cleanup, security scanning, a firewall, cloud history or AI diagnostics.
 
-## Published release versus development
+[Read the desktop guide](https://github.com/Abdenasser/neohtop/blob/main/docs/usage.md) or [changelog](https://github.com/Abdenasser/neohtop/blob/main/CHANGELOG.md). Resource use depends on OS, process count, refresh cadence and visible data; there is no universal CPU/memory benchmark.
 
-[The latest published GitHub release](https://github.com/Abdenasser/neohtop/releases/latest) is the source for stable downloads and available architectures. Download links must match actual release assets; some older releases lack ARM64 Linux packages or offer a portable Windows executable rather than an installer.
+## Downloads
 
-Desktop process trees with combined family CPU/RAM are development work for a future release. Tree CPU sums all descendant processes and may exceed 100% across cores; family RAM sums reported resident memory and may double-count shared pages. Linux packaging and build compatibility improvements are also intended for a future release. These changes may not be available in published downloads yet.
+[Published GitHub releases](https://github.com/Abdenasser/neohtop/releases/latest) are authoritative for stable binaries and architectures. Older versions do not include all v1.3.0 features and may lack ARM64 Linux packages or a Windows installer. Community packages can update on a separate schedule.
 
 ## NeoHtop Pro
 
-Pro is in development. Remote monitoring, historical metrics, and alerts are being explored for developers and small teams. Scope, pricing, and launch date are not final. There is no Pro product to purchase or install yet. The free open-source local monitor remains the foundation.
+Pro is postponed and is not available to purchase or install. The current release focuses on the free, open-source local desktop monitor. No Pro scope, price or launch date is announced.
 
 ## NeoHtop CLI
 
-The terminal companion is a separate Go/Charm application, not the desktop app. Its documentation lists sparklines, process trees, filters, and themes. Install it with `npm install -g neohtop-cli`. See the [Desktop vs CLI comparison](https://abdenasser.github.io/neohtop/desktop-vs-cli.html).
+The CLI is a separate Go/Charm terminal application: `npm install -g neohtop-cli`. It does not install the desktop app. [Compare Desktop and CLI](https://abdenasser.github.io/neohtop/desktop-vs-cli.html).
 
 ## Links
 
 - [Home](https://abdenasser.github.io/neohtop/)
 - [Install and troubleshoot](https://abdenasser.github.io/neohtop/install.html)
 - [Desktop source](https://github.com/Abdenasser/neohtop)
-- [Published releases](https://github.com/Abdenasser/neohtop/releases/latest)
+- [Releases](https://github.com/Abdenasser/neohtop/releases/latest)
 - [CLI source](https://github.com/Abdenasser/neohtop-cli)
 - [Issues](https://github.com/Abdenasser/neohtop/issues)
 - [License](https://github.com/Abdenasser/neohtop/blob/main/LICENSE)
+
+## Privacy and analytics
+
+Official v1.3.0 builds send a basic launch count and app version without a persistent identifier, even when optional sharing is off. **Settings → Privacy** lets you opt in to limited feature usage. Process names, search text, commands, paths and system readings stay local. See the [privacy notice](https://abdenasser.github.io/neohtop/privacy.html).

@@ -4,45 +4,43 @@
 //! through Tauri's IPC mechanism. These commands provide the interface between
 //! the frontend and the system monitoring functionality.
 
-use crate::monitoring::{ProcessInfo, ProcessMonitor, SystemStats};
+use crate::monitoring::ProcessMonitor;
 use crate::state::AppState;
 use tauri::State;
 
-/// Retrieves the current list of processes and system statistics
-///
-/// # Arguments
-///
-/// * `state` - The application state containing system monitoring components
-///
-/// # Returns
-///
-/// A tuple containing:
-/// * A vector of process information
-/// * Current system statistics
-///
-/// # Errors
-///
-/// Returns an error string if:
-/// * Failed to acquire locks on system state
-/// * Failed to collect process information
+/// The main window and companion share one interval-gated native capture.
 #[tauri::command]
 pub async fn get_processes(
-    state: State<'_, AppState>,
-) -> Result<(Vec<ProcessInfo>, SystemStats), String> {
-    let mut sys = state.sys.lock().map_err(|e| e.to_string())?;
-    let mut disks = state.disks.lock().map_err(|e| e.to_string())?;
-    let mut networks = state.networks.lock().map_err(|e| e.to_string())?;
-    sys.refresh_all();
-    disks.refresh(true);
-    networks.refresh(true);
-
-    let mut process_monitor = state.process_monitor.lock().map_err(|e| e.to_string())?;
-    let mut system_monitor = state.system_monitor.lock().map_err(|e| e.to_string())?;
-
-    let processes = process_monitor.collect_processes(&sys)?;
-    let system_stats = system_monitor.collect_stats(&sys, &networks, &disks);
-
-    Ok((processes, system_stats))
+    app: tauri::AppHandle,
+    include_gpu: Option<bool>,
+    include_ports: Option<bool>,
+) -> Result<crate::sampling::Snapshot, String> {
+    tauri::async_runtime::spawn_blocking(move || {
+        use tauri::Manager;
+        let state = app.state::<AppState>();
+        let mut hub = state.hub.lock().map_err(|e| e.to_string())?;
+        hub.process_gpu = include_gpu.unwrap_or(false);
+        let mut snapshot = hub.read(&state)?;
+        drop(hub);
+        if include_ports.unwrap_or(false) {
+            if snapshot.paused {
+                snapshot.port_error = Some("Resume updates to search local ports.".into());
+            } else {
+                match crate::monitoring::collect_ports_by_pid() {
+                    Ok(ports) => {
+                        let frame = std::sync::Arc::make_mut(&mut snapshot.frame);
+                        for process in &mut frame.processes {
+                            process.ports = ports.get(&process.pid).cloned().unwrap_or_default();
+                        }
+                    }
+                    Err(error) => snapshot.port_error = Some(error),
+                }
+            }
+        }
+        Ok(snapshot)
+    })
+    .await
+    .map_err(|e| e.to_string())?
 }
 
 /// Attempts to kill a process with the specified PID
@@ -64,4 +62,43 @@ pub async fn get_processes(
 pub async fn kill_process(pid: u32, state: State<'_, AppState>) -> Result<bool, String> {
     let sys = state.sys.lock().map_err(|e| e.to_string())?;
     Ok(ProcessMonitor::kill_process(&sys, pid))
+}
+
+/// Resolve only requested, currently observed process identities. File paths never
+/// come from the frontend; release the sampling lock before doing icon I/O.
+#[tauri::command]
+pub async fn get_process_icons(
+    requests: Vec<crate::native_icons::IconRequest>,
+    state: State<'_, AppState>,
+    app: tauri::AppHandle,
+) -> Result<Vec<crate::native_icons::IconReply>, String> {
+    use crate::native_icons::{IconReply, MAX_BATCH};
+    if requests.len() > MAX_BATCH {
+        return Err("Too many icon requests".into());
+    }
+    let targets = {
+        let sys = state.sys.lock().map_err(|e| e.to_string())?;
+        requests
+            .into_iter()
+            .map(|request| {
+                let path = crate::native_icons::process_target(&sys, &request);
+                (request, path)
+            })
+            .collect::<Vec<_>>()
+    };
+    tauri::async_runtime::spawn_blocking(move || {
+        use tauri::Manager;
+        let state = app.state::<AppState>();
+        let mut icons = state.icons.lock().map_err(|e| e.to_string())?;
+        Ok(targets
+            .into_iter()
+            .map(|(request, path)| IconReply {
+                pid: request.pid,
+                start_time: request.start_time,
+                icon: path.and_then(|p| icons.resolve(&p)),
+            })
+            .collect())
+    })
+    .await
+    .map_err(|e| e.to_string())?
 }

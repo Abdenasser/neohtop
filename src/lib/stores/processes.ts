@@ -1,10 +1,22 @@
-import { writable, derived } from "svelte/store";
-import type { Process, SystemStats } from "$lib/types";
+import { trackUsage } from "$lib/utils/telemetry";
+import { get, writable } from "svelte/store";
+import type {
+  Process,
+  SystemStats,
+  ResourceSample,
+  GpuDevice,
+  MonitorSnapshot,
+} from "$lib/types";
+import { searchHasPortQuery } from "$lib/utils";
 import { invoke } from "@tauri-apps/api/core";
 
 interface ProcessStore {
+  portError: string | null;
+  resourceHistory: ResourceSample[];
   processes: Process[];
   systemStats: SystemStats | null;
+  gpus: GpuDevice[];
+  capturedAt: number;
   error: string | null;
   isLoading: boolean;
   searchTerm: string;
@@ -24,8 +36,12 @@ interface ProcessStore {
 }
 
 const initialState: ProcessStore = {
+  portError: null,
+  resourceHistory: [],
   processes: [],
   systemStats: null,
+  gpus: [],
+  capturedAt: 0,
   error: null,
   isLoading: true,
   searchTerm: "",
@@ -51,30 +67,47 @@ function createProcessStore() {
   const setIsLoading = (isLoading: boolean) =>
     update((state) => ({ ...state, isLoading }));
 
-  const getProcesses = async () => {
+  let inFlight: Promise<void> | null = null;
+  let gpuDetails = false;
+  const readProcesses = async () => {
     try {
-      const result = await invoke<[Process[], SystemStats]>("get_processes");
-      update((state) => {
-        let updatedSelectedProcess = state.selectedProcess;
-        if (state.selectedProcessPid) {
-          updatedSelectedProcess =
-            result[0].find((p) => p.pid === state.selectedProcessPid) || null;
-        }
-
-        return {
-          ...state,
-          processes: result[0],
-          systemStats: result[1],
-          error: null,
-          selectedProcess: updatedSelectedProcess,
-        };
+      const result = await invoke<MonitorSnapshot>("get_processes", {
+        includeGpu: gpuDetails,
+        includePorts: searchHasPortQuery(get({ subscribe }).searchTerm),
       });
+      update((state) => ({
+        ...state,
+        processes: result.frame.processes,
+        systemStats: result.frame.stats,
+        gpus: result.frame.gpus,
+        capturedAt: result.frame.captured_at,
+        resourceHistory: result.history,
+        isFrozen: result.paused,
+        error: result.error,
+        portError: result.port_error ?? null,
+        selectedProcess: state.selectedProcess
+          ? (result.frame.processes.find(
+              (p) =>
+                p.pid === state.selectedProcess?.pid &&
+                p.start_time === state.selectedProcess?.start_time,
+            ) ?? null)
+          : null,
+      }));
     } catch (e: unknown) {
       update((state) => ({
         ...state,
         error: e instanceof Error ? e.message : String(e),
       }));
     }
+  };
+
+  // Share an in-flight read so manual actions and timer ticks cannot reorder history.
+  const getProcesses = () => {
+    if (inFlight) return inFlight;
+    inFlight = readProcesses().finally(() => {
+      inFlight = null;
+    });
+    return inFlight;
   };
 
   const killProcess = async (pid: number) => {
@@ -123,16 +156,33 @@ function createProcessStore() {
     });
   };
 
-  const setSearchTerm = (searchTerm: string) =>
+  const setSearchTerm = (searchTerm: string) => {
+    if (searchHasPortQuery(searchTerm)) trackUsage("port_search");
     update((state) => ({ ...state, searchTerm, currentPage: 1 }));
+  };
 
-  const setIsFrozen = (isFrozen: boolean) =>
-    update((state) => ({ ...state, isFrozen }));
+  const refreshControl = async () => {
+    if (inFlight) await inFlight;
+    await getProcesses();
+  };
+
+  const setIsFrozen = async (isFrozen: boolean) => {
+    try {
+      await invoke("set_monitor_paused", { paused: isFrozen });
+      await refreshControl();
+    } catch (e: unknown) {
+      update((state) => ({
+        ...state,
+        error: e instanceof Error ? e.message : String(e),
+      }));
+    }
+  };
 
   const setCurrentPage = (currentPage: number) =>
     update((state) => ({ ...state, currentPage }));
 
   const showProcessDetails = (process: Process) => {
+    trackUsage("inspector_open");
     update((state) => ({
       ...state,
       selectedProcessPid: process.pid,
@@ -197,10 +247,14 @@ function createProcessStore() {
   // Return all methods
   return {
     subscribe,
+    setGpuDetails(value: boolean) {
+      gpuDetails = value;
+    },
     set,
     update,
     setIsLoading,
     getProcesses,
+    refreshControl,
     killProcess,
     toggleSort,
     togglePin,

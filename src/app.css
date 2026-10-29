@@ -1,5 +1,41 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn-svelte/tailwind.css";
+@custom-variant dark (&:is(.dark *));
+@theme inline {
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial,
+    sans-serif;
+  --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
 :root {
-  /* Default theme values will be overridden by theme store */
   --base: #1e1e2e;
   --mantle: #181825;
   --crust: #11111b;
@@ -21,105 +57,222 @@
   --yellow: #f9e2af;
   --green: #a6e3a1;
   --teal: #94e2d5;
+  --background: #1e1e2e;
+  --foreground: #cdd6f4;
+  --card: #181825;
+  --card-foreground: #cdd6f4;
+  --popover: #1f202d;
+  --popover-foreground: #cdd6f4;
+  --primary: #94bbfa;
+  --primary-foreground: #11111b;
+  --secondary: #313244;
+  --secondary-foreground: #cdd6f4;
+  --muted: #2a2a3b;
+  --muted-foreground: #abb2cb;
+  --accent: #383c53;
+  --accent-foreground: #cdd6f4;
+  --destructive: #f9c7d5;
+  --destructive-foreground: #11111b;
+  --border: #505160;
+  --input: #6a6c7b;
+  --ring: #bdd5fc;
+  --chart-1: #89b4fa;
+  --chart-2: #a6e3a1;
+  --chart-3: #fab387;
+  --chart-4: #b4befe;
+  --chart-5: #94e2d5;
+  --status-running: #a6e3a1;
+  --status-stopped: #f38ba8;
+  --status-idle: #a6adc8;
+  --scrollbar-thumb: #878998;
+  --scrollbar-thumb-hover: #a6a8b3;
+  --radius: 0.625rem;
 }
-
-body {
-  margin: 0;
-  padding: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial,
-    sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
-  background-color: var(--base);
-  color: var(--text);
-  -webkit-font-smoothing: antialiased;
-  overflow: hidden;
-  user-select: none;
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+    scrollbar-width: thin;
+    scrollbar-color: var(--scrollbar-thumb) var(--card);
+  }
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    margin: 0;
+    overflow: hidden;
+    user-select: none;
+  }
+  button,
+  input,
+  select {
+    font: inherit;
+  }
+  button {
+    cursor: pointer;
+  }
+  button:disabled {
+    cursor: default;
+  }
+  input,
+  pre,
+  code,
+  [data-selectable] {
+    user-select: text;
+  }
 }
-
-/* Global scrollbar styles */
-* {
-  scrollbar-width: thin;
-  scrollbar-color: var(--surface2) var(--mantle);
+::selection {
+  background: var(--primary);
+  color: var(--primary-foreground);
 }
-
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
-
 ::-webkit-scrollbar-track {
-  background: var(--mantle);
-  border-radius: 4px;
+  background: var(--card);
 }
-
 ::-webkit-scrollbar-thumb {
-  background: var(--surface2);
+  background: var(--scrollbar-thumb);
   border-radius: 4px;
-  transition: background 0.2s ease;
 }
-
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--surface1);
+  background: var(--scrollbar-thumb-hover);
 }
-
-::-webkit-scrollbar-corner {
-  background: var(--mantle);
+.resource-grid {
+  display: grid;
+  grid-template-columns:
+    minmax(0, 1.5fr) repeat(3, minmax(0, 1fr)) minmax(0, 1.05fr)
+    minmax(0, 1.2fr);
+  gap: 12px;
+  padding: 16px;
 }
-
-/* Glassy theme */
-
+.resource-grid > [data-slot="card"] {
+  min-width: 0;
+}
+.resource-grid [data-slot="card-header"],
+.resource-grid [data-slot="card-content"] {
+  padding-inline: 16px;
+}
+.process-table-region {
+  flex: 1;
+  min-height: 0;
+  min-width: 0;
+  overflow: auto;
+}
+.process-table-region [data-slot="table-container"] {
+  overflow: visible;
+}
+.process-table-region [data-slot="table"] {
+  width: max-content;
+  min-width: 100%;
+  table-layout: fixed;
+  font-size: 13px;
+}
+.process-table-region [data-slot="table-head"] {
+  height: 40px;
+  padding-block: 0;
+  background: var(--card);
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  box-shadow: inset 0 -1px var(--border);
+}
+.process-table-region [data-slot="table-cell"] {
+  padding-block: 8px;
+  white-space: nowrap;
+}
+.process-table-region .actions-cell {
+  position: sticky;
+  right: 0;
+  z-index: 1;
+  background: var(--card);
+  box-shadow: inset 1px 0 var(--border);
+}
+.process-table-region [data-slot="table-head"].actions-heading {
+  right: 0;
+  z-index: 4;
+  box-shadow:
+    inset 1px 0 var(--border),
+    inset 0 -1px var(--border);
+}
+.process-table-region [data-slot="table-row"]:hover .actions-cell {
+  background: color-mix(in srgb, var(--card), var(--muted) 50%);
+}
+.process-table-region [data-slot="table-row"][data-pinned="true"],
+.process-table-region
+  [data-slot="table-row"][data-pinned="true"]
+  .actions-cell {
+  background: color-mix(in srgb, var(--primary) 6%, var(--card));
+}
+.process-table-region .tree-name {
+  position: sticky;
+  left: 0;
+  background: var(--card);
+  z-index: 1;
+}
+.process-table-region [data-slot="table-head"].tree-name {
+  z-index: 4;
+}
+.process-table-region [data-slot="table-row"]:hover .tree-name {
+  background: color-mix(in srgb, var(--card), var(--muted) 50%);
+}
+.process-table-region [data-slot="table-row"][data-pinned="true"] .tree-name {
+  background: color-mix(in srgb, var(--primary) 6%, var(--card));
+}
 [data-theme="glassy"] body {
+  background: transparent;
+}
+[data-theme="glassy"] .app-container {
+  background: color-mix(in srgb, var(--background) 85%, transparent);
+}
+[data-theme="glassy"] .resource-grid > [data-slot="card"],
+[data-theme="glassy"] .toolbar,
+[data-theme="glassy"] .view-controls,
+[data-theme="glassy"] [data-slot="table-cell"],
+[data-theme="glassy"] .title-bar {
+  background: color-mix(in srgb, var(--card) 78%, transparent);
+  backdrop-filter: blur(12px);
+}
+[data-theme="glassy"] [data-slot="table-head"],
+[data-theme="glassy"] .actions-cell {
+  background: color-mix(in srgb, var(--card) 95%, transparent);
+}
+@media (max-width: 1200px) {
+  .resource-grid {
+    gap: 8px;
+    padding: 12px;
+    grid-template-columns:
+      minmax(0, 1.5fr) repeat(3, minmax(0, 1fr)) minmax(0, 1.05fr)
+      minmax(0, 1.2fr);
+  }
+  .resource-grid [data-slot="card-header"],
+  .resource-grid [data-slot="card-content"] {
+    padding-inline: 12px;
+  }
+}
+@media (max-width: 900px) {
+  .resource-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    max-height: 330px;
+    overflow: auto;
+  }
+  .resource-grid > [data-slot="card"]:first-child {
+    grid-column: 1/-1;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* The transparent webview supplies native rounded companion edges. */
+html[data-companion],
+html[data-companion] body {
   background: transparent !important;
 }
-
-[data-theme="glassy"] .toolbar {
-  position: relative;
-  background: rgba(24, 24, 37, 0.5) !important;
-  border: 1px solid rgba(255, 255, 255, 0.1) !important;
-  z-index: 9;
-}
-
-[data-theme="glassy"] .stat-panel {
-  background: rgba(24, 24, 37, 0.2) !important;
-  z-index: 100;
-}
-
-[data-theme="glassy"] .panel-header {
-  border-color: rgba(255, 255, 255, 0.1) !important;
-}
-
-[data-theme="glassy"] .col-actions {
-  background: rgba(24, 24, 37, 0.2) !important;
-  border-bottom: 1px solid rgba(232, 232, 232, 0.1) !important;
-  border-left: 1px solid rgba(232, 232, 232, 0.1) !important;
-}
-
-[data-theme="glassy"] .search-input,
-[data-theme="glassy"] .btn-toggle,
-[data-theme="glassy"] .btn-action,
-[data-theme="glassy"] .info-button,
-[data-theme="glassy"] .btn-page,
-[data-theme="glassy"] .theme-button,
-[data-theme="glassy"] .usage-pill,
-[data-theme="glassy"] .bar-container,
-[data-theme="glassy"] .select-input {
-  background: rgba(24, 24, 37, 0.2) !important;
-  z-index: 100;
-}
-
-[data-theme="glassy"] .btn-clear {
-  z-index: 100;
-}
-
-[data-theme="glassy"] tr.pinned,
-[data-theme="glassy"] tr:hover {
-  background: rgba(24, 24, 37, 0.3) !important;
-}
-
-[data-theme="glassy"] th {
-  background: rgba(24, 24, 37, 0.5) !important;
-}
-
-[data-theme="glassy"] td {
-  border-bottom: 1px solid rgba(232, 232, 232, 0.1) !important;
-  background: rgba(24, 24, 37, 0.2) !important;
+html[data-companion] body {
+  overflow: hidden;
 }

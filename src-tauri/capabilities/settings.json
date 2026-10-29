@@ -1,0 +1,14 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "settings",
+  "description": "Local settings and About windows",
+  "windows": [
+    "settings",
+    "about"
+  ],
+  "permissions": [
+    "core:default",
+    "core:app:allow-version",
+    "core:window:allow-set-theme"
+  ]
+}
