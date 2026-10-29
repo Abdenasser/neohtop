@@ -13,3 +13,5 @@ vite.config.ts.timestamp-*
 ## Jetbrains
 .idea/
 .run/
+
+/.site-build/

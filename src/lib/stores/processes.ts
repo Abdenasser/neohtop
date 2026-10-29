@@ -1,3 +1,4 @@
+import { trackUsage } from "$lib/utils/telemetry";
 import { get, writable } from "svelte/store";
 import type {
   Process,
@@ -155,8 +156,10 @@ function createProcessStore() {
     });
   };
 
-  const setSearchTerm = (searchTerm: string) =>
+  const setSearchTerm = (searchTerm: string) => {
+    if (searchHasPortQuery(searchTerm)) trackUsage("port_search");
     update((state) => ({ ...state, searchTerm, currentPage: 1 }));
+  };
 
   const refreshControl = async () => {
     if (inFlight) await inFlight;
@@ -179,6 +182,7 @@ function createProcessStore() {
     update((state) => ({ ...state, currentPage }));
 
   const showProcessDetails = (process: Process) => {
+    trackUsage("inspector_open");
     update((state) => ({
       ...state,
       selectedProcessPid: process.pid,

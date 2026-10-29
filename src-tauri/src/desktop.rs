@@ -16,7 +16,7 @@ fn show(app: &AppHandle, label: &str) -> Result<(), String> {
 #[tauri::command]
 pub fn open_settings(app: AppHandle, pane: Option<String>) -> Result<(), String> {
     if let Some(pane) = pane {
-        if pane == "general" || pane == "appearance" {
+        if pane == "general" || pane == "appearance" || pane == "privacy" {
             *app.state::<DesktopState>()
                 .0
                 .lock()
@@ -25,6 +25,7 @@ pub fn open_settings(app: AppHandle, pane: Option<String>) -> Result<(), String>
                 .map_err(|e| e.to_string())?;
         }
     }
+    crate::telemetry::track(&app, "settings_open", None);
     show(&app, "settings")
 }
 #[tauri::command]

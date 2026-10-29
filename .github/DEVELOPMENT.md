@@ -74,25 +74,28 @@ Before submitting a PR, ensure:
 
 ### Website and discoverability
 
-GitHub Pages serves the static `docs/` directory from `main`. Preview it over
-HTTP so browser modules and copy controls work:
+GitHub Pages serves the generated static `docs/` directory from `main`. The
+website source is `site/Site.svelte`, with the same shadcn buttons, cards, badges
+and Catppuccin semantic tokens used by the desktop app. A small Svelte server
+render produces complete HTML; there is no Svelte client bundle to hydrate.
+Native FAQ disclosures, links and download fallbacks work without JavaScript.
+
+After editing the website source, regenerate all three public pages and CSS:
 
 ```bash
+npm run build:site
+npm run test:release
 python3 -m http.server 8765 --bind 127.0.0.1 --directory docs
 ```
 
-Open `http://127.0.0.1:8765/`. The HTML contains the product content, navigation,
-FAQ answers, and release-page download links without requiring JavaScript.
-JavaScript resolves only assets from the latest published stable release; API
-failures retain working release-page links. Version 1.3.0 brings process families, GPU details, native app icons, resource
-histories, local-port search, the menu-bar companion and Settings to the free
-open-source desktop app. Pro is postponed and is not available to buy or install.
+Open `http://127.0.0.1:8765/`. Commit both the source and generated pages/assets.
+Do not hand-edit generated HTML. `docs/main.js` progressively enhances actual
+published-release download links and copy controls. Website analytics is separate from the desktop relay and does not affect navigation or downloads. Desktop analytics requires its explicit build-time endpoint; see `telemetry/README.md`.
 
 Each public HTML page has a canonical URL, social metadata, structured data,
 and a linked Markdown equivalent. Keep the HTML, Markdown, `llms.txt`, and
 `sitemap.xml` consistent when changing product facts. The site uses local assets,
-system fonts, native FAQ disclosures, and reduced-motion styles. Existing Google
-Analytics remains optional; blocking it must not affect downloads or navigation.
+system fonts, native FAQ disclosures, and reduced-motion styles. Blocking Google Analytics must not affect downloads or navigation.
 
 `llms.txt` follows a [proposed convention](https://llmstxt.org/), not a search
 ranking guarantee. [Google's AI search guidance](https://developers.google.com/search/docs/appearance/ai-features)

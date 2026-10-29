@@ -1,17 +1,14 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="dark" data-theme="catppuccin">
   <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Install NeoHtop on macOS, Windows &amp; Linux — NeoHtop</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="color-scheme" content="dark" />
+    <title>Install NeoHtop — macOS, Windows and Linux</title>
     <meta
       name="description"
-      content="Install NeoHtop from official GitHub releases. Choose Apple Silicon or Intel, Windows x64, and Linux .deb, .rpm, or AppImage packages; troubleshoot common issues."
+      content="Download and install NeoHtop Desktop on Apple Silicon or Intel Macs, Windows x64 and Linux x86_64 or ARM64. Official packages, checksums and troubleshooting."
     />
-    <meta name="author" content="Abdenasser" />
-    <meta name="theme-color" content="#0c1012" />
-    <meta name="color-scheme" content="dark" />
-    <meta name="robots" content="index, follow, max-image-preview:large" />
     <link
       rel="canonical"
       href="https://abdenasser.github.io/neohtop/install.html"
@@ -23,6 +20,8 @@
       title="Markdown version"
     />
     <link rel="describedby" href="llms.txt" />
+    <link rel="icon" href="favicon.ico" />
+    <link rel="apple-touch-icon" href="assets/neohtop-icon.png" />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="NeoHtop" />
     <meta
@@ -31,297 +30,459 @@
     />
     <meta
       property="og:title"
-      content="Install NeoHtop on macOS, Windows &amp; Linux — NeoHtop"
+      content="Install NeoHtop — macOS, Windows and Linux"
     />
     <meta
       property="og:description"
-      content="Install NeoHtop from official GitHub releases. Choose Apple Silicon or Intel, Windows x64, and Linux .deb, .rpm, or AppImage packages; troubleshoot common issues."
+      content="Download and install NeoHtop Desktop on Apple Silicon or Intel Macs, Windows x64 and Linux x86_64 or ARM64. Official packages, checksums and troubleshooting."
     />
     <meta
       property="og:image"
       content="https://abdenasser.github.io/neohtop/assets/neohtop-desktop.png"
     />
-    <meta property="og:image:width" content="2784" />
-    <meta property="og:image:height" content="2024" />
+    <meta property="og:image:width" content="1280" />
+    <meta property="og:image:height" content="900" />
     <meta
       property="og:image:alt"
-      content="NeoHtop desktop system monitor showing process metrics"
+      content="NeoHtop in Catppuccin with resource charts and a searchable process table"
     />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:creator" content="@__abdenasser" />
     <meta
       name="twitter:title"
-      content="Install NeoHtop on macOS, Windows &amp; Linux — NeoHtop"
+      content="Install NeoHtop — macOS, Windows and Linux"
     />
     <meta
       name="twitter:description"
-      content="Install NeoHtop from official GitHub releases. Choose Apple Silicon or Intel, Windows x64, and Linux .deb, .rpm, or AppImage packages; troubleshoot common issues."
+      content="Download and install NeoHtop Desktop on Apple Silicon or Intel Macs, Windows x64 and Linux x86_64 or ARM64. Official packages, checksums and troubleshooting."
     />
     <meta
       name="twitter:image"
       content="https://abdenasser.github.io/neohtop/assets/neohtop-desktop.png"
     />
-    <link rel="icon" href="favicon.ico" />
-    <link rel="apple-touch-icon" href="assets/neohtop-icon.png" />
-    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="assets/site-style-CAg3NXHY.css" />
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
-        "@type": "TechArticle",
-        "headline": "Install NeoHtop on macOS, Windows and Linux",
+        "@type": "WebPage",
+        "name": "Install NeoHtop — macOS, Windows and Linux",
         "url": "https://abdenasser.github.io/neohtop/install.html",
-        "about": { "@id": "https://abdenasser.github.io/neohtop/#desktop" }
+        "description": "Download and install NeoHtop Desktop on Apple Silicon or Intel Macs, Windows x64 and Linux x86_64 or ARM64. Official packages, checksums and troubleshooting."
       }
     </script>
   </head>
   <body>
-    <a class="skip-link" href="#main">Skip to content</a>
+    <!--[--><a class="skip-link" href="#main">Skip to content</a>
     <header class="site-header">
-      <nav class="shell navigation" aria-label="Main navigation">
+      <div class="site-shell header-row">
         <a class="brand" href="./" aria-label="NeoHtop home"
-          ><img
-            src="assets/neohtop-icon.png"
-            width="32"
-            height="32"
-            alt=""
-          /><span>neohtop<span class="brand-cursor">_</span></span></a
-        ><button
-          class="menu-button"
-          aria-expanded="false"
-          aria-controls="navigation-links"
-        >
-          Menu <span aria-hidden="true">+</span>
-        </button>
-        <div class="nav-links" id="navigation-links">
-          <a href="./#features">Features</a
-          ><a href="install.html">Installation</a
-          ><a href="desktop-vs-cli.html">Desktop / CLI</a
-          ><a href="./#pro">Pro <span class="tiny-tag">POSTPONED</span></a
-          ><a class="nav-github" href="https://github.com/Abdenasser/neohtop"
-            >GitHub <span aria-hidden="true">↗</span></a
-          >
-        </div>
-      </nav>
-    </header>
-    <main id="main">
-      <article class="guide shell">
-        <p class="eyebrow">NEOHTOP / FIELD GUIDE 01</p>
-        <h1>From download<br />to <em>first process.</em></h1>
-        <p class="guide-lead">
-          Install the free NeoHtop desktop system monitor on macOS, Windows, or
-          Linux. Official binaries are published on GitHub Releases.
-        </p>
-        <div class="guide-toc">
-          <a href="#macos">macOS</a><a href="#windows">Windows</a
-          ><a href="#linux">Linux</a
-          ><a href="#troubleshooting">Troubleshooting</a
-          ><a href="#source">Build from source</a>
-        </div>
-        <aside class="notice">
-          <strong>NeoHtop v1.3.0</strong>
-          <p>
-            Downloads refer to the latest published release. Version 1.3.0
-            includes the desktop refresh, process families, GPU diagnostics and
-            menu-bar overview. Older versions differ. Pro is postponed and is
-            not part of these downloads.
-          </p>
-        </aside>
-        <section id="macos">
-          <h2>Install NeoHtop on macOS</h2>
-          <ol>
-            <li>
-              Open the
-              <a href="https://github.com/Abdenasser/neohtop/releases/latest"
-                >latest published release</a
-              >.
-            </li>
-            <li>
-              Choose the Apple Silicon DMG for M-series Macs or the Intel DMG
-              for Intel-based Macs. In Apple menu → About This Mac, look for
-              “Chip” or “Processor.”
-            </li>
-            <li>Open the DMG and drag NeoHtop into Applications.</li>
-            <li>Launch NeoHtop from Applications.</li>
-          </ol>
-          <h3>Homebrew alternative</h3>
-          <p>
-            The community-maintained Homebrew cask offers another install path.
-            Its version and update timing can differ from the official releases.
-          </p>
-          <div class="install-command">
-            <span class="prompt" aria-hidden="true">$</span
-            ><code id="guide-brew">brew install --cask neohtop</code
-            ><button
-              class="copy-button"
-              data-copy="guide-brew"
-              aria-label="Copy Homebrew command"
-            >
-              Copy
-            </button>
-          </div>
-          <p>
-            If macOS cannot verify a download, confirm you obtained it from the
-            official repository and read the release notes. Do not disable
-            Gatekeeper or remove quarantine flags as a routine install step.
-          </p>
-        </section>
-        <section id="windows">
-          <h2>Install NeoHtop on Windows</h2>
-          <ol>
-            <li>
-              Find the Windows x64 <code>.exe</code> in the
-              <a href="https://github.com/Abdenasser/neohtop/releases/latest"
-                >latest release assets</a
-              >.
-            </li>
-            <li>
-              If its name ends in <code>-setup.exe</code>, run the installer and
-              follow its prompts.
-            </li>
-            <li>
-              Older published releases may provide a portable <code>.exe</code>.
-              Put that file in a folder you control and launch it there.
-            </li>
-          </ol>
-          <p>
-            Use a package listed for your architecture. Consult the release
-            notes for platform requirements and known issues.
-          </p>
-        </section>
-        <section id="linux">
-          <h2>Install NeoHtop on Linux</h2>
-          <p>
-            Choose the package for your distribution and CPU architecture. Run
-            <code>uname -m</code>: <code>x86_64</code> means x64, and
-            <code>aarch64</code> means ARM64. An architecture may be unavailable
-            in older releases.
-          </p>
-          <div class="guide-table">
-            <table>
-              <caption>
-                Linux package options
-              </caption>
-              <thead>
-                <tr>
-                  <th>Package</th>
-                  <th>Use it for</th>
-                  <th>Install approach</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>.deb</td>
-                  <td>Debian / Ubuntu</td>
-                  <td>
-                    Open it in your system’s package installer, or install the
-                    downloaded local file with apt.
-                  </td>
-                </tr>
-                <tr>
-                  <td>.rpm</td>
-                  <td>Fedora and compatible RPM distributions</td>
-                  <td>
-                    Use your distribution’s package manager to install the
-                    downloaded local file.
-                  </td>
-                </tr>
-                <tr>
-                  <td>AppImage</td>
-                  <td>A portable Linux app</td>
-                  <td>
-                    Make the downloaded file executable in its Properties, then
-                    open it.
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-          <p>
-            AppImages still rely on system libraries and may require FUSE
-            support. “Portable” does not mean compatible with every distribution
-            or glibc version.
-          </p>
-        </section>
-        <section id="troubleshooting">
-          <h2>Troubleshooting</h2>
-          <h3>A Linux build reports a glibc error or opens a blank window</h3>
-          <p>
-            First check the release notes and your distribution version. Version
-            1.3.0 builds on Ubuntu 22.04 and checks AppImages for bundled host
-            Wayland libraries. Older releases may not contain these fixes. Try
-            an appropriate native package if available, and include the exact
-            error when reporting a problem.
-          </p>
-          <h3>Some process details are missing</h3>
-          <p>
-            Operating-system permissions can restrict which details are visible.
-            See the repository’s platform-specific guidance before granting
-            elevated access. Normal use should start without administrator
-            privileges.
-          </p>
-          <h3>Need help?</h3>
-          <p>
-            <a href="https://github.com/Abdenasser/neohtop/issues"
-              >Open a GitHub issue</a
-            >
-            with your NeoHtop version, operating system, architecture, package
-            type, error text, and steps to reproduce. Redact credentials and
-            private command-line arguments from diagnostic output.
-          </p>
-        </section>
-        <section id="source">
-          <h2>Build the development version</h2>
-          <p>
-            Developers can build the current source with Node.js 22, stable Rust
-            1.88 or newer, and the platform prerequisites for Tauri. This is a
-            development build and may differ from the published app.
-          </p>
-          <pre
-            class="code-block"
-          ><code>git clone https://github.com/Abdenasser/neohtop.git
-cd neohtop
-npm ci
-npm run tauri dev</code></pre>
-          <p>
-            Read the
-            <a href="https://github.com/Abdenasser/neohtop#development"
-              >repository’s development instructions</a
-            >
-            for platform setup and build commands.
-          </p>
-        </section>
-        <a class="button primary" href="./#download">Choose a download ↓</a>
-      </article>
-    </main>
-    <footer class="site-footer shell">
-      <div class="footer-top">
-        <a class="brand" href="./"
           ><img
             src="assets/neohtop-icon.png"
             width="28"
             height="28"
             alt=""
-          /><span>neohtop_</span></a
+          /><span>NeoHtop</span
+          ><!----><span
+            data-slot="badge"
+            class="h-5 gap-1 rounded-4xl border border-transparent px-2 py-0.5 text-xs font-medium transition-all has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&amp;>svg]:size-3! group/badge inline-flex w-fit shrink-0 items-center justify-center overflow-hidden whitespace-nowrap focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 [&amp;>svg]:pointer-events-none bg-secondary text-secondary-foreground [a]:hover:bg-secondary/80 version-badge"
+            ><!---->1.3<!----><!----></span
+          ><!----><!----></a
         >
-        <p>Built for the beautifully curious.</p>
-        <a href="https://github.com/sponsors/Abdenasser"
-          >Support the project ↗</a
-        >
+        <nav aria-label="Main navigation">
+          <a href="./#features">Features</a><a href="./#themes">Themes</a
+          ><a href="install.html">Install</a
+          ><a
+            href="https://github.com/Abdenasser/neohtop/blob/main/CHANGELOG.md"
+            >Changelog<svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="lucide lucide-arrow-up-right lucide-icon size-3"
+              aria-hidden="true"
+            >
+              <!--[--><!---->
+              <path d="M7 7h10v10"><!----></path>
+              <!----><!---->
+              <path d="M7 17 17 7"><!----></path>
+              <!----><!--]--><!----></svg
+            ><!----></a
+          >
+        </nav>
+        <!--[0--><a
+          data-slot="button"
+          class="focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:aria-invalid:border-destructive/50 border border-transparent bg-clip-padding text-sm font-medium focus-visible:ring-3 aria-invalid:ring-3 active:not-aria-[haspopup]:translate-y-px [&amp;_svg:not([class*='size-'])]:size-4 group/button inline-flex shrink-0 items-center justify-center whitespace-nowrap transition-all outline-none select-none disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:shrink-0 bg-primary text-primary-foreground hover:bg-primary/80 h-8 gap-1 rounded-[min(var(--radius-md),10px)] px-2.5 in-data-[slot=button-group]:rounded-md has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5"
+          href="./#download"
+          ><svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            class="lucide lucide-arrow-down lucide-icon"
+            aria-hidden="true"
+          >
+            <!--[--><!---->
+            <path d="M12 5v14"><!----></path>
+            <!----><!---->
+            <path d="m19 12-7 7-7-7"><!----></path>
+            <!----><!--]--><!----></svg
+          ><!---->Download<!----></a
+        ><!--]--><!---->
       </div>
-      <div class="footer-bottom">
-        <span
-          >Free software. MIT license. Made by
-          <a href="https://github.com/Abdenasser">Abdenasser</a>.</span
-        >
-        <div>
-          <a href="install.html">Docs</a
-          ><a href="https://github.com/Abdenasser/neohtop/issues"
-            >Report an issue</a
-          ><a href="llms.txt">llms.txt</a><a href="sitemap.xml">Sitemap</a>
+    </header>
+    <main id="main">
+      <!--[1-->
+      <article class="site-shell guide-page">
+        <!----><span
+          data-slot="badge"
+          class="h-5 gap-1 rounded-4xl border px-2 py-0.5 text-xs font-medium transition-all has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&amp;>svg]:size-3! group/badge inline-flex w-fit shrink-0 items-center justify-center overflow-hidden whitespace-nowrap focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 [&amp;>svg]:pointer-events-none border-border text-foreground [a]:hover:bg-muted [a]:hover:text-muted-foreground"
+          ><!---->GET STARTED<!----><!----></span
+        ><!----><!---->
+        <h1>Make it part<br /><span>of your desktop.</span></h1>
+        <p class="guide-intro">
+          Choose an official package for your operating system and architecture.
+          Version 1.3.0 includes the refreshed desktop, GPU diagnostics, process
+          families and menu-bar companion.
+        </p>
+        <div class="guide-grid">
+          <div
+            data-slot="card"
+            data-size="default"
+            class="ring-border bg-card text-card-foreground gap-(--card-spacing) overflow-hidden rounded-xl py-(--card-spacing) text-sm shadow-xs ring-1 [--card-spacing:--spacing(6)] has-[>img:first-child]:pt-0 data-[size=sm]:[--card-spacing:--spacing(4)] *:[img:first-child]:rounded-t-xl *:[img:last-child]:rounded-b-xl group/card flex flex-col"
+          >
+            <div
+              data-slot="card-header"
+              class="gap-1 rounded-t-xl px-(--card-spacing) [.border-b]:pb-(--card-spacing) group/card-header @container/card-header grid auto-rows-min items-start has-data-[slot=card-action]:grid-cols-[1fr_auto] has-data-[slot=card-description]:grid-rows-[auto_auto]"
+            >
+              <div
+                data-slot="card-title"
+                class="cn-font-heading text-base leading-normal font-medium group-data-[size=sm]/card:text-sm"
+              >
+                <!---->macOS<!---->
+              </div>
+              <!---->
+            </div>
+            <!---->
+            <div
+              data-slot="card-content"
+              class="flex flex-col gap-3 px-(--card-spacing)"
+            >
+              <ol>
+                <li>Check Apple menu → About This Mac for your chip.</li>
+                <li>
+                  Download the Apple Silicon or Intel DMG from GitHub Releases.
+                </li>
+                <li>
+                  Open the DMG, drag NeoHtop into Applications and launch it.
+                </li>
+              </ol>
+              <p>
+                Release DMGs require Developer ID signing and Apple
+                notarization. Check release notes if a download cannot be
+                verified.
+              </p>
+              <!--[0--><a
+                data-slot="button"
+                class="focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:aria-invalid:border-destructive/50 rounded-md border bg-clip-padding text-sm font-medium focus-visible:ring-3 aria-invalid:ring-3 active:not-aria-[haspopup]:translate-y-px [&amp;_svg:not([class*='size-'])]:size-4 group/button inline-flex shrink-0 items-center justify-center whitespace-nowrap transition-all outline-none select-none disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:shrink-0 border-border bg-background hover:bg-muted hover:text-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50 aria-expanded:bg-muted aria-expanded:text-foreground shadow-xs h-9 gap-1.5 px-2.5 in-data-[slot=button-group]:rounded-md has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2"
+                href="https://github.com/Abdenasser/neohtop/releases/latest"
+                ><!---->Choose a Mac download<svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="lucide lucide-arrow-up-right lucide-icon"
+                  aria-hidden="true"
+                >
+                  <!--[--><!---->
+                  <path d="M7 7h10v10"><!----></path>
+                  <!----><!---->
+                  <path d="M7 17 17 7"><!----></path>
+                  <!----><!--]--><!----></svg
+                ><!----><!----></a
+              ><!--]--><!----><!---->
+            </div>
+            <!----><!---->
+          </div>
+          <!---->
+          <div
+            data-slot="card"
+            data-size="default"
+            class="ring-border bg-card text-card-foreground gap-(--card-spacing) overflow-hidden rounded-xl py-(--card-spacing) text-sm shadow-xs ring-1 [--card-spacing:--spacing(6)] has-[>img:first-child]:pt-0 data-[size=sm]:[--card-spacing:--spacing(4)] *:[img:first-child]:rounded-t-xl *:[img:last-child]:rounded-b-xl group/card flex flex-col"
+          >
+            <div
+              data-slot="card-header"
+              class="gap-1 rounded-t-xl px-(--card-spacing) [.border-b]:pb-(--card-spacing) group/card-header @container/card-header grid auto-rows-min items-start has-data-[slot=card-action]:grid-cols-[1fr_auto] has-data-[slot=card-description]:grid-rows-[auto_auto]"
+            >
+              <div
+                data-slot="card-title"
+                class="cn-font-heading text-base leading-normal font-medium group-data-[size=sm]/card:text-sm"
+              >
+                <!---->Windows<!---->
+              </div>
+              <!---->
+            </div>
+            <!---->
+            <div
+              data-slot="card-content"
+              class="flex flex-col gap-3 px-(--card-spacing)"
+            >
+              <ol>
+                <li>
+                  Download the Windows x64 file ending in
+                  <code>-setup.exe</code>.
+                </li>
+                <li>Run the installer and follow the prompts.</li>
+                <li>Launch NeoHtop from your installed apps.</li>
+              </ol>
+              <p>
+                Older releases may provide a portable executable instead.
+                Windows code signing is not configured.
+              </p>
+              <!--[0--><a
+                data-slot="button"
+                class="focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:aria-invalid:border-destructive/50 rounded-md border bg-clip-padding text-sm font-medium focus-visible:ring-3 aria-invalid:ring-3 active:not-aria-[haspopup]:translate-y-px [&amp;_svg:not([class*='size-'])]:size-4 group/button inline-flex shrink-0 items-center justify-center whitespace-nowrap transition-all outline-none select-none disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:shrink-0 border-border bg-background hover:bg-muted hover:text-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50 aria-expanded:bg-muted aria-expanded:text-foreground shadow-xs h-9 gap-1.5 px-2.5 in-data-[slot=button-group]:rounded-md has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2"
+                href="https://github.com/Abdenasser/neohtop/releases/latest"
+                ><!---->Choose a Windows download<svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="lucide lucide-arrow-up-right lucide-icon"
+                  aria-hidden="true"
+                >
+                  <!--[--><!---->
+                  <path d="M7 7h10v10"><!----></path>
+                  <!----><!---->
+                  <path d="M7 17 17 7"><!----></path>
+                  <!----><!--]--><!----></svg
+                ><!----><!----></a
+              ><!--]--><!----><!---->
+            </div>
+            <!----><!---->
+          </div>
+          <!---->
+          <div
+            data-slot="card"
+            data-size="default"
+            class="ring-border bg-card text-card-foreground gap-(--card-spacing) overflow-hidden rounded-xl py-(--card-spacing) text-sm shadow-xs ring-1 [--card-spacing:--spacing(6)] has-[>img:first-child]:pt-0 data-[size=sm]:[--card-spacing:--spacing(4)] *:[img:first-child]:rounded-t-xl *:[img:last-child]:rounded-b-xl group/card flex flex-col"
+          >
+            <div
+              data-slot="card-header"
+              class="gap-1 rounded-t-xl px-(--card-spacing) [.border-b]:pb-(--card-spacing) group/card-header @container/card-header grid auto-rows-min items-start has-data-[slot=card-action]:grid-cols-[1fr_auto] has-data-[slot=card-description]:grid-rows-[auto_auto]"
+            >
+              <div
+                data-slot="card-title"
+                class="cn-font-heading text-base leading-normal font-medium group-data-[size=sm]/card:text-sm"
+              >
+                <!---->Linux<!---->
+              </div>
+              <!---->
+            </div>
+            <!---->
+            <div
+              data-slot="card-content"
+              class="flex flex-col gap-3 px-(--card-spacing)"
+            >
+              <p>
+                <code>uname -m</code> reports <code>x86_64</code> or
+                <code>aarch64</code> (ARM64).
+              </p>
+              <ul>
+                <li>Debian/Ubuntu: choose the matching <code>.deb</code>.</li>
+                <li>Fedora/RPM distributions: choose <code>.rpm</code>.</li>
+                <li>
+                  AppImage: mark executable in Properties and open it.
+                  Distribution libraries and possibly FUSE are still required.
+                </li>
+              </ul>
+              <!--[0--><a
+                data-slot="button"
+                class="focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:aria-invalid:border-destructive/50 rounded-md border bg-clip-padding text-sm font-medium focus-visible:ring-3 aria-invalid:ring-3 active:not-aria-[haspopup]:translate-y-px [&amp;_svg:not([class*='size-'])]:size-4 group/button inline-flex shrink-0 items-center justify-center whitespace-nowrap transition-all outline-none select-none disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:shrink-0 border-border bg-background hover:bg-muted hover:text-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50 aria-expanded:bg-muted aria-expanded:text-foreground shadow-xs h-9 gap-1.5 px-2.5 in-data-[slot=button-group]:rounded-md has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2"
+                href="https://github.com/Abdenasser/neohtop/releases/latest"
+                ><!---->Choose a Linux package<svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="lucide lucide-arrow-up-right lucide-icon"
+                  aria-hidden="true"
+                >
+                  <!--[--><!---->
+                  <path d="M7 7h10v10"><!----></path>
+                  <!----><!---->
+                  <path d="M7 17 17 7"><!----></path>
+                  <!----><!--]--><!----></svg
+                ><!----><!----></a
+              ><!--]--><!----><!---->
+            </div>
+            <!----><!---->
+          </div>
+          <!---->
+        </div>
+        <section id="troubleshooting">
+          <h2>Something needs a closer look?</h2>
+          <h3>Linux reports a glibc error or a blank window</h3>
+          <p>
+            Check distribution, package type and release notes. Version 1.3.0
+            uses an Ubuntu 22.04 build baseline and checks AppImages for bundled
+            host Wayland libraries. Older releases can differ. An appropriate
+            native package may work better on your distribution.
+          </p>
+          <h3>Some process, socket or GPU details are unavailable</h3>
+          <p>
+            Operating-system permissions and GPU drivers determine which
+            counters can be read. Unavailable does not mean idle. Start without
+            administrator access; the app does not elevate automatically.
+            Per-process GPU engine activity requires a supported Linux DRM
+            driver.
+          </p>
+          <h3>Where should I report a problem?</h3>
+          <p>
+            Include OS, architecture, app version, package type, error text and
+            reproduction steps. Redact private command lines, environment values
+            and identifiers.
+          </p>
+          <!--[0--><a
+            data-slot="button"
+            class="focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:aria-invalid:border-destructive/50 rounded-md border bg-clip-padding text-sm font-medium focus-visible:ring-3 aria-invalid:ring-3 active:not-aria-[haspopup]:translate-y-px [&amp;_svg:not([class*='size-'])]:size-4 group/button inline-flex shrink-0 items-center justify-center whitespace-nowrap transition-all outline-none select-none disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:shrink-0 border-border bg-background hover:bg-muted hover:text-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50 aria-expanded:bg-muted aria-expanded:text-foreground shadow-xs h-9 gap-1.5 px-2.5 in-data-[slot=button-group]:rounded-md has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2"
+            href="https://github.com/Abdenasser/neohtop/issues"
+            ><!---->Report an issue<svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="lucide lucide-arrow-up-right lucide-icon"
+              aria-hidden="true"
+            >
+              <!--[--><!---->
+              <path d="M7 7h10v10"><!----></path>
+              <!----><!---->
+              <path d="M7 17 17 7"><!----></path>
+              <!----><!--]--><!----></svg
+            ><!----><!----></a
+          ><!--]--><!---->
+        </section>
+        <section id="source">
+          <h2>Build it yourself.</h2>
+          <p>
+            Use Node.js 22, Rust 1.88 or newer, and the relevant Tauri platform
+            prerequisites.
+          </p>
+          <pre><code>git clone https://github.com/Abdenasser/neohtop.git
+cd neohtop
+npm ci
+npm run tauri dev</code></pre>
+          <!--[0--><a
+            data-slot="button"
+            class="focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:aria-invalid:border-destructive/50 rounded-md border bg-clip-padding text-sm font-medium focus-visible:ring-3 aria-invalid:ring-3 active:not-aria-[haspopup]:translate-y-px [&amp;_svg:not([class*='size-'])]:size-4 group/button inline-flex shrink-0 items-center justify-center whitespace-nowrap transition-all outline-none select-none disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:shrink-0 border-border bg-background hover:bg-muted hover:text-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50 aria-expanded:bg-muted aria-expanded:text-foreground shadow-xs h-9 gap-1.5 px-2.5 in-data-[slot=button-group]:rounded-md has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2"
+            href="https://github.com/Abdenasser/neohtop/blob/main/.github/DEVELOPMENT.md"
+            ><!---->Development guide<svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="lucide lucide-arrow-up-right lucide-icon"
+              aria-hidden="true"
+            >
+              <!--[--><!---->
+              <path d="M7 7h10v10"><!----></path>
+              <!----><!---->
+              <path d="M7 17 17 7"><!----></path>
+              <!----><!--]--><!----></svg
+            ><!----><!----></a
+          ><!--]--><!---->
+        </section>
+        <p class="section-note">
+          Community package managers are maintained independently. Pro is
+          postponed and is not part of these downloads.
+        </p>
+      </article>
+      <!--]-->
+    </main>
+    <footer class="site-footer">
+      <div class="site-shell">
+        <div class="footer-top">
+          <a class="brand" href="./"
+            ><img
+              src="assets/neohtop-icon.png"
+              width="24"
+              height="24"
+              alt=""
+            />NeoHtop</a
+          >
+          <p>Your system. In plain sight.</p>
+          <nav aria-label="Footer">
+            <a href="https://github.com/Abdenasser/neohtop">GitHub</a
+            ><a href="privacy.html">Privacy</a
+            ><a href="desktop-vs-cli.html">Desktop vs CLI</a
+            ><a href="https://www.buymeacoffee.com/abdenasser"
+              >Buy me a coffee<svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="lucide lucide-arrow-up-right lucide-icon"
+                aria-hidden="true"
+              >
+                <!--[--><!---->
+                <path d="M7 7h10v10"><!----></path>
+                <!----><!---->
+                <path d="M7 17 17 7"><!----></path>
+                <!----><!--]--><!----></svg
+              ><!----></a
+            >
+          </nav>
+        </div>
+        <div class="footer-bottom">
+          <span>Made by Abdenasser. Free under the MIT license.</span>
+          <div>
+            <a href="install.md">Read as Markdown</a
+            ><a href="llms.txt">llms.txt</a><a href="sitemap.xml">Sitemap</a>
+          </div>
         </div>
       </div>
     </footer>
-    <p class="sr-only" id="copy-status" role="status" aria-live="polite"></p>
+    <!--]-->
     <script type="module" src="main.js"></script>
   </body>
 </html>

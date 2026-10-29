@@ -24,3 +24,9 @@ NeoHtop Pro is postponed and is not available to purchase or install. No Pro sco
 - [Issue tracker](https://github.com/Abdenasser/neohtop/issues): Bugs, feature discussions, and compatibility reports.
 - [CLI source and README](https://github.com/Abdenasser/neohtop-cli): CLI-specific capabilities and installation.
 - [CLI npm package](https://www.npmjs.com/package/neohtop-cli): Terminal companion package.
+
+## Privacy
+
+Official v1.3.0 desktop builds send a basic launch event and app version without a persistent identifier. Optional feature usage is off by default and controlled in Settings → Privacy. Process and system readings stay local. Self-built apps without a configured endpoint send no desktop events. Website GA4 collection is separate.
+
+- [Privacy notice](https://abdenasser.github.io/neohtop/privacy.md): Exact data, choices and service-provider handling.

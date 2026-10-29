@@ -136,6 +136,7 @@ export interface AppConfig {
     defaultStatusFilter: string;
     processView?: "flat" | "tree";
     menuBarEnabled: boolean;
+    usageAnalytics: boolean;
     keepRunning: boolean;
   };
 }

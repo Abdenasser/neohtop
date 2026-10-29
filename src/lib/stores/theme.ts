@@ -1,3 +1,4 @@
+import { trackUsage } from "$lib/utils/telemetry";
 import { emit, listen } from "@tauri-apps/api/event";
 import { isTauri } from "@tauri-apps/api/core";
 import { writable } from "svelte/store";
@@ -49,6 +50,7 @@ function createThemeStore() {
       }
       set(theme);
       applyTheme(theme);
+      trackUsage("theme_changed", name);
       if (isTauri()) void emit("theme-change", name);
     },
     init() {

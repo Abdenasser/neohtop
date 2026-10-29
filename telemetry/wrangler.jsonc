@@ -1,0 +1,12 @@
+{
+  "name": "neohtop-analytics",
+  "main": "worker.js",
+  "compatibility_date": "2026-10-29",
+  "workers_dev": true,
+  "observability": {
+    "enabled": false,
+  },
+  "limits": {
+    "cpu_ms": 10,
+  },
+}

@@ -42,3 +42,7 @@ Appearance and the app-bar palette chooser share all 24 original themes. Search 
 ## Downloads and support
 
 Use the [official release](https://github.com/Abdenasser/neohtop/releases/latest) and [installation guide](install.md). Include OS, architecture, app version, package type and reproduction steps in [bug reports](https://github.com/Abdenasser/neohtop/issues). Redact private command lines, environment variables and identifiers before sharing diagnostics or screenshots.
+
+## Privacy and analytics
+
+Official v1.3.0 builds send a basic launch count and app version without a persistent identifier, even when optional sharing is off. **Settings → Privacy** lets you opt in to limited feature usage. Process names, search text, commands, paths and system readings stay local. See the [privacy notice](https://abdenasser.github.io/neohtop/privacy.html).

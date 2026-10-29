@@ -32,6 +32,11 @@
 - Ship Apple Silicon/Intel macOS DMGs, Linux x86_64/ARM64 deb/rpm/AppImage packages, and a Windows x64 NSIS installer, with SHA-256 checksums and a build manifest. macOS release builds require signing and notarization.
 - Update the website, screenshots, installation guide, usage documentation and machine-readable product references.
 
+### Privacy
+
+- Add a disclosed basic launch counter (app version, no persistent identifier) through a Cloudflare relay. Detailed feature usage remains off by default in Settings → Privacy. Process names, commands, queries, paths, port numbers and system readings are never sent.
+- Keep Google Analytics credentials on the server. Builds without the analytics endpoint send no desktop events; monitoring works offline.
+
 ### Compatibility and scope
 
 - Source builds now require Rust 1.88 or newer and Node.js 22. GPU/socket detail visibility depends on drivers and operating-system permissions; Linux tray behavior varies by desktop.

@@ -38,3 +38,7 @@ The CLI is a separate Go/Charm terminal application: `npm install -g neohtop-cli
 - [CLI source](https://github.com/Abdenasser/neohtop-cli)
 - [Issues](https://github.com/Abdenasser/neohtop/issues)
 - [License](https://github.com/Abdenasser/neohtop/blob/main/LICENSE)
+
+## Privacy and analytics
+
+Official v1.3.0 builds send a basic launch count and app version without a persistent identifier, even when optional sharing is off. **Settings → Privacy** lets you opt in to limited feature usage. Process names, search text, commands, paths and system readings stay local. See the [privacy notice](https://abdenasser.github.io/neohtop/privacy.html).

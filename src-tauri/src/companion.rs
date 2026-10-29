@@ -203,6 +203,7 @@ fn show(app: &AppHandle, rect: Option<Rect>) -> Result<(), String> {
         .map_err(|e| e.to_string())?;
     window.show().map_err(|e| e.to_string())?;
     window.set_focus().map_err(|e| e.to_string())?;
+    crate::telemetry::track(app, "companion_open", None);
     app.emit_to("overview", "companion-visibility", true)
         .map_err(|e| e.to_string())
 }

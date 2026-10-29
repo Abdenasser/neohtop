@@ -49,7 +49,7 @@ fn merge(config: &mut Value, patch: &Value) {
                     .as_u64()
                     .is_some_and(|n| [15, 25, 50, 100, 250, 500].contains(&n)),
                 "refreshRate" => value.as_u64().is_some_and(|n| (1000..=30000).contains(&n)),
-                "menuBarEnabled" | "keepRunning" => value.is_boolean(),
+                "menuBarEnabled" | "keepRunning" | "usageAnalytics" => value.is_boolean(),
                 "processView" => matches!(value.as_str(), Some("flat" | "tree")),
                 "defaultStatusFilter" => matches!(
                     value.as_str(),
@@ -121,6 +121,14 @@ pub async fn read_preferences(
                     .map_err(|e| e.to_string())?;
             }
         }
+        if migrate && state.ready {
+            crate::telemetry::configure(
+                &app,
+                state.config["behavior"]["usageAnalytics"]
+                    .as_bool()
+                    .unwrap_or(false),
+            )?;
+        }
         Ok(state.clone())
     })
     .await
@@ -143,6 +151,15 @@ pub async fn update_preferences(app: AppHandle, patch: Value) -> Result<Snapshot
                 .map_err(|e| e.to_string())?
                 .join("settings.json");
             persist(&path, &next)?;
+            if let Err(error) = crate::telemetry::configure(
+                &app,
+                next["behavior"]["usageAnalytics"]
+                    .as_bool()
+                    .unwrap_or(false),
+            ) {
+                persist(&path, &state.config).map_err(|rollback| format!("{error}. {rollback}"))?;
+                return Err(error);
+            }
             state.config = next;
             state.revision += 1;
             app.emit("preferences-change", state.clone())

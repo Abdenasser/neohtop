@@ -11,11 +11,12 @@
     "check:watch": "svelte-kit sync && svelte-check --tsconfig ./jsconfig.json --watch",
     "test:metrics": "node tests/format-usage-percentage.mjs",
     "tauri": "tauri",
-    "format": "prettier --write ./src ./scripts ./docs .github/workflows && cargo fmt --manifest-path src-tauri/Cargo.toml",
-    "format:check": "prettier --check ./src ./scripts ./docs .github/workflows && cargo fmt --manifest-path src-tauri/Cargo.toml -- --check",
+    "format": "prettier --write ./src ./scripts ./docs ./site ./telemetry .github/workflows && cargo fmt --manifest-path src-tauri/Cargo.toml",
+    "format:check": "prettier --check ./src ./scripts ./docs ./site ./telemetry .github/workflows && cargo fmt --manifest-path src-tauri/Cargo.toml -- --check",
     "release:check": "node scripts/release.mjs check-version",
     "test:release": "node --test scripts/*.test.mjs && npm run test:metrics",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "build:site": "node scripts/build-site.mjs"
   },
   "license": "MIT",
   "dependencies": {

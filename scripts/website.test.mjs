@@ -6,7 +6,12 @@ import { fileURLToPath } from "node:url";
 
 const root = fileURLToPath(new URL("../docs/", import.meta.url));
 const base = "https://abdenasser.github.io/neohtop/";
-const pages = ["index.html", "install.html", "desktop-vs-cli.html"];
+const pages = [
+  "index.html",
+  "install.html",
+  "desktop-vs-cli.html",
+  "privacy.html",
+];
 const read = (file) => fs.readFileSync(path.join(root, file), "utf8");
 
 // Protect navigation and crawler entry points across the static deployment.
@@ -74,9 +79,9 @@ test("indexable pages have unique metadata, matching canonicals, and parseable s
 
 test("downloads work without JavaScript and AI references do not advertise an available Pro product", () => {
   const html = read("index.html");
-  const downloads = [
-    ...html.matchAll(/<a\s+class="download-button"[\s\S]*?href="([^"]+)"/g),
-  ];
+  const downloads = [...html.matchAll(/<a\b[^>]*>/g)]
+    .filter(([tag]) => /class="[^"]*\bdownload-button\b/.test(tag))
+    .map(([tag]) => tag.match(/href="([^"]+)"/));
   assert.equal(downloads.length, 9);
   for (const link of downloads)
     assert.equal(

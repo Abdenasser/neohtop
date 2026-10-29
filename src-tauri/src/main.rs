@@ -13,6 +13,7 @@ mod native_icons;
 mod preferences;
 mod sampling;
 mod state;
+mod telemetry;
 mod ui;
 
 use state::AppState;
@@ -43,10 +44,13 @@ fn main() {
         .plugin(tauri_plugin_os::init())
         .manage(AppState::new())
         .manage(preferences::Preferences::default())
+        .manage(telemetry::Telemetry::default())
         .manage(desktop::DesktopState::default())
         .manage(std::sync::Mutex::new(companion::CompanionState::default()))
         .on_window_event(companion::window_event)
         .invoke_handler(tauri::generate_handler![
+            telemetry::track_usage,
+            telemetry::analytics_configured,
             preferences::read_preferences,
             preferences::update_preferences,
             desktop::open_settings,

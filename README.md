@@ -12,12 +12,9 @@
   <p><a href="https://github.com/Abdenasser/neohtop/releases/latest"><strong>Download NeoHtop</strong></a> · <a href="https://abdenasser.github.io/neohtop/">Website</a> · <a href="CHANGELOG.md">What’s new</a> · <a href="docs/screenshots/README.md">Screenshots</a> · <a href="docs/usage.md">Desktop guide</a></p>
 </div>
 
-<picture>
-  <source media="(prefers-color-scheme: light)" srcset="docs/screenshots/desktop-light.jpg" />
-  <img src="docs/assets/neohtop-desktop.png" alt="NeoHtop desktop: CPU, memory and GPU charts, storage and network readings, and a searchable process table" width="1280" />
-</picture>
+<img src="docs/assets/neohtop-desktop.png" alt="NeoHtop in Catppuccin, captured with macOS: CPU, memory and GPU charts, storage, network and processes" width="1280" />
 
-<p align="center"><sub>Real desktop UI. Dark, light, and 22 more ways to make it yours. Free, local, and open source.</sub></p>
+<p align="center"><sub>Catppuccin, front and center. 23 more themes when you want a change. Free, local, and open source.</sub></p>
 
 ## Meet NeoHtop 1.3
 
@@ -36,6 +33,15 @@ A fresh desktop experience with more to explore—from the process holding a por
   <tr>
     <td width="50%"><img src="docs/screenshots/cpu-details.jpg" alt="CPU details with a utilization chart and per-core activity" /><br /><strong>Go deeper from every resource card.</strong><br /><sub>CPU cores, memory breakdowns, graphics adapters, mounted volumes, system identity and network interfaces.</sub></td>
     <td width="50%"><img src="docs/screenshots/themes.jpg" alt="Appearance settings showing the light and dark theme gallery" /><br /><strong>Your setup, your atmosphere.</strong><br /><sub>Dark, light, colorful, retro and accessible palettes. The same theme follows you across app windows.</sub></td>
+  </tr>
+</table>
+
+## A whole monitor in your menu bar.
+
+<table>
+  <tr>
+    <td width="40%"><img src="docs/screenshots/menubar-overview-system.png" alt="The NeoHtop ghost in the macOS menu bar with its live overview open" width="400" /></td>
+    <td><h3>Open. Check. Carry on.</h3><p>Your essential readings, without bringing the full app forward.</p><ul><li>CPU, memory, GPU, network and free storage.</li><li>Your five busiest processes, with native icons.</li><li>One click from a process to its inspector.</li><li>Shared pause, sampling interval and theme.</li><li>Optional monitoring after closing the main window.</li></ul><p><a href="docs/usage.md#menu-bar-companion">Explore the companion →</a></p><sub>Real macOS system capture. Also available through the system tray on supported desktops.</sub></td>
   </tr>
 </table>
 
@@ -155,3 +161,7 @@ This release is the free, MIT-licensed desktop app. No account or cloud subscrip
 If NeoHtop earns a place in your setup, [star the project](https://github.com/Abdenasser/neohtop/stargazers), [sponsor development](https://github.com/sponsors/Abdenasser), or [buy Abdenasser a coffee](https://www.buymeacoffee.com/abdenasser).
 
 [The story behind NeoHtop](https://www.abdenasser.com/2024/11/06/oh-boy-neohtop/) · [MIT License](LICENSE)
+
+## Privacy and analytics
+
+Official v1.3.0 builds send a basic launch count and app version without a persistent identifier, even when optional sharing is off. **Settings → Privacy** lets you opt in to limited feature usage. Process names, search text, commands, paths and system readings stay local. See the [privacy notice](https://abdenasser.github.io/neohtop/privacy.html).

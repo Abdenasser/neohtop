@@ -25,6 +25,7 @@
     "menuBarEnabled": true,
     "keepRunning": false,
     "defaultStatusFilter": "all",
-    "processView": "flat"
+    "processView": "flat",
+    "usageAnalytics": false
   }
 }

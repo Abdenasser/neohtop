@@ -1,0 +1,275 @@
+<!doctype html>
+<html lang="en" class="dark" data-theme="catppuccin">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="color-scheme" content="dark" />
+    <title>NeoHtop Privacy — Local monitoring and analytics choices</title>
+    <meta
+      name="description"
+      content="What NeoHtop keeps local, how the basic launch counter works, and how to choose optional desktop feature sharing in Settings."
+    />
+    <link
+      rel="canonical"
+      href="https://abdenasser.github.io/neohtop/privacy.html"
+    />
+    <link
+      rel="alternate"
+      type="text/markdown"
+      href="privacy.md"
+      title="Markdown version"
+    />
+    <link rel="describedby" href="llms.txt" />
+    <link rel="icon" href="favicon.ico" />
+    <link rel="apple-touch-icon" href="assets/neohtop-icon.png" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="NeoHtop" />
+    <meta
+      property="og:url"
+      content="https://abdenasser.github.io/neohtop/privacy.html"
+    />
+    <meta
+      property="og:title"
+      content="NeoHtop Privacy — Local monitoring and analytics choices"
+    />
+    <meta
+      property="og:description"
+      content="What NeoHtop keeps local, how the basic launch counter works, and how to choose optional desktop feature sharing in Settings."
+    />
+    <meta
+      property="og:image"
+      content="https://abdenasser.github.io/neohtop/assets/neohtop-desktop.png"
+    />
+    <meta property="og:image:width" content="1280" />
+    <meta property="og:image:height" content="900" />
+    <meta
+      property="og:image:alt"
+      content="NeoHtop in Catppuccin with resource charts and a searchable process table"
+    />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:creator" content="@__abdenasser" />
+    <meta
+      name="twitter:title"
+      content="NeoHtop Privacy — Local monitoring and analytics choices"
+    />
+    <meta
+      name="twitter:description"
+      content="What NeoHtop keeps local, how the basic launch counter works, and how to choose optional desktop feature sharing in Settings."
+    />
+    <meta
+      name="twitter:image"
+      content="https://abdenasser.github.io/neohtop/assets/neohtop-desktop.png"
+    />
+    <link rel="stylesheet" href="assets/site-style-CAg3NXHY.css" />
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebPage",
+        "name": "NeoHtop Privacy — Local monitoring and analytics choices",
+        "url": "https://abdenasser.github.io/neohtop/privacy.html",
+        "description": "What NeoHtop keeps local, how the basic launch counter works, and how to choose optional desktop feature sharing in Settings."
+      }
+    </script>
+  </head>
+  <body>
+    <!--[--><a class="skip-link" href="#main">Skip to content</a>
+    <header class="site-header">
+      <div class="site-shell header-row">
+        <a class="brand" href="./" aria-label="NeoHtop home"
+          ><img
+            src="assets/neohtop-icon.png"
+            width="28"
+            height="28"
+            alt=""
+          /><span>NeoHtop</span
+          ><!----><span
+            data-slot="badge"
+            class="h-5 gap-1 rounded-4xl border border-transparent px-2 py-0.5 text-xs font-medium transition-all has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&amp;>svg]:size-3! group/badge inline-flex w-fit shrink-0 items-center justify-center overflow-hidden whitespace-nowrap focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 [&amp;>svg]:pointer-events-none bg-secondary text-secondary-foreground [a]:hover:bg-secondary/80 version-badge"
+            ><!---->1.3<!----><!----></span
+          ><!----><!----></a
+        >
+        <nav aria-label="Main navigation">
+          <a href="./#features">Features</a><a href="./#themes">Themes</a
+          ><a href="install.html">Install</a
+          ><a
+            href="https://github.com/Abdenasser/neohtop/blob/main/CHANGELOG.md"
+            >Changelog<svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="lucide lucide-arrow-up-right lucide-icon size-3"
+              aria-hidden="true"
+            >
+              <!--[--><!---->
+              <path d="M7 7h10v10"><!----></path>
+              <!----><!---->
+              <path d="M7 17 17 7"><!----></path>
+              <!----><!--]--><!----></svg
+            ><!----></a
+          >
+        </nav>
+        <!--[0--><a
+          data-slot="button"
+          class="focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:aria-invalid:border-destructive/50 border border-transparent bg-clip-padding text-sm font-medium focus-visible:ring-3 aria-invalid:ring-3 active:not-aria-[haspopup]:translate-y-px [&amp;_svg:not([class*='size-'])]:size-4 group/button inline-flex shrink-0 items-center justify-center whitespace-nowrap transition-all outline-none select-none disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:shrink-0 bg-primary text-primary-foreground hover:bg-primary/80 h-8 gap-1 rounded-[min(var(--radius-md),10px)] px-2.5 in-data-[slot=button-group]:rounded-md has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5"
+          href="./#download"
+          ><svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            class="lucide lucide-arrow-down lucide-icon"
+            aria-hidden="true"
+          >
+            <!--[--><!---->
+            <path d="M12 5v14"><!----></path>
+            <!----><!---->
+            <path d="m19 12-7 7-7-7"><!----></path>
+            <!----><!--]--><!----></svg
+          ><!---->Download<!----></a
+        ><!--]--><!---->
+      </div>
+    </header>
+    <main id="main">
+      <!--[2-->
+      <article class="site-shell guide-page">
+        <!----><span
+          data-slot="badge"
+          class="h-5 gap-1 rounded-4xl border px-2 py-0.5 text-xs font-medium transition-all has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&amp;>svg]:size-3! group/badge inline-flex w-fit shrink-0 items-center justify-center overflow-hidden whitespace-nowrap focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 [&amp;>svg]:pointer-events-none border-border text-foreground [a]:hover:bg-muted [a]:hover:text-muted-foreground"
+          ><!---->YOUR DATA<!----><!----></span
+        ><!----><!---->
+        <h1>Local readings.<br /><span>Clear choices.</span></h1>
+        <p class="guide-intro">
+          NeoHtop Desktop v1.3.0 privacy notice · Updated October 29, 2026.
+        </p>
+        <h2>Your system stays on your machine.</h2>
+        <p>
+          NeoHtop does not upload process names, commands, search text, file
+          paths, environment values, port numbers or your system readings.
+          Monitoring works offline, without an account.
+        </p>
+        <h2>One basic launch count.</h2>
+        <p>
+          Official builds with analytics configured send one app-open event per
+          launch, including the app version, even when optional sharing is off.
+          It has no persistent identifier or OS field. It counts launches, not
+          unique people.
+        </p>
+        <p>
+          The HTTPS request passes through our Cloudflare Worker to Google
+          Analytics 4. Cloudflare receives your IP address to handle the
+          connection. Our Worker does not forward it or your request headers to
+          Google, store events or write request logs. It generates a fresh
+          random GA client ID for each basic launch. Service providers also
+          process data under their own policies; network requests are not
+          anonymous to them.
+        </p>
+        <h2>Feature sharing is your choice.</h2>
+        <p>
+          Settings → Privacy → Share feature usage is off by default. If
+          enabled, it shares use of resource views, built-in themes, list/tree
+          view, the companion, inspector, Settings and port search, together
+          with your app version and OS family. Search queries and port numbers
+          are never sent.
+        </p>
+        <p>
+          Optional sharing uses a random installation ID and a launch-session
+          ID. Turning it off stops future optional events and deletes the local
+          installation ID; enabling it again creates a new one. It does not
+          erase data already received by Google. Advertising personalization and
+          ad-user-data consent are denied.
+        </p>
+        <h2>Monitoring comes first.</h2>
+        <p>
+          Events have a short timeout, no disk queue and no retries. Blocked or
+          unavailable analytics never prevents monitoring. Reopening a hidden
+          window does not count another launch. Self-built apps without an
+          analytics endpoint send no desktop events.
+        </p>
+        <h2>The website is separate.</h2>
+        <p>
+          This production website uses Google Analytics 4 (G-88HFXRBNLS) for
+          page usage. Google's browser tag can set analytics cookies and
+          receives browser and network information. Desktop preferences do not
+          control website analytics. Analytics is disabled on localhost;
+          blocking it does not affect downloads or navigation.
+        </p>
+        <h2>Read more or ask us.</h2>
+        <p>
+          See the <a href="privacy.md">full Markdown notice</a>,
+          <a href="https://www.cloudflare.com/privacypolicy/"
+            >Cloudflare's privacy policy</a
+          >
+          and
+          <a href="https://policies.google.com/privacy"
+            >Google's privacy policy</a
+          >. Questions can go to the
+          <a href="https://github.com/Abdenasser/neohtop/issues"
+            >project issue tracker</a
+          >; please omit private information.
+        </p>
+      </article>
+      <!--]-->
+    </main>
+    <footer class="site-footer">
+      <div class="site-shell">
+        <div class="footer-top">
+          <a class="brand" href="./"
+            ><img
+              src="assets/neohtop-icon.png"
+              width="24"
+              height="24"
+              alt=""
+            />NeoHtop</a
+          >
+          <p>Your system. In plain sight.</p>
+          <nav aria-label="Footer">
+            <a href="https://github.com/Abdenasser/neohtop">GitHub</a
+            ><a href="privacy.html">Privacy</a
+            ><a href="desktop-vs-cli.html">Desktop vs CLI</a
+            ><a href="https://www.buymeacoffee.com/abdenasser"
+              >Buy me a coffee<svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="lucide lucide-arrow-up-right lucide-icon"
+                aria-hidden="true"
+              >
+                <!--[--><!---->
+                <path d="M7 7h10v10"><!----></path>
+                <!----><!---->
+                <path d="M7 17 17 7"><!----></path>
+                <!----><!--]--><!----></svg
+              ><!----></a
+            >
+          </nav>
+        </div>
+        <div class="footer-bottom">
+          <span>Made by Abdenasser. Free under the MIT license.</span>
+          <div>
+            <a href="privacy.md">Read as Markdown</a
+            ><a href="llms.txt">llms.txt</a><a href="sitemap.xml">Sitemap</a>
+          </div>
+        </div>
+      </div>
+    </footer>
+    <!--]-->
+    <script type="module" src="main.js"></script>
+  </body>
+</html>

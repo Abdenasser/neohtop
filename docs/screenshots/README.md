@@ -6,6 +6,10 @@ The v1.3.0 desktop interface on macOS. Desktop screenshots are filtered to a few
 
 ![NeoHtop desktop with resource charts and a filtered process list](desktop-dark.jpg)
 
+## Menu-bar companion
+
+![The real NeoHtop menu-bar icon and its open overview, captured by macOS without a cursor](menubar-overview-system.png)
+
 ## Light appearance
 
 ![NeoHtop desktop using GitHub Light](desktop-light.jpg)

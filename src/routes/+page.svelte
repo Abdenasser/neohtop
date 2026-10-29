@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { trackUsage } from "$lib/utils/telemetry";
+  import AnalyticsNotice from "$lib/components/AnalyticsNotice.svelte";
   import SettingsWindow from "$lib/components/SettingsWindow.svelte";
   import AppInfo from "$lib/components/AppInfo.svelte";
   import { emit } from "@tauri-apps/api/event";
@@ -70,6 +72,7 @@
   let expandedProcesses = new Set<string>();
 
   function setProcessView(view: "flat" | "tree") {
+    trackUsage("process_view_changed", view);
     settingsStore.updateConfig({
       behavior: { ...$settingsStore.behavior, processView: view },
     });
@@ -133,6 +136,7 @@
 
   // Collect sockets as soon as the query becomes a port search, not on the next tick
   $: if (mounted && !isFrozen && !auxiliary && searchHasPortQuery(searchTerm)) {
+    trackUsage("port_search");
     debouncedPortRefresh();
   }
 
@@ -298,6 +302,7 @@
   <div class="app-container">
     <TitleBar {isFrozen} onPause={processStore.setIsFrozen} />
     <main>
+      <AnalyticsNotice />
       {#if systemStats}
         <StatsBar
           {systemStats}

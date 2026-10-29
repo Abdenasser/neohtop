@@ -165,7 +165,13 @@
       class="grid-cols-[1fr_auto] items-center gap-2 border-b border-border pb-4"
     >
       <div class="flex items-center gap-2">
-        <ProcessIcon size={22} />
+        <img
+          src="/128x128.png"
+          alt=""
+          width="28"
+          height="28"
+          class="size-7 shrink-0"
+        />
         <div>
           <Card.Title>NeoHtop</Card.Title>
           <p class="mt-0.5 text-xs text-muted-foreground">
