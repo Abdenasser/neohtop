@@ -12,6 +12,10 @@ use sysinfo::{Disks, Networks, System};
 /// Maintains thread-safe access to system information and monitoring components
 #[derive(Debug)]
 pub struct AppState {
+    /// Icons are resolved separately from the sampling loop.
+    pub icons: Mutex<crate::native_icons::IconCache>,
+    pub hub: Mutex<crate::sampling::Hub>,
+    pub gpu: Mutex<crate::gpu::GpuMonitor>,
     /// System information handler
     pub sys: Mutex<System>,
     /// Networks information handler
@@ -38,6 +42,9 @@ impl AppState {
         let networks = Networks::new_with_refreshed_list();
 
         Self {
+            icons: Mutex::new(crate::native_icons::IconCache::default()),
+            hub: Mutex::new(crate::sampling::Hub::default()),
+            gpu: Mutex::new(crate::gpu::GpuMonitor::default()),
             process_monitor: Mutex::new(ProcessMonitor::new()),
             system_monitor: Mutex::new(SystemMonitor::new(&networks)),
             sys: Mutex::new(sys),

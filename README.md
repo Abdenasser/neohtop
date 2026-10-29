@@ -68,6 +68,8 @@
 - 🚀 Real-time process monitoring
 - 🌳 Expandable process trees with family CPU/RAM totals and search that keeps matching processes in context
 - 💻 CPU and Memory usage tracking
+- 🎮 GPU utilization, memory and adapter details (driver-dependent)
+- 👻 Menu-bar/system-tray overview with shared pause and process shortcuts
 - 🎨 Beautiful, modern UI with dark/light themes
 - 🔍 Advanced process search and filtering
 - 📌 Pin important processes
@@ -95,6 +97,32 @@ Search and filters match individual processes. Tree mode retains their parents
 and expands matching branches automatically, while family totals continue to
 include all descendants. Clear the search and filters to collapse those branches.
 Pages keep expanded families together, and your choice of List or Tree is saved.
+
+### GPU readings and menu-bar overview
+
+The GPU card includes a two-minute utilization history and a **Graphics** details
+panel. On multi-GPU machines, select an adapter in that panel. Readings are local
+and read-only; unavailable driver counters stay unavailable instead of showing
+zero.
+
+| Platform | GPU support |
+| --- | --- |
+| macOS | IORegistry driver utilization; Apple silicon shared-memory usage and core count where exposed. Shared memory is part of RAM, not extra VRAM. |
+| Linux | NVIDIA utilization, VRAM and temperature through the installed NVML driver; AMD utilization/VRAM/temperature through amdgpu sysfs; other DRM adapters provide inventory. |
+| Windows | NVIDIA utilization, VRAM and temperature through NVML; other DXGI adapters provide inventory and reported dedicated capacity. |
+
+Support varies by GPU and driver. Missing/denied counters do not require running
+NeoHtop as administrator. There is no bundled GPU driver or monitoring agent.
+
+Click the ghost in the menu bar/system tray, or **Overview** in the toolbar, for
+CPU, RAM, GPU, network, storage and the five busiest processes. Selecting a process
+opens its inspector in the main window. Both windows share the sampling interval,
+pause state and themes. The overview stops polling while hidden.
+
+**Menu-bar settings**, beside Overview, control the icon and optional monitoring
+after the main window closes. By default, closing the window quits the app.
+**Quit NeoHtop** always exits. On Linux, tray click handling depends on the desktop;
+use the icon's **Show overview** menu item or the toolbar button when needed.
 
 ## Tech Stack
 - **Frontend**: SvelteKit, TypeScript
@@ -292,3 +320,10 @@ We welcome contributions! Please see our [contributing guidelines](./.github/CON
 
 ## License
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+
+## UI components and themes
+
+NeoHtop uses [shadcn-svelte](https://www.shadcn-svelte.com/) components with Tailwind CSS. Shared primitives live in `src/lib/components/ui`; `components.json` configures the registry. Keep controls composed from that library and use semantic tokens rather than introducing independent widget styles. All existing themes, including supported native Glassy mode, remain available through the theme picker.
+
+See [the migration and validation notes](SHADCN_MIGRATION.md) for feature parity, theme mappings, actual native checks and remaining cross-platform release validation.

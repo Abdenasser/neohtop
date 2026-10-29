@@ -1,10 +1,19 @@
-import { writable, derived } from "svelte/store";
-import type { Process, SystemStats } from "$lib/types";
+import { writable } from "svelte/store";
+import type {
+  Process,
+  SystemStats,
+  ResourceSample,
+  GpuDevice,
+  MonitorSnapshot,
+} from "$lib/types";
 import { invoke } from "@tauri-apps/api/core";
 
 interface ProcessStore {
+  resourceHistory: ResourceSample[];
   processes: Process[];
   systemStats: SystemStats | null;
+  gpus: GpuDevice[];
+  capturedAt: number;
   error: string | null;
   isLoading: boolean;
   searchTerm: string;
@@ -24,8 +33,11 @@ interface ProcessStore {
 }
 
 const initialState: ProcessStore = {
+  resourceHistory: [],
   processes: [],
   systemStats: null,
+  gpus: [],
+  capturedAt: 0,
   error: null,
   isLoading: true,
   searchTerm: "",
@@ -51,30 +63,42 @@ function createProcessStore() {
   const setIsLoading = (isLoading: boolean) =>
     update((state) => ({ ...state, isLoading }));
 
-  const getProcesses = async () => {
+  let inFlight: Promise<void> | null = null;
+  const readProcesses = async () => {
     try {
-      const result = await invoke<[Process[], SystemStats]>("get_processes");
-      update((state) => {
-        let updatedSelectedProcess = state.selectedProcess;
-        if (state.selectedProcessPid) {
-          updatedSelectedProcess =
-            result[0].find((p) => p.pid === state.selectedProcessPid) || null;
-        }
-
-        return {
-          ...state,
-          processes: result[0],
-          systemStats: result[1],
-          error: null,
-          selectedProcess: updatedSelectedProcess,
-        };
-      });
+      const result = await invoke<MonitorSnapshot>("get_processes");
+      update((state) => ({
+        ...state,
+        processes: result.frame.processes,
+        systemStats: result.frame.stats,
+        gpus: result.frame.gpus,
+        capturedAt: result.frame.captured_at,
+        resourceHistory: result.history,
+        isFrozen: result.paused,
+        error: result.error,
+        selectedProcess: state.selectedProcess
+          ? (result.frame.processes.find(
+              (p) =>
+                p.pid === state.selectedProcess?.pid &&
+                p.start_time === state.selectedProcess?.start_time,
+            ) ?? null)
+          : null,
+      }));
     } catch (e: unknown) {
       update((state) => ({
         ...state,
         error: e instanceof Error ? e.message : String(e),
       }));
     }
+  };
+
+  // Share an in-flight read so manual actions and timer ticks cannot reorder history.
+  const getProcesses = () => {
+    if (inFlight) return inFlight;
+    inFlight = readProcesses().finally(() => {
+      inFlight = null;
+    });
+    return inFlight;
   };
 
   const killProcess = async (pid: number) => {
@@ -126,8 +150,22 @@ function createProcessStore() {
   const setSearchTerm = (searchTerm: string) =>
     update((state) => ({ ...state, searchTerm, currentPage: 1 }));
 
-  const setIsFrozen = (isFrozen: boolean) =>
-    update((state) => ({ ...state, isFrozen }));
+  const refreshControl = async () => {
+    if (inFlight) await inFlight;
+    await getProcesses();
+  };
+
+  const setIsFrozen = async (isFrozen: boolean) => {
+    try {
+      await invoke("set_monitor_paused", { paused: isFrozen });
+      await refreshControl();
+    } catch (e: unknown) {
+      update((state) => ({
+        ...state,
+        error: e instanceof Error ? e.message : String(e),
+      }));
+    }
+  };
 
   const setCurrentPage = (currentPage: number) =>
     update((state) => ({ ...state, currentPage }));
@@ -201,6 +239,7 @@ function createProcessStore() {
     update,
     setIsLoading,
     getProcesses,
+    refreshControl,
     killProcess,
     toggleSort,
     togglePin,

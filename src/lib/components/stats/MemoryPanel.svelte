@@ -1,56 +1,72 @@
 <script lang="ts">
-  import { faMemory } from "@fortawesome/free-solid-svg-icons";
-  import { PanelHeader, ProgressBar, StatItem } from "$lib/components";
-  import { formatMemorySize, formatPercentage } from "$lib/utils";
-
+  import ResourceDetails from "./ResourceDetails.svelte";
+  import type { SystemStats } from "$lib/types";
+  export let stats: SystemStats;
+  export let capturedAt = 0;
+  import * as Card from "$lib/components/ui/card/index.js";
+  import { Badge } from "$lib/components/ui/badge/index.js";
+  import type { ResourceSample } from "$lib/types";
+  import ResourceTrend from "./ResourceTrend.svelte";
+  export let history: ResourceSample[] = [];
+  export let isFrozen = false;
+  export let unavailable = false;
+  import { MemoryStick } from "@lucide/svelte";
+  import StatItem from "./StatItem.svelte";
+  import { formatMemorySize } from "$lib/utils";
   export let memoryTotal: number;
   export let memoryUsed: number;
   export let memoryFree: number;
-
-  $: memoryPercentage = (memoryUsed / memoryTotal) * 100;
+  $: ready =
+    Number.isFinite(memoryTotal) &&
+    memoryTotal > 0 &&
+    Number.isFinite(memoryUsed);
+  $: percentage = ready
+    ? Math.max(0, Math.min(100, (memoryUsed / memoryTotal) * 100))
+    : null;
 </script>
 
-<div class="stat-panel">
-  <PanelHeader
-    icon={faMemory}
-    title="Memory"
-    usageValue={formatPercentage(memoryPercentage)}
-  />
-  <div class="stats-content">
-    <div class="stat-item with-progress">
-      <ProgressBar
-        label="Memory usage"
-        value={memoryPercentage}
-        labelWidth="5rem"
-        valueWidth="2.5rem"
-      />
+<Card.Root size="sm" class="h-60 gap-3">
+  <Card.Header class="grid-cols-[1fr_auto] items-center gap-2">
+    <Card.Title
+      class="flex items-center gap-2 text-sm font-medium text-muted-foreground"
+      ><Badge
+        variant="secondary"
+        class="size-5 rounded-md border-0 p-0 bg-primary/10 text-primary [&>svg]:size-3!"
+        style="--primary:var(--chart-3)"
+        aria-hidden="true"><MemoryStick /></Badge
+      >Memory</Card.Title
+    ><ResourceDetails
+      kind="memory"
+      {stats}
+      {capturedAt}
+      {isFrozen}
+      {unavailable}
+      {history}
+    /></Card.Header
+  >
+  <Card.Content class="min-h-0 flex-1 gap-2">
+    <div>
+      <div class="text-2xl leading-8 font-semibold tracking-tight tabular-nums">
+        {ready ? formatMemorySize(memoryUsed) : "—"}
+      </div>
+      <p class="text-xs leading-4 text-muted-foreground">
+        used of {ready ? formatMemorySize(memoryTotal) : "unknown total"}
+      </p>
     </div>
-    <StatItem label="Total" value={formatMemorySize(memoryTotal)} />
-    <StatItem label="Used" value={formatMemorySize(memoryUsed)} />
-    <StatItem label="Free" value={formatMemorySize(memoryFree)} />
-  </div>
-</div>
-
-<style>
-  .stat-panel {
-    flex: 2;
-    min-width: 0;
-    background-color: var(--mantle);
-    border-radius: 6px;
-    padding: 0.75rem;
-    display: flex;
-    flex-direction: column;
-  }
-
-  .stats-content {
-    display: flex;
-    flex-direction: column;
-    gap: 0.4rem;
-  }
-
-  .stat-item.with-progress {
-    display: flex;
-    flex-direction: column;
-    gap: 0.2rem;
-  }
-</style>
+    <StatItem
+      label="Not in use"
+      value={ready ? formatMemorySize(memoryFree) : "Unavailable"}
+    />
+    <StatItem
+      label="Utilization"
+      value={percentage === null ? "Unavailable" : `${percentage.toFixed(1)}%`}
+    />
+    <ResourceTrend
+      {history}
+      metric="memory"
+      label="Memory utilization"
+      {isFrozen}
+      {unavailable}
+    />
+  </Card.Content></Card.Root
+>

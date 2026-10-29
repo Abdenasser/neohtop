@@ -45,7 +45,48 @@
         "minHeight": 700,
         "titleBarStyle": "Overlay",
         "hiddenTitle": true,
-        "transparent": true
+        "transparent": true,
+        "label": "main"
+      },
+      {
+        "label": "overview",
+        "url": "/?view=companion",
+        "title": "NeoHtop Overview",
+        "width": 400,
+        "height": 600,
+        "visible": false,
+        "decorations": false,
+        "transparent": true,
+        "resizable": false,
+        "alwaysOnTop": true,
+        "skipTaskbar": true,
+        "shadow": false
+      },
+      {
+        "label": "settings",
+        "url": "/?view=settings",
+        "title": "Settings",
+        "width": 640,
+        "height": 640,
+        "minWidth": 580,
+        "minHeight": 560,
+        "visible": false,
+        "resizable": true,
+        "maximizable": false,
+        "minimizable": false,
+        "center": true
+      },
+      {
+        "label": "about",
+        "url": "/?view=about",
+        "title": "About NeoHtop",
+        "width": 520,
+        "height": 400,
+        "visible": false,
+        "resizable": false,
+        "maximizable": false,
+        "minimizable": false,
+        "center": true
       }
     ],
     "security": {

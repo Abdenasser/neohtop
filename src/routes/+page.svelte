@@ -1,9 +1,22 @@
 <script lang="ts">
+  import SettingsWindow from "$lib/components/SettingsWindow.svelte";
+  import AppInfo from "$lib/components/AppInfo.svelte";
+  import { emit } from "@tauri-apps/api/event";
+  import { get } from "svelte/store";
+  import { settingsStatus } from "$lib/stores/settings";
+  import {
+    startMonitoringPreferences,
+    monitoringPreferencesError,
+    retryMonitoringPreferences,
+  } from "$lib/stores/monitoring-preferences";
+  import MenuBarOverview from "$lib/components/MenuBarOverview.svelte";
+  import { listen, type UnlistenFn } from "@tauri-apps/api/event";
   import { onMount, onDestroy } from "svelte";
   import { debounce } from "$lib/utils";
   import {
     StatsBar,
     ToolBar,
+    PaginationControls,
     TitleBar,
     ProcessTable,
     ProcessDetailsModal,
@@ -21,6 +34,8 @@
   $: ({
     processes,
     systemStats,
+    gpus,
+    resourceHistory,
     error,
     searchTerm,
     isLoading,
@@ -35,6 +50,15 @@
     sortConfig,
   } = $processStore);
 
+  const view =
+    typeof window !== "undefined"
+      ? new URLSearchParams(window.location.search).get("view")
+      : null;
+  const companion = view === "companion";
+  const auxiliary = companion || view === "settings" || view === "about";
+  let mounted = false;
+  let disposed = false;
+  const listeners: UnlistenFn[] = [];
   let intervalId: NodeJS.Timeout;
   let lastProcessCount = 0;
   let cachedFilteredProcesses: Process[] = [];
@@ -131,15 +155,27 @@
     currentPage * itemsPerPage,
   );
 
+  // Reset the actual store page when search, filtering or page size changes.
+  // Keeping only the destructured local page at 1 lets the next store read undo it.
   $: {
-    if (searchTerm || itemsPerPage) {
-      currentPage = 1;
-    }
+    searchTerm;
+    itemsPerPage;
+    filters;
+    processStore.setCurrentPage(1);
+  }
+  function clearSearchAndFilters() {
+    processStore.setSearchTerm("");
+    filters = {
+      cpu: { ...filters.cpu, enabled: false },
+      ram: { ...filters.ram, enabled: false },
+      runtime: { ...filters.runtime, enabled: false },
+      status: { values: [], enabled: false },
+    };
   }
 
   $: {
     if (intervalId) clearInterval(intervalId);
-    if (!isFrozen) {
+    if (mounted && !auxiliary && !isFrozen) {
       // Use adaptive refresh rate - slightly slower for 1s to reduce CPU usage
       const adaptiveRefreshRate = refreshRate === 1000 ? 1500 : refreshRate;
       intervalId = setInterval(() => {
@@ -148,25 +184,96 @@
     }
   }
 
-  onMount(async () => {
-    try {
-      await processStore.getProcesses();
-    } catch (error) {
-      console.error("Failed to load processes:", error);
-    } finally {
-      processStore.setIsLoading(false);
+  onMount(() => {
+    if (auxiliary) {
+      if (!companion) themeStore.init();
+      return;
     }
-
-    settingsStore.init();
     themeStore.init();
+    void (async () => {
+      await settingsStore.init(true);
+      const stopPreferences = await startMonitoringPreferences();
+      const stopRuntimeError = monitoringPreferencesError.subscribe((error) => {
+        void emit("preferences-runtime-error", error);
+      });
+      const stopRetry = await listen("preferences-runtime-retry", async () => {
+        await settingsStore.retry(true);
+        await retryMonitoringPreferences();
+      });
+      const stopStatus = await listen(
+        "preferences-runtime-status-request",
+        () => {
+          void emit(
+            "preferences-runtime-error",
+            get(monitoringPreferencesError),
+          );
+        },
+      );
+      const stopCommand = await listen<string>("app-command", ({ payload }) => {
+        if (payload === "view-list" || payload === "view-tree")
+          setProcessView(payload === "view-tree" ? "tree" : "flat");
+      });
+      if (disposed) {
+        [
+          stopPreferences,
+          stopRuntimeError,
+          stopRetry,
+          stopStatus,
+          stopCommand,
+        ].forEach((stop) => stop());
+        return;
+      }
+      listeners.push(
+        stopPreferences,
+        stopRuntimeError,
+        stopRetry,
+        stopStatus,
+        stopCommand,
+      );
+      mounted = true;
+      const stopControl = await listen("monitor-control", () => {
+        void processStore.refreshControl();
+      });
+      const stopOpen = await listen<{ pid: number; start_time: number }>(
+        "open-process",
+        async ({ payload }) => {
+          await processStore.refreshControl();
+          const process = $processStore.processes.find(
+            (p) => p.pid === payload.pid && p.start_time === payload.start_time,
+          );
+          if (process) processStore.showProcessDetails(process);
+          else
+            processStore.update((state) => ({
+              ...state,
+              error: "This process is no longer available.",
+            }));
+        },
+      );
+      if (disposed) {
+        stopControl();
+        stopOpen();
+        return;
+      }
+      listeners.push(stopControl, stopOpen);
+      await processStore.getProcesses();
+      if (!disposed) processStore.setIsLoading(false);
+    })();
   });
 
   onDestroy(() => {
+    disposed = true;
     if (intervalId) clearInterval(intervalId);
+    listeners.forEach((stop) => stop());
   });
 </script>
 
-{#if isLoading}
+{#if view === "settings"}
+  <SettingsWindow />
+{:else if view === "about"}
+  <AppInfo />
+{:else if companion}
+  <MenuBarOverview />
+{:else if isLoading}
   <div class="loading-container">
     <div class="loading-content">
       <img src="128x128.png" alt="NeoHtop Logo" class="logo" />
@@ -174,19 +281,57 @@
   </div>
 {:else}
   <div class="app-container">
-    <TitleBar />
+    <TitleBar {isFrozen} onPause={processStore.setIsFrozen} />
     <main>
       {#if systemStats}
-        <StatsBar {systemStats} />
+        <StatsBar
+          {systemStats}
+          {gpus}
+          capturedAt={$processStore.capturedAt}
+          history={resourceHistory}
+          {isFrozen}
+          unavailable={!!error}
+        />
       {/if}
 
       <ToolBar
         bind:searchTerm={$processStore.searchTerm}
+        totalProcesses={processes.length}
+        matchingProcesses={cachedFilteredProcesses.length}
+        viewMode={processView}
+        expandedCount={expandedProcesses.size}
+        onViewChange={setProcessView}
+        onCollapseAll={() => (expandedProcesses = new Set())}
+        onClearFilters={clearSearchAndFilters}
+        bind:filters
+        {columns}
+      />
+
+      {#if error || $settingsStatus.error || $monitoringPreferencesError}
+        <div class="alert" role="alert">
+          {error || $settingsStatus.error || $monitoringPreferencesError}
+        </div>
+      {/if}
+
+      <ProcessTable
+        onClearFilters={clearSearchAndFilters}
+        processes={paginatedProcesses}
+        {columns}
+        {systemStats}
+        {sortConfig}
+        {pinnedProcesses}
+        viewMode={processView}
+        treeRows={treePage.rows}
+        {searchActive}
+        onToggleExpand={toggleExpansion}
+        onToggleSort={processStore.toggleSort}
+        onTogglePin={processStore.togglePin}
+        onShowDetails={processStore.showProcessDetails}
+        onKillProcess={processStore.confirmKillProcess}
+      />
+      <PaginationControls
         bind:itemsPerPage
         bind:currentPage={$processStore.currentPage}
-        bind:refreshRate
-        bind:isFrozen={$processStore.isFrozen}
-        bind:filters
         {totalPages}
         totalResults={processView === "tree"
           ? tree.rootCount
@@ -198,30 +343,6 @@
           : cachedFilteredProcesses.length === 1
             ? "process"
             : "processes"}
-        bind:columns
-      />
-
-      {#if error}
-        <div class="alert">{error}</div>
-      {/if}
-
-      <ProcessTable
-        processes={paginatedProcesses}
-        {columns}
-        {systemStats}
-        {sortConfig}
-        {pinnedProcesses}
-        viewMode={processView}
-        treeRows={treePage.rows}
-        {searchActive}
-        expandedCount={expandedProcesses.size}
-        onViewChange={setProcessView}
-        onToggleExpand={toggleExpansion}
-        onCollapseAll={() => (expandedProcesses = new Set())}
-        onToggleSort={processStore.toggleSort}
-        onTogglePin={processStore.togglePin}
-        onShowDetails={processStore.showProcessDetails}
-        onKillProcess={processStore.confirmKillProcess}
       />
     </main>
   </div>
@@ -244,102 +365,45 @@
 />
 
 <style>
-  :global(:root) {
-    --base: #1e1e2e;
-    --mantle: #181825;
-    --crust: #11111b;
-    --text: #cdd6f4;
-    --subtext0: #a6adc8;
-    --subtext1: #bac2de;
-    --surface0: #313244;
-    --surface1: #45475a;
-    --surface2: #585b70;
-    --overlay0: #6c7086;
-    --overlay1: #7f849c;
-    --blue: #89b4fa;
-    --lavender: #b4befe;
-    --sapphire: #74c7ec;
-    --sky: #89dceb;
-    --red: #f38ba8;
-    --maroon: #eba0ac;
-    --peach: #fab387;
-    --yellow: #f9e2af;
-    --green: #a6e3a1;
-    --teal: #94e2d5;
-  }
-
-  :global(body) {
-    margin: 0;
-    padding: 0;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial,
-      sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
-    background-color: var(--base);
-    color: var(--text);
-    -webkit-font-smoothing: antialiased;
-    overflow: hidden;
-    user-select: none;
-  }
-
   main {
     flex: 1;
     display: flex;
     flex-direction: column;
+    min-height: 0;
     min-width: 0;
     overflow: hidden;
   }
-
   .app-container {
     height: 100vh;
     display: flex;
     flex-direction: column;
   }
-
   .alert {
-    margin: 8px;
+    margin: 8px 16px;
     padding: 8px 12px;
-    background-color: var(--surface0);
-    border: 1px solid var(--red);
-    border-radius: 6px;
-    color: var(--red);
+    border: 1px solid var(--destructive);
+    border-radius: var(--radius);
+    background: color-mix(in srgb, var(--destructive) 8%, var(--background));
+    color: var(--destructive);
     font-size: 13px;
   }
-
   .loading-container {
-    width: 100vw;
     height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, var(--base) 0%, var(--mantle) 100%);
-    position: relative;
-    overflow: hidden;
+    background: var(--background);
   }
-
   .loading-content {
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 2;
   }
-
   .logo {
-    width: 128px;
-    height: 128px;
-    filter: drop-shadow(0 0 5px var(--text)) drop-shadow(0 0 10px var(--text))
-      drop-shadow(0 0 20px var(--blue)) drop-shadow(0 0 40px var(--blue));
-    animation: neonPulse 2s ease-in-out infinite;
-  }
-
-  @keyframes neonPulse {
-    0%,
-    100% {
-      filter: drop-shadow(0 0 5px var(--text)) drop-shadow(0 0 10px var(--text))
-        drop-shadow(0 0 20px var(--blue)) drop-shadow(0 0 40px var(--blue));
-    }
-    50% {
-      filter: drop-shadow(0 0 10px var(--text))
-        drop-shadow(0 0 20px var(--text)) drop-shadow(0 0 40px var(--blue))
-        drop-shadow(0 0 80px var(--blue));
-    }
+    width: 96px;
+    height: 96px;
+    filter: drop-shadow(
+      0 0 18px color-mix(in srgb, var(--primary) 35%, transparent)
+    );
   }
 </style>

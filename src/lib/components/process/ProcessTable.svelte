@@ -1,9 +1,12 @@
 <script lang="ts">
   import type { Process, Column, ProcessTreeRow } from "$lib/types";
+  import { tableWidth } from "$lib/utils/table-layout.js";
   import { TableHeader, ProcessRow } from "$lib/components";
   import { processIdentity } from "$lib/utils/process-tree.js";
-  import Fa from "svelte-fa";
-  import { faList, faSitemap } from "@fortawesome/free-solid-svg-icons";
+  import { Button } from "$lib/components/ui/button/index.js";
+  import * as Table from "$lib/components/ui/table/index.js";
+  import { Search } from "@lucide/svelte";
+  export let onClearFilters: () => void = () => {};
 
   export let processes: Process[];
   export let columns: Column[];
@@ -13,10 +16,7 @@
   export let viewMode: "flat" | "tree" = "flat";
   export let treeRows: ProcessTreeRow[] = [];
   export let searchActive = false;
-  export let expandedCount = 0;
-  export let onViewChange: (view: "flat" | "tree") => void = () => {};
   export let onToggleExpand: (key: string) => void = () => {};
-  export let onCollapseAll: () => void = () => {};
 
   export let onToggleSort: (field: keyof Process) => void;
   export let onTogglePin: (command: string) => void;
@@ -39,45 +39,14 @@
         }));
 </script>
 
-<section class="process-browser" aria-label="Processes">
-  <div class="view-controls">
-    <div class="view-toggle" role="group" aria-label="Process view">
-      <button
-        aria-pressed={viewMode === "flat"}
-        on:click={() => onViewChange("flat")}
-      >
-        <Fa icon={faList} size="sm" /> List
-      </button>
-      <button
-        aria-pressed={viewMode === "tree"}
-        on:click={() => onViewChange("tree")}
-      >
-        <Fa icon={faSitemap} size="sm" /> Tree
-      </button>
-    </div>
-    {#if viewMode === "tree"}
-      <span
-        class="tree-hint"
-        title="Family CPU sums process CPU usage. Family RAM sums reported resident memory; shared pages may be counted more than once."
-      >
-        {searchActive
-          ? "Matching branches are expanded. Totals include hidden children."
-          : "Explore app families and their combined CPU and memory."}
-      </span>
-      <button
-        class="collapse-all"
-        on:click={onCollapseAll}
-        disabled={searchActive || expandedCount === 0}>Collapse all</button
-      >
-    {/if}
-  </div>
-  <!-- svelte-ignore a11y_no_noninteractive_tabindex a11y_no_noninteractive_element_interactions (The labeled scroll region needs keyboard focus and arrow-key handling for WebKit scrolling.) -->
+<section class="flex min-h-0 min-w-0 flex-1 flex-col" aria-label="Processes">
+  <!-- svelte-ignore a11y_no_noninteractive_tabindex a11y_no_noninteractive_element_interactions (The labeled scroll region supports WebKit keyboard scrolling.) -->
   <div
-    class="table-container"
+    class="process-table-region focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring"
     role="region"
     aria-label="Process table"
     tabindex="0"
-    on:keydown={(event) => {
+    onkeydown={(event) => {
       if (
         event.target === event.currentTarget &&
         (event.key === "ArrowLeft" || event.key === "ArrowRight")
@@ -89,21 +58,15 @@
       }
     }}
   >
-    <table
-      class:tree-view={viewMode === "tree"}
-      style:width={viewMode === "tree"
-        ? `max(100%, ${440 + Math.max(0, columns.filter((column) => column.visible).length - 1) * 100}px)`
-        : undefined}
-    >
-      <TableHeader
+    <Table.Root
+      style={`width:max(100%,${tableWidth(columns, viewMode === "tree")}px)`}
+      ><TableHeader
         {columns}
         {sortConfig}
         {onToggleSort}
         treeView={viewMode === "tree"}
-      />
-      <tbody>
-        {#each rows as row (row.key)}
-          <ProcessRow
+      /><Table.Body
+        >{#each rows as row (row.key)}<ProcessRow
             process={row.process}
             {columns}
             tree={viewMode === "tree" ? row : null}
@@ -121,130 +84,29 @@
             {onTogglePin}
             {onShowDetails}
             {onKillProcess}
-          />
-        {/each}
-      </tbody>
-    </table>
+          />{:else}<Table.Row
+            ><Table.Cell
+              colspan={columns.filter((c) => c.visible).length + 1}
+              class="h-48 text-center"
+              ><Search class="mx-auto mb-3 size-6 text-muted-foreground" />
+              <p class="text-sm font-medium">
+                {searchActive
+                  ? "No matching processes"
+                  : "No processes in this snapshot"}
+              </p>
+              <p class="mt-1 text-xs text-muted-foreground">
+                {searchActive
+                  ? "Try another name, PID or condition."
+                  : "Wait for the next update or resume monitoring."}
+              </p>
+              {#if searchActive}<Button
+                  variant="link"
+                  size="sm"
+                  onclick={onClearFilters}>Clear search and filters</Button
+                >{/if}</Table.Cell
+            ></Table.Row
+          >{/each}</Table.Body
+      ></Table.Root
+    >
   </div>
 </section>
-
-<style>
-  .process-browser {
-    display: flex;
-    flex-direction: column;
-    flex: 1;
-    min-height: 0;
-    min-width: 0;
-  }
-
-  .view-controls {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 8px 12px;
-    background: var(--mantle);
-    border-bottom: 1px solid var(--surface0);
-    font-size: 12px;
-  }
-
-  .view-toggle {
-    display: flex;
-    gap: 2px;
-    padding: 3px;
-    border: 1px solid var(--surface0);
-    border-radius: 8px;
-    background: var(--base);
-  }
-
-  .view-toggle button,
-  .collapse-all {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    min-height: 28px;
-    padding: 4px 12px;
-    color: var(--subtext0);
-    background: transparent;
-    border: 0;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 12px;
-  }
-
-  .view-toggle button[aria-pressed="true"] {
-    color: var(--text);
-    background: var(--surface0);
-  }
-
-  .view-toggle button:hover,
-  .collapse-all:hover:not(:disabled) {
-    color: var(--text);
-    background: var(--surface0);
-  }
-
-  button:focus-visible {
-    outline: 2px solid var(--blue);
-    outline-offset: 2px;
-  }
-
-  .tree-hint {
-    color: var(--subtext0);
-    flex: 1;
-  }
-
-  .collapse-all:disabled {
-    opacity: 0.4;
-    cursor: default;
-  }
-
-  .table-container {
-    flex: 1;
-    min-width: 0;
-    overflow-x: auto;
-    overflow-y: auto;
-    scrollbar-width: thin;
-    scrollbar-color: var(--surface2) var(--mantle);
-  }
-
-  .table-container:focus-visible {
-    outline: 2px solid var(--blue);
-    outline-offset: -2px;
-  }
-
-  .table-container::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
-  }
-
-  .table-container::-webkit-scrollbar-track {
-    background: var(--mantle);
-    border-radius: 4px;
-  }
-
-  .table-container::-webkit-scrollbar-thumb {
-    background: var(--surface2);
-    border-radius: 4px;
-    transition: background 0.2s ease;
-  }
-
-  .table-container::-webkit-scrollbar-thumb:hover {
-    background: var(--surface1);
-  }
-
-  .table-container::-webkit-scrollbar-corner {
-    background: var(--mantle);
-  }
-
-  table {
-    width: max-content;
-    min-width: 100%;
-    table-layout: fixed;
-    border-collapse: collapse;
-    font-size: 13px;
-  }
-  .tree-view :global(th:first-child) {
-    width: 320px;
-    left: 0;
-    z-index: 4;
-  }
-</style>

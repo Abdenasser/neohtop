@@ -9,9 +9,10 @@ edition = "2021"
 tauri-build = { version = "2", features = [] }
 
 [dependencies]
+base64 = "0.22"
 serde_json = "1.0"
-serde = { version = "1.0", features = ["derive"] }
-tauri = { version = "2.1.1", features = ["macos-private-api"] }
+serde = { version = "1.0", features = ["derive", "rc"] }
+tauri = { version = "2.1.1", features = ["macos-private-api", "tray-icon"] }
 sysinfo = { version = "0.35.2", features = ["disk", "multithread", "network", "system"] }
 tauri-plugin-shell = "2"
 tauri-plugin-os = "2"
@@ -28,3 +29,20 @@ lto = "fat"                # More aggressive link-time optimization
 opt-level = 3              # Optimize for maximum performance
 strip = true               # Remove debug symbols
 incremental = false         # Disable incremental compilation
+
+[target.'cfg(any(target_os = "macos", target_os = "windows"))'.dependencies]
+file_icon_provider = "=1.0.2"
+png = "0.17"
+
+[target.'cfg(target_os = "macos")'.dependencies]
+objc2 = "0.6.4"
+core-foundation = "0.10"
+
+[target.'cfg(target_os = "linux")'.dependencies]
+freedesktop-icons = "0.4"
+
+[target.'cfg(any(target_os = "linux", target_os = "windows"))'.dependencies]
+nvml-wrapper = "0.13"
+
+[target.'cfg(target_os = "windows")'.dependencies]
+windows = { version = "0.62.2", features = ["Win32_Graphics_Dxgi", "Win32_Graphics_Dxgi_Common"] }
