@@ -29,7 +29,7 @@
 </script>
 
 {#if visible}
-  <Card.Root size="sm" role="status" class="mb-3"
+  <Card.Root size="sm" role="status" class="mx-4 mt-4 shrink-0"
     ><Card.Content class="flex-row items-start gap-3">
       <div class="min-w-0 flex-1">
         <p class="text-sm font-medium">A small change to privacy in v1.3</p>
