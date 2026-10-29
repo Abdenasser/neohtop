@@ -82,6 +82,7 @@
   // Initialize filters object for the new FilterToggle
   let filters = {
     cpu: { operator: ">", value: 50, enabled: false },
+    gpu: { operator: ">", value: 1, enabled: false },
     ram: { operator: ">", value: 100, enabled: false },
     runtime: { operator: ">", value: 60, enabled: false },
     status: { values: [], enabled: false },
@@ -95,6 +96,11 @@
   }));
   $: itemsPerPage = $settingsStore.behavior.itemsPerPage;
   $: refreshRate = $settingsStore.behavior.refreshRate;
+  $: processStore.setGpuDetails(
+    (!!$settingsStore.appearance.columnVisibility.gpu_usage ||
+      filters.gpu.enabled) &&
+      !auxiliary,
+  );
   $: processView = $settingsStore.behavior.processView ?? "flat";
   $: searchActive =
     searchTerm.trim().length > 0 ||
@@ -167,6 +173,7 @@
     processStore.setSearchTerm("");
     filters = {
       cpu: { ...filters.cpu, enabled: false },
+      gpu: { ...filters.gpu, enabled: false },
       ram: { ...filters.ram, enabled: false },
       runtime: { ...filters.runtime, enabled: false },
       status: { values: [], enabled: false },

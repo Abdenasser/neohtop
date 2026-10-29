@@ -4,7 +4,9 @@
 //! and processes. It includes process monitoring, system statistics collection,
 //! and data structures for representing system state.
 
+mod gpu_process_monitor;
 mod process_monitor;
+pub use gpu_process_monitor::GpuProcessMonitor;
 mod system_monitor;
 mod types;
 

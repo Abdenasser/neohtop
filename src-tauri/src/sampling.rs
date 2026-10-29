@@ -111,6 +111,8 @@ fn append(history: &mut VecDeque<Sample>, sample: Sample) {
 #[derive(Debug)]
 pub struct Hub {
     pub frame: Option<Arc<Frame>>,
+    pub process_gpu: bool,
+    gpu_process_monitor: crate::monitoring::GpuProcessMonitor,
     history: VecDeque<Sample>,
     pub interval: u64,
     pub paused: bool,
@@ -122,6 +124,8 @@ impl Default for Hub {
     fn default() -> Self {
         Self {
             frame: None,
+            process_gpu: false,
+            gpu_process_monitor: crate::monitoring::GpuProcessMonitor::new(),
             history: VecDeque::new(),
             interval: 3000,
             paused: false,
@@ -190,7 +194,7 @@ impl Hub {
         })
     }
     fn capture(&mut self, state: &AppState) -> Result<Frame, String> {
-        let (processes, stats) = {
+        let (mut processes, stats) = {
             let mut sys = state.sys.lock().map_err(|e| e.to_string())?;
             let mut disks = state.disks.lock().map_err(|e| e.to_string())?;
             let mut networks = state.networks.lock().map_err(|e| e.to_string())?;
@@ -209,6 +213,14 @@ impl Hub {
                 .collect_stats(&sys, &networks, &disks);
             (processes, stats)
         };
+        if self.process_gpu {
+            let usage = self.gpu_process_monitor.collect(&processes);
+            for process in &mut processes {
+                process.gpu_usage = usage.get(&(process.pid, process.start_time)).copied();
+            }
+        } else {
+            self.gpu_process_monitor.reset();
+        }
         let gpus = state.gpu.lock().map_err(|e| e.to_string())?.collect();
         self.sequence += 1;
         Ok(Frame {
@@ -386,6 +398,8 @@ mod tests {
             memory_total: None,
             memory_kind: "unknown".into(),
             temperature: None,
+            power_watts: None,
+            core_clock_mhz: None,
             cores: None,
             source: "Fixture".into(),
         };

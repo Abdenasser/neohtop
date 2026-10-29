@@ -67,7 +67,7 @@
           </div>
           <Card.Root size="sm"
             ><Card.Content class="divide-y divide-border">
-              {#each [["GPU utilization", device.utilization === null ? "Unavailable" : percent(device.utilization)], [device.memory_kind === "shared" ? "Shared memory in use" : "GPU memory in use", bytes(device.memory_used)], ["GPU memory capacity", device.memory_kind === "shared" ? "Uses system memory" : bytes(device.memory_total)], ["Temperature", device.temperature === null ? "Unavailable" : `${device.temperature.toFixed(0)} °C`]] as [label, value]}<div
+              {#each [["GPU utilization", device.utilization === null ? "Unavailable" : percent(device.utilization)], [device.memory_kind === "shared" ? "Shared memory in use" : "GPU memory in use", bytes(device.memory_used)], ["GPU memory capacity", device.memory_kind === "shared" ? "Uses system memory" : bytes(device.memory_total)], ["Temperature", device.temperature === null ? "Unavailable" : `${device.temperature.toFixed(0)} °C`], ["Power", device.power_watts == null ? "Unavailable" : `${device.power_watts.toFixed(1)} W`], ["Core clock", device.core_clock_mhz == null ? "Unavailable" : `${device.core_clock_mhz} MHz`]] as [label, value]}<div
                   class="flex justify-between gap-4 py-3 first:pt-0 last:pb-0"
                 >
                   <span class="text-muted-foreground">{label}</span><span

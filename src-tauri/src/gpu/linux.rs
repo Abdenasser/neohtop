@@ -93,6 +93,10 @@ fn collect_from(root: &Path) -> Vec<GpuDevice> {
             },
             memory_kind: if amd { "dedicated" } else { "unknown" }.into(),
             temperature,
+            power_watts: hwmon_number(&path, "power1_average")
+                .or_else(|| hwmon_number(&path, "power1_input"))
+                .map(|v| v as f64 / 1_000_000.0),
+            core_clock_mhz: hwmon_number(&path, "freq1_input").map(|v| v / 1_000_000),
             cores: None,
             source: if amd {
                 "Linux amdgpu sysfs"
@@ -146,4 +150,11 @@ mod tests {
         assert_eq!(devices[0].memory_used, None);
         fs::remove_dir_all(root).unwrap();
     }
+}
+
+fn hwmon_number(device: &Path, field: &str) -> Option<u64> {
+    fs::read_dir(device.join("hwmon"))
+        .ok()?
+        .flatten()
+        .find_map(|entry| integer(&entry.path(), field))
 }

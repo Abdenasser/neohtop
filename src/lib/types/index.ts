@@ -4,6 +4,7 @@ export interface Process {
   ppid: number;
   name: string;
   cpu_usage: number;
+  gpu_usage: number | null;
   memory_usage: number;
   status: string;
   user: string;
@@ -180,6 +181,8 @@ export interface GpuDevice {
   memory_total: number | null;
   memory_kind: "shared" | "dedicated" | "unknown";
   temperature: number | null;
+  power_watts: number | null;
+  core_clock_mhz: number | null;
   cores: number | null;
   source: string;
 }

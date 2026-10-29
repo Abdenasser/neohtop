@@ -52,8 +52,10 @@ pub struct ProcessStaticInfo {
 
 /// Process information exposed to the frontend via Tauri
 /// Contains formatted and filtered process data for UI consumption
-#[derive(Serialize, Debug)]
+#[derive(Clone, Serialize, Debug)]
 pub struct ProcessInfo {
+    /// Driver-reported DRM engine activity; unknown and unsupported stay None.
+    pub gpu_usage: Option<f32>,
     /// Process ID
     pub pid: u32,
     /// Parent process ID

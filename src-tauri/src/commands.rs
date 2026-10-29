@@ -10,8 +10,19 @@ use tauri::State;
 
 /// The main window and companion share one interval-gated native capture.
 #[tauri::command]
-pub async fn get_processes(app: tauri::AppHandle) -> Result<crate::sampling::Snapshot, String> {
-    crate::sampling::read(app).await
+pub async fn get_processes(
+    app: tauri::AppHandle,
+    include_gpu: Option<bool>,
+) -> Result<crate::sampling::Snapshot, String> {
+    tauri::async_runtime::spawn_blocking(move || {
+        use tauri::Manager;
+        let state = app.state::<AppState>();
+        let mut hub = state.hub.lock().map_err(|e| e.to_string())?;
+        hub.process_gpu = include_gpu.unwrap_or(false);
+        hub.read(&state)
+    })
+    .await
+    .map_err(|e| e.to_string())?
 }
 
 /// Attempts to kill a process with the specified PID

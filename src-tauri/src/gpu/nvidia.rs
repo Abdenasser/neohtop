@@ -1,5 +1,8 @@
 use super::{percent, GpuDevice};
-use nvml_wrapper::{enum_wrappers::device::TemperatureSensor, Nvml};
+use nvml_wrapper::{
+    enum_wrappers::device::{Clock, TemperatureSensor},
+    Nvml,
+};
 use std::time::{Duration, Instant};
 
 #[derive(Debug, Default)]
@@ -55,6 +58,8 @@ impl Nvidia {
                         .temperature(TemperatureSensor::Gpu)
                         .ok()
                         .map(|v| v as f64),
+                    power_watts: device.power_usage().ok().map(|v| v as f64 / 1000.0),
+                    core_clock_mhz: device.clock_info(Clock::Graphics).ok().map(u64::from),
                     cores: None,
                     source: "NVIDIA NVML driver".into(),
                 })

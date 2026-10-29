@@ -17,6 +17,12 @@ export let column_definitions: Column[] = [
     format: (v) => v.toFixed(1) + "%",
   },
   {
+    id: "gpu_usage",
+    label: "GPU %",
+    visible: false,
+    format: (v) => (v == null ? "—" : `${v.toFixed(1)}%`),
+  },
+  {
     id: "memory_usage",
     label: "RAM",
     visible: true,

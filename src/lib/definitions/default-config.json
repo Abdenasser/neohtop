@@ -15,7 +15,8 @@
       "environ": false,
       "session_id": false,
       "start_time": false,
-      "run_time": true
+      "run_time": true,
+      "gpu_usage": false
     }
   },
   "behavior": {

@@ -22,6 +22,7 @@
   export let onClearFilters: () => void;
   export let filters: {
     cpu: { operator: string; value: number; enabled: boolean };
+    gpu: { operator: string; value: number; enabled: boolean };
     ram: { operator: string; value: number; enabled: boolean };
     runtime: { operator: string; value: number; enabled: boolean };
     status: { values: string[]; enabled: boolean };
@@ -33,6 +34,9 @@
     ...(searchTerm.trim() ? [`Search: ${searchTerm.trim()}`] : []),
     ...(filters.cpu.enabled
       ? [`CPU ${filters.cpu.operator} ${filters.cpu.value}%`]
+      : []),
+    ...(filters.gpu.enabled
+      ? [`GPU ${filters.gpu.operator} ${filters.gpu.value}%`]
       : []),
     ...(filters.ram.enabled
       ? [`Memory ${filters.ram.operator} ${filters.ram.value} MB`]

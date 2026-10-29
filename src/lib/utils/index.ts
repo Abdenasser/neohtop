@@ -67,6 +67,7 @@ export function filterProcesses(
   searchTerm: string,
   filters: {
     cpu: { operator: string; value: number; enabled: boolean };
+    gpu: { operator: string; value: number; enabled: boolean };
     ram: { operator: string; value: number; enabled: boolean };
     runtime: { operator: string; value: number; enabled: boolean };
     status: { values: string[]; enabled: boolean };
@@ -101,6 +102,19 @@ export function filterProcesses(
         return false;
       }
     }
+
+    // Missing GPU counters never pass as measured zero.
+    if (
+      filters.gpu.enabled &&
+      (process.gpu_usage == null ||
+        !Number.isFinite(process.gpu_usage) ||
+        !compareValue(
+          process.gpu_usage,
+          filters.gpu.operator,
+          filters.gpu.value,
+        ))
+    )
+      return false;
 
     // Apply RAM filter (convert bytes to MB)
     if (filters.ram.enabled) {

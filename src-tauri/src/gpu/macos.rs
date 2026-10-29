@@ -131,6 +131,8 @@ pub fn collect() -> Vec<GpuDevice> {
             memory_total: None,
             memory_kind: if apple { "shared" } else { "unknown" }.into(),
             temperature: None,
+            power_watts: None,
+            core_clock_mhz: None,
             cores,
             source: "macOS IORegistry driver statistics".into(),
         });

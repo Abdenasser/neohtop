@@ -9,6 +9,7 @@
   import { SlidersHorizontal, RotateCcw } from "@lucide/svelte";
   export let filters: {
     cpu: { operator: string; value: number; enabled: boolean };
+    gpu: { operator: string; value: number; enabled: boolean };
     ram: { operator: string; value: number; enabled: boolean };
     runtime: { operator: string; value: number; enabled: boolean };
     status: { values: string[]; enabled: boolean };
@@ -16,6 +17,7 @@
   $: count = Object.values(filters).filter((f) => f.enabled).length;
   const numeric = [
     { id: "cpu" as const, label: "CPU usage", unit: "%" },
+    { id: "gpu" as const, label: "GPU engine activity", unit: "%" },
     { id: "ram" as const, label: "Memory", unit: "MB" },
     { id: "runtime" as const, label: "Run time", unit: "min" },
   ];
@@ -43,6 +45,7 @@
     filters = {
       ...filters,
       cpu: { ...filters.cpu, enabled: false },
+      gpu: { ...filters.gpu, enabled: false },
       ram: { ...filters.ram, enabled: false },
       runtime: { ...filters.runtime, enabled: false },
       status: { values: [], enabled: false },

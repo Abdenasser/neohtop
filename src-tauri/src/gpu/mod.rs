@@ -23,6 +23,8 @@ pub struct GpuDevice {
     pub memory_total: Option<u64>,
     pub memory_kind: String,
     pub temperature: Option<f64>,
+    pub power_watts: Option<f64>,
+    pub core_clock_mhz: Option<u64>,
     pub cores: Option<u64>,
     pub source: String,
 }

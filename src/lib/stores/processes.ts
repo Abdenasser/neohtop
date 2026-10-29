@@ -64,9 +64,12 @@ function createProcessStore() {
     update((state) => ({ ...state, isLoading }));
 
   let inFlight: Promise<void> | null = null;
+  let gpuDetails = false;
   const readProcesses = async () => {
     try {
-      const result = await invoke<MonitorSnapshot>("get_processes");
+      const result = await invoke<MonitorSnapshot>("get_processes", {
+        includeGpu: gpuDetails,
+      });
       update((state) => ({
         ...state,
         processes: result.frame.processes,
@@ -235,6 +238,9 @@ function createProcessStore() {
   // Return all methods
   return {
     subscribe,
+    setGpuDetails(value: boolean) {
+      gpuDetails = value;
+    },
     set,
     update,
     setIsLoading,

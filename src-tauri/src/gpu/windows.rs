@@ -49,6 +49,8 @@ pub fn collect() -> Vec<GpuDevice> {
                 }
                 .into(),
                 temperature: None,
+                power_watts: None,
+                core_clock_mhz: None,
                 cores: None,
                 source: "Windows DXGI inventory; live counters unavailable for this adapter".into(),
             });
