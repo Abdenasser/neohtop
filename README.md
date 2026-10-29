@@ -66,7 +66,7 @@
 
 ## Features
 
-**[What’s new in v1.3.0](CHANGELOG.md)** · [Desktop guide](docs/usage.md) · [Downloads](https://github.com/Abdenasser/neohtop/releases/latest)
+**[What’s new in v1.3.0](CHANGELOG.md)** · [Screenshots](docs/screenshots/README.md) · [Desktop guide](docs/usage.md) · [Downloads](https://github.com/Abdenasser/neohtop/releases/latest)
 
 - 🚀 Real-time process monitoring
 - 🌳 Expandable process trees with family CPU/RAM totals and search that keeps matching processes in context
