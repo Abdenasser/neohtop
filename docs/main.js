@@ -1,4 +1,5 @@
-import { resolveDownloadAssets } from "./downloads.js";
+import { resolveDownloadAssets, selectPublishedRelease } from "./downloads.js";
+import releaseSnapshot from "./release.json" with { type: "json" };
 
 document.documentElement.classList.add("js");
 const menu = document.querySelector(".menu-button");
@@ -53,61 +54,84 @@ for (const button of document.querySelectorAll("[data-copy]")) {
   });
 }
 
-// Only published GitHub releases can provide download links. Static links remain
-// useful without JavaScript, with a blocked API, or while GitHub is rate limited.
-async function updateRelease() {
+// The HTML already contains verified direct downloads. Live lookup can advance
+// them to a newer stable release, but cannot downgrade them or break offline use.
+let currentRelease = releaseSnapshot;
+let releaseRequestInFlight = false;
+let releaseCheckedAt = 0;
+function renderRelease(release) {
+  const assets = resolveDownloadAssets(release);
   const version = document.getElementById("current-version");
+  if (version) version.textContent = `${release.tag_name} · current release`;
+  for (const link of document.querySelectorAll(".download-button[data-type]")) {
+    const url = assets[link.dataset.type];
+    const detail = link.querySelector(".secondary");
+    if (url) {
+      link.href = url;
+      link.dataset.version = release.tag_name;
+      link.removeAttribute("aria-disabled");
+      link.removeAttribute("tabindex");
+      if (detail)
+        detail.textContent = `${link.dataset.format} · ${release.tag_name}`;
+    } else {
+      link.removeAttribute("href");
+      link.setAttribute("aria-disabled", "true");
+      link.tabIndex = -1;
+      if (detail) detail.textContent = `Unavailable in ${release.tag_name}`;
+    }
+  }
+  for (const link of document.querySelectorAll("[data-release-notes]"))
+    link.href = release.html_url;
+  const checksum = release.assets.find((asset) => asset.name === "SHA256SUMS");
+  for (const link of document.querySelectorAll("[data-release-checksums]"))
+    link.href = checksum?.browser_download_url || release.html_url;
+}
+async function updateRelease() {
+  if (
+    !document.getElementById("current-version") ||
+    releaseRequestInFlight ||
+    Date.now() - releaseCheckedAt < 60000
+  )
+    return;
   const status = document.getElementById("release-status");
-  if (!version) return;
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 8000);
+  releaseRequestInFlight = true;
   try {
     const response = await fetch(
       "https://api.github.com/repos/Abdenasser/neohtop/releases/latest",
       {
+        cache: "no-store",
         signal: controller.signal,
         headers: { Accept: "application/vnd.github+json" },
       },
     );
     if (!response.ok) throw new Error("Release lookup unavailable");
-    const release = await response.json();
-    if (
-      release.draft ||
-      release.prerelease ||
-      !/^v\d+\.\d+\.\d+$/.test(release.tag_name)
-    ) {
-      throw new Error("Not a published stable release");
-    }
-    const assets = resolveDownloadAssets(release);
-    if (!Object.keys(assets).length)
-      throw new Error("No recognized release assets");
-    version.textContent = `${release.tag_name} · published release`;
-    for (const link of document.querySelectorAll(
-      ".download-button[data-type]",
-    )) {
-      const url = assets[link.dataset.type];
-      if (url) {
-        link.href = url;
-        link.dataset.version = release.tag_name;
-      } else {
-        link.removeAttribute("href");
-        link.setAttribute("aria-disabled", "true");
-        link.tabIndex = -1;
-        link.querySelector(".secondary").textContent = "Not in this release";
-      }
-    }
+    currentRelease = selectPublishedRelease(
+      await response.json(),
+      currentRelease,
+    );
+    renderRelease(currentRelease);
     if (status)
-      status.textContent =
-        "Direct links use the assets in this published release. Development features may not be included.";
+      status.textContent = `Official ${currentRelease.tag_name} installers. Choose your operating system and architecture.`;
   } catch {
     if (status)
-      status.textContent =
-        "Live release lookup is unavailable. Download links open GitHub Releases so you can choose an available package.";
+      status.textContent = `${currentRelease.tag_name} downloads are ready. Live release lookup is unavailable; these verified links still work.`;
   } finally {
     clearTimeout(timeout);
+    releaseCheckedAt = Date.now();
+    releaseRequestInFlight = false;
   }
 }
-updateRelease();
+renderRelease(currentRelease);
+void updateRelease();
+// Recheck when returning to a page left open before a new release was published.
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "visible") void updateRelease();
+});
+window.addEventListener("pageshow", (event) => {
+  if (event.persisted) void updateRelease();
+});
 
 // Preserve the site's existing analytics account. Loading or blocking analytics
 // never changes navigation, copy controls, or downloads.

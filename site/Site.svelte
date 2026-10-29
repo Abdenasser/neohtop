@@ -17,11 +17,24 @@
     Settings2,
     Activity,
     HardDrive,
+    Laptop,
+    AppWindow,
+    Terminal,
+    ArrowRight,
+    ShieldCheck,
   } from "@lucide/svelte";
   import { faq } from "./content.js";
+  import publishedRelease from "../docs/release.json";
+  import { resolveDownloadAssets } from "../docs/downloads.js";
   export let page = "home";
   const repo = "https://github.com/Abdenasser/neohtop";
   const release = `${repo}/releases/latest`;
+  const releaseTag = publishedRelease.tag_name;
+  const releaseSeries = releaseTag.slice(1).split(".").slice(0, 2).join(".");
+  const downloadLinks = resolveDownloadAssets(publishedRelease);
+  const checksumUrl =
+    publishedRelease.assets.find((asset) => asset.name === "SHA256SUMS")
+      ?.browser_download_url || publishedRelease.html_url;
   const features = [
     {
       icon: GitBranch,
@@ -69,7 +82,9 @@
   const packages = [
     {
       title: "macOS",
-      detail: "Apple Silicon",
+      detail: "Apple Silicon & Intel",
+      icon: Laptop,
+      color: "var(--site-blue)",
       items: [
         ["macos-silicon", "Apple Silicon", "DMG"],
         ["macos-intel", "Intel", "DMG"],
@@ -77,12 +92,16 @@
     },
     {
       title: "Windows",
-      detail: "64-bit",
+      detail: "64-bit installer",
+      icon: AppWindow,
+      color: "var(--site-lavender)",
       items: [["windows", "Windows x64", "Installer"]],
     },
     {
       title: "Linux",
       detail: "x86_64 & ARM64",
+      icon: Terminal,
+      color: "var(--site-green)",
       items: [
         ["linux-deb-x64", "x86_64", ".deb"],
         ["linux-rpm-x64", "x86_64", ".rpm"],
@@ -109,7 +128,8 @@
     <a class="brand" href="./" aria-label="NeoHtop home"
       ><img src="assets/neohtop-icon.png" width="28" height="28" alt="" /><span
         >NeoHtop</span
-      ><Badge variant="secondary" class="version-badge">1.3</Badge></a
+      ><Badge variant="secondary" class="version-badge">{releaseSeries}</Badge
+      ></a
     >
     <nav aria-label="Main navigation">
       <a href="./#features">Features</a><a href="./#themes">Themes</a><a
@@ -126,9 +146,9 @@
   {#if page === "home"}
     <section class="site-shell hero">
       <Badge variant="outline" class="release-badge"
-        ><span class="status-dot"></span>NeoHtop 1.3<span class="badge-divider"
-          >/</span
-        >More to explore.</Badge
+        ><span class="status-dot"></span>NeoHtop {releaseSeries}<span
+          class="badge-divider">/</span
+        >GPU + menu bar, now live.<ArrowRight class="size-3" /></Badge
       >
       <h1>Your system.<br /><span>In plain sight.</span></h1>
       <p class="hero-description">
@@ -152,6 +172,17 @@
           >·</span
         >No account required
       </p>
+      <div class="hero-highlights" aria-label="Release highlights">
+        <Badge variant="outline" class="highlight-processes"
+          ><GitBranch />Follow every process</Badge
+        >
+        <Badge variant="outline" class="highlight-gpu"
+          ><Activity />Meet your GPU</Badge
+        >
+        <Badge variant="outline" class="highlight-companion"
+          ><Monitor />Keep it in your menu bar</Badge
+        >
+      </div>
     </section>
     <section
       class="product-stage site-shell-wide"
@@ -188,11 +219,12 @@
       class="site-shell platform-line"
       aria-label="Platforms and project facts"
     >
-      <span>Built for your desktop.</span><strong>macOS</strong><strong
-        >Linux</strong
-      ><strong>Windows</strong><span class="platform-divider"></span><span
-        >Rust + Tauri + Svelte</span
-      ><a href={`${repo}/blob/main/LICENSE`}>MIT licensed<ArrowUpRight /></a>
+      <span>Built for your desktop.</span><strong><Laptop />macOS</strong
+      ><strong><Terminal />Linux</strong><strong><AppWindow />Windows</strong
+      ><span class="platform-divider"></span><span><Palette />24 themes</span><a
+        href={`${repo}/blob/main/LICENSE`}
+        ><ShieldCheck />Open source. Always yours.</a
+      >
     </section>
     <section id="features" class="site-shell section-block">
       <div class="section-heading">
@@ -204,7 +236,10 @@
         </p>
       </div>
       <div class="feature-grid">
-        {#each features as feature}<Card.Root class="feature-card" size="sm"
+        {#each features as feature}<Card.Root
+            class="feature-card"
+            size="sm"
+            style={`--feature-color:${feature.color}`}
             ><Card.Header
               ><span
                 class="feature-icon"
@@ -237,12 +272,20 @@
         />
       </figure>
       <div class="resource-labels">
-        <Badge variant="secondary"><Cpu />CPU</Badge><Badge variant="secondary"
+        <Badge variant="secondary" style="--resource-color:var(--site-blue)"
+          ><Cpu />CPU</Badge
+        ><Badge variant="secondary" style="--resource-color:var(--site-peach)"
           ><MemoryStick />Memory</Badge
-        ><Badge variant="secondary"><Activity />Graphics</Badge><Badge
-          variant="secondary"><HardDrive />Storage</Badge
-        ><Badge variant="secondary"><Monitor />System</Badge><Badge
-          variant="secondary"><Network />Network</Badge
+        ><Badge variant="secondary" style="--resource-color:var(--site-green)"
+          ><Activity />Graphics</Badge
+        ><Badge
+          variant="secondary"
+          style="--resource-color:var(--site-lavender)"
+          ><HardDrive />Storage</Badge
+        ><Badge variant="secondary" style="--resource-color:var(--site-mauve)"
+          ><Monitor />System</Badge
+        ><Badge variant="secondary" style="--resource-color:var(--site-sky)"
+          ><Network />Network</Badge
         >
       </div>
       <p class="section-note">
@@ -294,44 +337,58 @@
           view.
         </p>
         <Badge variant="outline" id="current-version"
-          >Latest published release</Badge
+          >{releaseTag} · current release</Badge
         >
       </div>
       <div class="download-grid">
-        {#each packages as platform}<Card.Root class="download-card" size="sm"
+        {#each packages as platform}<Card.Root
+            class="download-card"
+            size="sm"
+            style={`--platform-color:${platform.color}`}
             ><Card.Header
-              ><Card.Title>{platform.title}</Card.Title><Card.Description
+              ><div class="platform-icon"><platform.icon class="size-5" /></div>
+              <Card.Title>{platform.title}</Card.Title><Card.Description
                 >{platform.detail}</Card.Description
               ></Card.Header
             ><Card.Content
               >{#each platform.items as item}<Button
-                  href={release}
+                  href={downloadLinks[item[0]] || release}
                   variant="outline"
                   class="download-button"
                   data-type={item[0]}
+                  data-format={item[2]}
+                  data-version={releaseTag}
                   ><span class="download-label"
-                    >{item[1]}<span class="secondary">{item[2]}</span></span
+                    >{item[1]}<span class="secondary"
+                      >{item[2]} · {releaseTag}</span
+                    ></span
                   ><ArrowDown /></Button
                 >{/each}</Card.Content
             ></Card.Root
           >{/each}
       </div>
       <p id="release-status" role="status" class="section-note">
-        Links open the published release page. Direct downloads load from the
-        actual release assets.
+        Official {releaseTag} installers. Choose your operating system and architecture.
       </p>
       <div class="download-help">
         <Button href="install.html" variant="ghost"
           >Installation & troubleshooting<ArrowUpRight /></Button
-        ><Button href={repo + "/releases"} variant="ghost"
-          >All release notes<ArrowUpRight /></Button
+        ><Button href={checksumUrl} data-release-checksums variant="ghost"
+          ><ShieldCheck />Verify checksums</Button
+        ><Button
+          href={publishedRelease.html_url}
+          data-release-notes
+          variant="ghost">Release notes<ArrowUpRight /></Button
         >
       </div>
       <Card.Root size="sm" class="brew-card"
         ><Card.Content
           ><div>
             <strong>Prefer Homebrew?</strong>
-            <p>Community-maintained; updates can follow a separate schedule.</p>
+            <p>
+              Community-maintained and may lag behind. Use the installers above
+              for the current official release.
+            </p>
           </div>
           <code id="brew-command">brew install --cask neohtop</code><Button
             variant="outline"

@@ -115,3 +115,9 @@ the footer even without a host-root robots declaration.
 Run `npm run test:release` to check internal links, metadata, structured data,
 Markdown references, sitemap coverage, and static download fallbacks alongside
 the release and process-tree tests.
+
+### Published website downloads
+
+`docs/release.json` is a small snapshot of an actual published stable release, not a version inferred from the source package. It supplies all installer links during static rendering so downloads work without JavaScript, a successful API call or a fresh browser cache. The live lookup can only advance to a newer stable release; older cached results and partial same-version responses cannot replace verified links.
+
+After publishing a new release, run `npm run refresh:site-release`, then `npm run build:site` and `npm run test:release`, and commit the snapshot and generated website. Website runtime scripts use content-hashed filenames; retain earlier hashed bundles so cached HTML can still load its assets. Homebrew is independently maintained and can still offer an older version.

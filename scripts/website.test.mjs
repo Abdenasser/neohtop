@@ -86,7 +86,9 @@ test("downloads work without JavaScript and AI references do not advertise an av
   for (const link of downloads)
     assert.equal(
       link[1],
-      "https://github.com/Abdenasser/neohtop/releases/latest",
+      JSON.parse(read("release.json")).assets.find(
+        (asset) => asset.browser_download_url === link[1],
+      )?.browser_download_url,
     );
   for (const file of [
     "index.md",
@@ -107,4 +109,27 @@ test("downloads work without JavaScript and AI references do not advertise an av
     }
   }
   assert.ok(fs.existsSync(path.join(root, ".nojekyll")));
+});
+
+test("published downloads and their version are available before JavaScript executes", () => {
+  const snapshot = JSON.parse(read("release.json"));
+  assert.equal(snapshot.draft, false);
+  assert.equal(snapshot.prerelease, false);
+  const html = read("index.html");
+  assert.ok(html.includes(`${snapshot.tag_name} · current release`));
+  const downloads = [...html.matchAll(/<a\b[^>]*>/g)]
+    .map(([tag]) => tag)
+    .filter((tag) => /class="[^"]*\bdownload-button\b/.test(tag));
+  assert.equal(downloads.length, 9);
+  for (const tag of downloads) {
+    assert.ok(tag.includes(`data-version="${snapshot.tag_name}"`));
+    assert.ok(tag.includes(`/releases/download/${snapshot.tag_name}/`));
+  }
+  for (const file of pages) {
+    const script = read(file).match(
+      /<script type="module" src="(assets\/site-runtime-[A-Za-z0-9_-]+\.js)"/,
+    );
+    assert.ok(script, `${file}: runtime must use a content hash`);
+    assert.ok(fs.existsSync(path.join(root, script[1])));
+  }
 });

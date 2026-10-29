@@ -1,5 +1,6 @@
 import { build } from "vite";
 import { faq } from "../site/content.js";
+import publishedRelease from "../docs/release.json" with { type: "json" };
 import { format, resolveConfig } from "prettier";
 import {
   readFile,
@@ -7,7 +8,6 @@ import {
   readdir,
   copyFile,
   mkdir,
-  rm,
 } from "node:fs/promises";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import path from "node:path";
@@ -20,14 +20,37 @@ const assets = await readdir(path.join(root, ".site-build/assets"));
 const css = assets.find((name) => name.endsWith(".css"));
 if (!css) throw new Error("Website CSS was not emitted");
 await mkdir(path.join(root, "docs/assets"), { recursive: true });
-// Remove only previously generated site bundles, preserving screenshots/icons.
-for (const name of await readdir(path.join(root, "docs/assets")))
-  if (/^site-.*\.css$/.test(name))
-    await rm(path.join(root, "docs/assets", name));
+// Keep earlier hashed bundles available for browsers with cached HTML.
 for (const name of assets)
   await copyFile(
     path.join(root, ".site-build/assets", name),
     path.join(root, "docs/assets", name),
+  );
+const runtimeBuild = await build({
+  configFile: false,
+  publicDir: false,
+  build: {
+    write: false,
+    rollupOptions: {
+      input: path.join(root, "docs/main.js"),
+      output: {
+        entryFileNames: "site-runtime-[hash].js",
+        chunkFileNames: "site-runtime-[hash].js",
+      },
+    },
+  },
+});
+const runtimeOutput = (
+  Array.isArray(runtimeBuild) ? runtimeBuild[0] : runtimeBuild
+).output;
+const runtime = runtimeOutput.find(
+  (file) => file.type === "chunk" && file.isEntry,
+);
+if (!runtime) throw new Error("Website runtime was not emitted");
+for (const file of runtimeOutput)
+  await writeFile(
+    path.join(root, "docs/assets", file.fileName),
+    file.type === "chunk" ? file.code : file.source,
   );
 const pages = [
   {
@@ -81,7 +104,7 @@ for (const page of pages) {
           "@context": "https://schema.org",
           "@type": "SoftwareApplication",
           name: "NeoHtop",
-          softwareVersion: "1.3.0",
+          softwareVersion: publishedRelease.tag_name.slice(1),
           applicationCategory: "UtilitiesApplication",
           operatingSystem: ["macOS", "Linux", "Windows"],
           description: page.description,
@@ -117,7 +140,7 @@ for (const page of pages) {
         }
       : schema;
   const html = `<!doctype html>
-<html lang="en" class="dark" data-theme="catppuccin"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width,initial-scale=1" /><meta name="color-scheme" content="dark" /><title>${escape(page.title)}</title><meta name="description" content="${escape(page.description)}" /><link rel="canonical" href="${base + page.canonical}" /><link rel="alternate" type="text/markdown" href="${page.markdown}" title="Markdown version" /><link rel="describedby" href="llms.txt" /><link rel="icon" href="favicon.ico" /><link rel="apple-touch-icon" href="assets/neohtop-icon.png" /><meta property="og:type" content="website" /><meta property="og:site_name" content="NeoHtop" /><meta property="og:url" content="${base + page.canonical}" /><meta property="og:title" content="${escape(page.title)}" /><meta property="og:description" content="${escape(page.description)}" /><meta property="og:image" content="${base}assets/neohtop-desktop.png" /><meta property="og:image:width" content="1280" /><meta property="og:image:height" content="900" /><meta property="og:image:alt" content="NeoHtop in Catppuccin with resource charts and a searchable process table" /><meta name="twitter:card" content="summary_large_image" /><meta name="twitter:creator" content="@__abdenasser" /><meta name="twitter:title" content="${escape(page.title)}" /><meta name="twitter:description" content="${escape(page.description)}" /><meta name="twitter:image" content="${base}assets/neohtop-desktop.png" /><link rel="stylesheet" href="assets/${css}" /><script type="application/ld+json">${JSON.stringify(structured)}</script>${rendered.head}</head><body>${rendered.body}<script type="module" src="main.js"></script></body></html>
+<html lang="en" class="dark" data-theme="catppuccin"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width,initial-scale=1" /><meta name="color-scheme" content="dark" /><title>${escape(page.title)}</title><meta name="description" content="${escape(page.description)}" /><link rel="canonical" href="${base + page.canonical}" /><link rel="alternate" type="text/markdown" href="${page.markdown}" title="Markdown version" /><link rel="describedby" href="llms.txt" /><link rel="icon" href="favicon.ico" /><link rel="apple-touch-icon" href="assets/neohtop-icon.png" /><meta property="og:type" content="website" /><meta property="og:site_name" content="NeoHtop" /><meta property="og:url" content="${base + page.canonical}" /><meta property="og:title" content="${escape(page.title)}" /><meta property="og:description" content="${escape(page.description)}" /><meta property="og:image" content="${base}assets/neohtop-desktop.png" /><meta property="og:image:width" content="1280" /><meta property="og:image:height" content="900" /><meta property="og:image:alt" content="NeoHtop in Catppuccin with resource charts and a searchable process table" /><meta name="twitter:card" content="summary_large_image" /><meta name="twitter:creator" content="@__abdenasser" /><meta name="twitter:title" content="${escape(page.title)}" /><meta name="twitter:description" content="${escape(page.description)}" /><meta name="twitter:image" content="${base}assets/neohtop-desktop.png" /><link rel="stylesheet" href="assets/${css}" /><script type="application/ld+json">${JSON.stringify(structured)}</script>${rendered.head}</head><body>${rendered.body}<script type="module" src="assets/${runtime.fileName}"></script></body></html>
 `;
   await writeFile(
     path.join(root, "docs", page.file),

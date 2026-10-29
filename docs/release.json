@@ -1,0 +1,52 @@
+{
+  "tag_name": "v1.3.0",
+  "html_url": "https://github.com/Abdenasser/neohtop/releases/tag/v1.3.0",
+  "draft": false,
+  "prerelease": false,
+  "assets": [
+    {
+      "name": "intel-NeoHtop_1.3.0_x64.dmg",
+      "browser_download_url": "https://github.com/Abdenasser/neohtop/releases/download/v1.3.0/intel-NeoHtop_1.3.0_x64.dmg"
+    },
+    {
+      "name": "NeoHtop_1.3.0_aarch64.AppImage",
+      "browser_download_url": "https://github.com/Abdenasser/neohtop/releases/download/v1.3.0/NeoHtop_1.3.0_aarch64.AppImage"
+    },
+    {
+      "name": "NeoHtop_1.3.0_aarch64.deb",
+      "browser_download_url": "https://github.com/Abdenasser/neohtop/releases/download/v1.3.0/NeoHtop_1.3.0_aarch64.deb"
+    },
+    {
+      "name": "NeoHtop_1.3.0_aarch64.rpm",
+      "browser_download_url": "https://github.com/Abdenasser/neohtop/releases/download/v1.3.0/NeoHtop_1.3.0_aarch64.rpm"
+    },
+    {
+      "name": "NeoHtop_1.3.0_x64-setup.exe",
+      "browser_download_url": "https://github.com/Abdenasser/neohtop/releases/download/v1.3.0/NeoHtop_1.3.0_x64-setup.exe"
+    },
+    {
+      "name": "NeoHtop_1.3.0_x86_64.AppImage",
+      "browser_download_url": "https://github.com/Abdenasser/neohtop/releases/download/v1.3.0/NeoHtop_1.3.0_x86_64.AppImage"
+    },
+    {
+      "name": "NeoHtop_1.3.0_x86_64.deb",
+      "browser_download_url": "https://github.com/Abdenasser/neohtop/releases/download/v1.3.0/NeoHtop_1.3.0_x86_64.deb"
+    },
+    {
+      "name": "NeoHtop_1.3.0_x86_64.rpm",
+      "browser_download_url": "https://github.com/Abdenasser/neohtop/releases/download/v1.3.0/NeoHtop_1.3.0_x86_64.rpm"
+    },
+    {
+      "name": "release-manifest.json",
+      "browser_download_url": "https://github.com/Abdenasser/neohtop/releases/download/v1.3.0/release-manifest.json"
+    },
+    {
+      "name": "SHA256SUMS",
+      "browser_download_url": "https://github.com/Abdenasser/neohtop/releases/download/v1.3.0/SHA256SUMS"
+    },
+    {
+      "name": "silicon-NeoHtop_1.3.0_aarch64.dmg",
+      "browser_download_url": "https://github.com/Abdenasser/neohtop/releases/download/v1.3.0/silicon-NeoHtop_1.3.0_aarch64.dmg"
+    }
+  ]
+}
