@@ -17,6 +17,8 @@ export interface Process {
   run_time: number;
   disk_usage: [number, number]; // [read_bytes, written_bytes]
   session_id?: number;
+  /** Local bound ports (TCP LISTEN + UDP). Empty unless a port search is active. */
+  ports: number[];
 }
 
 export interface ResourceDetailsData {
@@ -187,6 +189,7 @@ export interface GpuDevice {
   source: string;
 }
 export interface MonitorSnapshot {
+  port_error?: string | null;
   frame: {
     captured_at: number;
     sequence: number;

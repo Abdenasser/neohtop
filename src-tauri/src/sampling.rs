@@ -25,7 +25,7 @@ pub fn interval(ms: u64) -> u64 {
     }
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Clone, Debug, Serialize)]
 pub struct Frame {
     pub captured_at: u64,
     pub sequence: u64,
@@ -137,6 +137,7 @@ impl Default for Hub {
 }
 #[derive(Serialize)]
 pub struct Snapshot {
+    pub port_error: Option<String>,
     pub frame: Arc<Frame>,
     pub history: Vec<Sample>,
     pub paused: bool,
@@ -182,6 +183,7 @@ impl Hub {
             }
         }
         Ok(Snapshot {
+            port_error: None,
             frame: self.frame.clone().ok_or_else(|| {
                 self.error
                     .clone()

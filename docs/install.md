@@ -1,6 +1,6 @@
 # Install NeoHtop Desktop
 
-Official desktop binaries are on the [latest published GitHub release](https://github.com/Abdenasser/neohtop/releases/latest). Choose the package for your platform and CPU architecture. Development features may not be in the current published app. NeoHtop Pro is not available yet.
+Official desktop binaries are on the [latest published GitHub release](https://github.com/Abdenasser/neohtop/releases/latest). Choose the package for your platform and CPU architecture. Version 1.3.0 includes the refreshed UI, GPU diagnostics, process families, local-port search and menu-bar companion. Older releases differ. NeoHtop Pro is postponed and is not available.
 
 ## macOS
 
@@ -22,7 +22,7 @@ Run `uname -m`: `x86_64` means x64 and `aarch64` means ARM64. Older releases may
 
 ## Troubleshooting
 
-For glibc errors or a blank Linux window, check your distribution version, package type, and release notes. An older Ubuntu build baseline and a bundled-Wayland-library AppImage check are development work for a future desktop release; they may not be in existing downloads. An appropriate native package may be another option.
+For glibc errors or a blank Linux window, check your distribution version, package type, and release notes. Version 1.3.0 uses an Ubuntu 22.04 build baseline and checks AppImages for bundled host Wayland libraries. Older releases may not contain these fixes. An appropriate native package may be another option.
 
 Operating-system permissions can restrict process details. Start without administrator privileges and consult platform-specific repository guidance before granting elevated access.
 
@@ -30,7 +30,7 @@ Operating-system permissions can restrict process details. Start without adminis
 
 ## Build the development version
 
-Use Node.js 22, stable Rust, and the relevant Tauri platform dependencies. See the [development documentation](https://github.com/Abdenasser/neohtop#development).
+Use Node.js 22, Rust 1.88 or newer, and the relevant Tauri platform dependencies. See the [development documentation](https://github.com/Abdenasser/neohtop#development).
 
 ```sh
 git clone https://github.com/Abdenasser/neohtop.git

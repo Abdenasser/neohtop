@@ -1,4 +1,4 @@
-import { writable } from "svelte/store";
+import { get, writable } from "svelte/store";
 import type {
   Process,
   SystemStats,
@@ -6,9 +6,11 @@ import type {
   GpuDevice,
   MonitorSnapshot,
 } from "$lib/types";
+import { searchHasPortQuery } from "$lib/utils";
 import { invoke } from "@tauri-apps/api/core";
 
 interface ProcessStore {
+  portError: string | null;
   resourceHistory: ResourceSample[];
   processes: Process[];
   systemStats: SystemStats | null;
@@ -33,6 +35,7 @@ interface ProcessStore {
 }
 
 const initialState: ProcessStore = {
+  portError: null,
   resourceHistory: [],
   processes: [],
   systemStats: null,
@@ -69,6 +72,7 @@ function createProcessStore() {
     try {
       const result = await invoke<MonitorSnapshot>("get_processes", {
         includeGpu: gpuDetails,
+        includePorts: searchHasPortQuery(get({ subscribe }).searchTerm),
       });
       update((state) => ({
         ...state,
@@ -79,6 +83,7 @@ function createProcessStore() {
         resourceHistory: result.history,
         isFrozen: result.paused,
         error: result.error,
+        portError: result.port_error ?? null,
         selectedProcess: state.selectedProcess
           ? (result.frame.processes.find(
               (p) =>

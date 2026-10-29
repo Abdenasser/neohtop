@@ -37,8 +37,8 @@
       property="og:image"
       content="https://abdenasser.github.io/neohtop/assets/neohtop-desktop.png"
     />
-    <meta property="og:image:width" content="2784" />
-    <meta property="og:image:height" content="2024" />
+    <meta property="og:image:width" content="1280" />
+    <meta property="og:image:height" content="900" />
     <meta
       property="og:image:alt"
       content="NeoHtop desktop system monitor showing process metrics"
@@ -77,6 +77,7 @@
             "url": "https://abdenasser.github.io/neohtop/",
             "description": "Free, open-source desktop system monitor for macOS, Linux, and Windows.",
             "applicationCategory": "UtilitiesApplication",
+            "softwareVersion": "1.3.0",
             "operatingSystem": ["macOS", "Linux", "Windows"],
             "license": "https://github.com/Abdenasser/neohtop/blob/main/LICENSE",
             "isAccessibleForFree": true,
@@ -117,7 +118,7 @@
                 "name": "Does NeoHtop require an account?",
                 "acceptedAnswer": {
                   "@type": "Answer",
-                  "text": "No account or cloud subscription is required for the free local desktop monitor. NeoHtop Pro is in development and is not available to buy or use yet."
+                  "text": "No account or cloud subscription is required for the free local desktop monitor. NeoHtop Pro is postponed and is not available to buy or install."
                 }
               },
               {
@@ -125,7 +126,7 @@
                 "name": "Is the new process Tree view available in downloads?",
                 "acceptedAnswer": {
                   "@type": "Answer",
-                  "text": "Process families with combined CPU and RAM are in development for a future desktop release. The download buttons point only to the latest published GitHub release, which may not include this feature yet."
+                  "text": "Yes. Version 1.3.0 includes expandable process families with combined CPU and RAM. Search retains matching branches and their parents. Older published versions may not contain this feature."
                 }
               },
               {
@@ -172,7 +173,7 @@
           <a href="./#features">Features</a
           ><a href="install.html">Installation</a
           ><a href="desktop-vs-cli.html">Desktop / CLI</a
-          ><a href="./#pro">Pro <span class="tiny-tag">IN DEV</span></a
+          ><a href="./#pro">Pro <span class="tiny-tag">POSTPONED</span></a
           ><a class="nav-github" href="https://github.com/Abdenasser/neohtop"
             >GitHub <span aria-hidden="true">↗</span></a
           >
@@ -229,8 +230,8 @@
           <img
             src="assets/neohtop-desktop.png"
             alt="NeoHtop desktop app showing CPU cores, memory, storage, network activity, and a searchable process table"
-            width="2784"
-            height="2024"
+            width="1280"
+            height="900"
             fetchpriority="high"
           />
           <figcaption>
@@ -289,9 +290,9 @@
             </div>
             <h3>Everything in view.</h3>
             <p>
-              CPU cores, memory, storage, network I/O, and process details. Pin
-              important processes, choose your columns, and set your refresh
-              pace.
+              CPU cores, memory, GPU diagnostics, storage, network I/O, and
+              detailed sheets. Pin important processes, choose your columns, and
+              set your refresh pace.
             </p>
             <span class="feature-note"
               >A dashboard that speaks your language.</span
@@ -304,8 +305,8 @@
             </div>
             <h3>Your terminal energy.<br />Your desktop.</h3>
             <p>
-              Dark, light, and colorful themes, a native window, and a Rust
-              backend. Make it feel like part of your setup.
+              All 24 dark, light, and colorful themes, native process icons, and
+              a Rust backend. Make it feel like part of your setup.
             </p>
             <span class="feature-note"
               >Built with Rust, Tauri, and Svelte.</span
@@ -313,14 +314,14 @@
           </article>
         </div>
         <div class="next-feature">
-          <span class="tag">NEXT DESKTOP RELEASE</span>
+          <span class="tag">NEW IN v1.3.0</span>
           <p>
             <strong>Meet process families.</strong> Expand parent/child trees
-            and see their combined CPU and RAM. In development; not in the
-            current download.
+            and see their combined CPU and RAM. Add local-port search, GPU
+            details and a menu-bar companion to your monitoring workflow.
           </p>
-          <a href="https://github.com/Abdenasser/neohtop/pull/206"
-            >See the work ↗</a
+          <a href="https://github.com/Abdenasser/neohtop/releases/tag/v1.3.0"
+            >Read the changelog ↗</a
           >
         </div>
       </section>
@@ -510,17 +511,16 @@
           /><span>PRO_</span>
         </div>
         <div>
-          <p class="eyebrow">THE NEXT CHAPTER / IN DEVELOPMENT</p>
-          <h2>Beyond your<br />local machine.</h2>
+          <p class="eyebrow">PRO / POSTPONED</p>
+          <h2>Local first.<br />Open source.</h2>
           <p>
-            We’re exploring NeoHtop Pro for developers and small teams who need
-            to understand more than one machine: remote monitoring, history, and
-            alerts.
+            NeoHtop Pro is postponed. Our focus is the free, open-source desktop
+            app and making local monitoring clearer and more useful.
           </p>
           <p class="pro-fineprint">
-            Pro is not available yet. Scope, pricing, and launch date are still
-            being worked out. The free, open-source local monitor stays at the
-            heart of NeoHtop.
+            Pro is not available to buy or install. No scope, price or launch
+            date is announced. All features in v1.3.0 belong to the open-source
+            desktop app.
           </p>
           <a class="button outline" href="https://github.com/Abdenasser/neohtop"
             >Follow development on GitHub ↗</a
@@ -565,8 +565,8 @@
             </summary>
             <p>
               No account or cloud subscription is required for the free local
-              desktop monitor. NeoHtop Pro is in development and is not
-              available to buy or use yet.
+              desktop monitor. NeoHtop Pro is postponed and is not available to
+              buy or install.
             </p>
           </details>
           <details>
@@ -577,10 +577,9 @@
               >
             </summary>
             <p>
-              Process families with combined CPU and RAM are in development for
-              a future desktop release. The download buttons point only to the
-              latest published GitHub release, which may not include this
-              feature yet.
+              Yes. Version 1.3.0 includes expandable process families with
+              combined CPU and RAM. Search retains matching branches and their
+              parents. Older published versions may not contain this feature.
             </p>
           </details>
           <details>

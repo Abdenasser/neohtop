@@ -1,9 +1,10 @@
 [package]
 name = "neohtop"
-version = "1.2.0"
+version = "1.3.0"
 description = "A cross-platform system monitor"
 authors = ["you"]
 edition = "2021"
+rust-version = "1.88"
 
 [build-dependencies]
 tauri-build = { version = "2", features = [] }
@@ -14,6 +15,7 @@ serde_json = "1.0"
 serde = { version = "1.0", features = ["derive", "rc"] }
 tauri = { version = "2.1.1", features = ["macos-private-api", "tray-icon"] }
 sysinfo = { version = "0.35.2", features = ["disk", "multithread", "network", "system"] }
+listeners = "0.6"
 tauri-plugin-shell = "2"
 tauri-plugin-os = "2"
 window-vibrancy = "0.5.2"

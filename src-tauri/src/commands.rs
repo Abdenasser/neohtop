@@ -13,13 +13,31 @@ use tauri::State;
 pub async fn get_processes(
     app: tauri::AppHandle,
     include_gpu: Option<bool>,
+    include_ports: Option<bool>,
 ) -> Result<crate::sampling::Snapshot, String> {
     tauri::async_runtime::spawn_blocking(move || {
         use tauri::Manager;
         let state = app.state::<AppState>();
         let mut hub = state.hub.lock().map_err(|e| e.to_string())?;
         hub.process_gpu = include_gpu.unwrap_or(false);
-        hub.read(&state)
+        let mut snapshot = hub.read(&state)?;
+        drop(hub);
+        if include_ports.unwrap_or(false) {
+            if snapshot.paused {
+                snapshot.port_error = Some("Resume updates to search local ports.".into());
+            } else {
+                match crate::monitoring::collect_ports_by_pid() {
+                    Ok(ports) => {
+                        let frame = std::sync::Arc::make_mut(&mut snapshot.frame);
+                        for process in &mut frame.processes {
+                            process.ports = ports.get(&process.pid).cloned().unwrap_or_default();
+                        }
+                    }
+                    Err(error) => snapshot.port_error = Some(error),
+                }
+            }
+        }
+        Ok(snapshot)
     })
     .await
     .map_err(|e| e.to_string())?

@@ -12,7 +12,12 @@
   import MenuBarOverview from "$lib/components/MenuBarOverview.svelte";
   import { listen, type UnlistenFn } from "@tauri-apps/api/event";
   import { onMount, onDestroy } from "svelte";
-  import { debounce } from "$lib/utils";
+  import {
+    debounce,
+    filterProcesses,
+    sortProcesses,
+    searchHasPortQuery,
+  } from "$lib/utils";
   import {
     StatsBar,
     ToolBar,
@@ -24,7 +29,6 @@
   } from "$lib/components/index";
   import { themeStore, settingsStore, processStore } from "$lib/stores/index";
   import { column_definitions } from "$lib/definitions/columns";
-  import { filterProcesses, sortProcesses } from "$lib/utils";
   import type { Process } from "$lib/types";
   import {
     buildProcessTree,
@@ -36,6 +40,7 @@
     systemStats,
     gpus,
     resourceHistory,
+    portError,
     error,
     searchTerm,
     isLoading,
@@ -60,7 +65,6 @@
   let disposed = false;
   const listeners: UnlistenFn[] = [];
   let intervalId: NodeJS.Timeout;
-  let lastProcessCount = 0;
   let cachedFilteredProcesses: Process[] = [];
   let cachedSortedProcesses: Process[] = [];
   let expandedProcesses = new Set<string>();
@@ -107,25 +111,29 @@
     Object.values(filters).some((filter) => filter.enabled);
 
   // Throttled filtering to reduce CPU usage
-  const debouncedFilter = debounce(() => {
-    cachedFilteredProcesses = filterProcesses(processes, searchTerm, filters);
-  }, 100);
+  const debouncedFilter = debounce(
+    (procs: Process[], term: string, activeFilters: typeof filters) => {
+      cachedFilteredProcesses = filterProcesses(procs, term, activeFilters);
+    },
+    100,
+  );
 
-  // Only recalculate filtering when inputs actually change
-  $: if (
-    processes.length !== lastProcessCount ||
-    searchTerm ||
-    Object.values(filters).some((f) => f.enabled)
-  ) {
-    lastProcessCount = processes.length;
-    debouncedFilter();
-  } else if (
-    processes.length === lastProcessCount &&
-    !searchTerm &&
-    !Object.values(filters).some((f) => f.enabled)
-  ) {
-    // No filters applied, use all processes directly
-    cachedFilteredProcesses = processes;
+  const debouncedPortRefresh = debounce(() => {
+    processStore.getProcesses();
+  }, 150);
+
+  // Recalculate when the process snapshot, search, or filters change
+  $: {
+    if (searchTerm || Object.values(filters).some((f) => f.enabled)) {
+      debouncedFilter(processes, searchTerm, filters);
+    } else {
+      cachedFilteredProcesses = processes;
+    }
+  }
+
+  // Collect sockets as soon as the query becomes a port search, not on the next tick
+  $: if (mounted && !isFrozen && !auxiliary && searchHasPortQuery(searchTerm)) {
+    debouncedPortRefresh();
   }
 
   // Cache sorted results to avoid re-sorting unchanged data
@@ -314,9 +322,12 @@
         {columns}
       />
 
-      {#if error || $settingsStatus.error || $monitoringPreferencesError}
+      {#if error || portError || $settingsStatus.error || $monitoringPreferencesError}
         <div class="alert" role="alert">
-          {error || $settingsStatus.error || $monitoringPreferencesError}
+          {error ||
+            portError ||
+            $settingsStatus.error ||
+            $monitoringPreferencesError}
         </div>
       {/if}
 

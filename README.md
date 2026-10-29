@@ -15,7 +15,7 @@
   <picture>
     <!-- <source media="(prefers-color-scheme: dark)" srcset="screenshot.png">
     <source media="(prefers-color-scheme: light)" srcset="screenshot-light.png"> -->
-    <img alt="NeoHtop Screenshot" src="./screenshot.png" width="800">
+    <img alt="NeoHtop Screenshot" src="./docs/assets/neohtop-desktop.png" width="800">
   </picture>
 </div>
 
@@ -65,6 +65,9 @@
 [Read about the back story and motivation behind NeoHtop](https://www.abdenasser.com/2024/11/06/oh-boy-neohtop/)
 
 ## Features
+
+**[What’s new in v1.3.0](CHANGELOG.md)** · [Desktop guide](docs/usage.md) · [Downloads](https://github.com/Abdenasser/neohtop/releases/latest)
+
 - 🚀 Real-time process monitoring
 - 🌳 Expandable process trees with family CPU/RAM totals and search that keeps matching processes in context
 - 💻 CPU and Memory usage tracking
@@ -78,12 +81,13 @@
 - 🔄 Auto-refresh system stats
 
 ### Search Functionality
-Search for processes by name, command, or PID. Use commas to search for multiple terms simultaneously. Regular expressions are supported for advanced filtering.
+Search for processes by name, command, PID, or port. Use commas to search for multiple terms simultaneously. Regular expressions are supported for advanced filtering.
 
 Examples:
 - `arm, x86`: Returns processes with "arm" or "x86" in the name or command
 - `d$`: Lists daemons (processes ending with 'd')
 - `^(\w+\.)+\w+$`: Shows processes with reverse domain name notation (e.g., com.docker.vmnetd)
+- `:3000` or `port:443`: Processes listening on that local port (TCP listen or UDP). A bare number still matches PID. Socket visibility depends on operating-system permissions; NeoHtop does not request elevation automatically.
 
 ### Process families
 
@@ -114,27 +118,36 @@ zero.
 Support varies by GPU and driver. Missing/denied counters do not require running
 NeoHtop as administrator. There is no bundled GPU driver or monitoring agent.
 
-Click the ghost in the menu bar/system tray, or **Overview** in the toolbar, for
+Click the ghost in the menu bar/system tray, or the **overview icon** in the app bar, for
 CPU, RAM, GPU, network, storage and the five busiest processes. Selecting a process
 opens its inspector in the main window. Both windows share the sampling interval,
 pause state and themes. The overview stops polling while hidden.
 
-**Menu-bar settings**, beside Overview, control the icon and optional monitoring
-after the main window closes. By default, closing the window quits the app.
+**Settings → General** controls the refresh interval, menu-bar icon and optional
+monitoring after the main window closes. Open Settings from the app menu or with
+**⌘,** on macOS (**Ctrl+,** elsewhere). **Settings → Appearance** and the app bar's
+palette button share all 24 themes, including searchable dark and light choices. By default, closing the window quits the app.
 **Quit NeoHtop** always exits. On Linux, tray click handling depends on the desktop;
-use the icon's **Show overview** menu item or the toolbar button when needed.
+use the icon's **Show overview** menu item or the app-bar button when needed.
+
+GPU engine activity per process is optional: enable **GPU %** in **View** or a GPU
+filter. It is available on Linux drivers exposing DRM fdinfo counters; other
+platforms and unreadable counters show a dash. Several engines can exceed 100%;
+this is different from the device's normalized utilization. The first sample
+establishes a baseline. Power and core clock are shown in Graphics details only
+when the installed AMD/NVIDIA driver exposes them.
 
 ## Tech Stack
 - **Frontend**: SvelteKit, TypeScript
 - **Backend**: Rust, Tauri
-- **Styling**: CSS Variables for theming
-- **Icons**: FontAwesome
+- **Styling**: shadcn-svelte, Tailwind CSS 4, and semantic theme tokens
+- **Icons**: Lucide controls, native process icons, and the ghost fallback
 
 ## Getting Started
 
 ### Prerequisites
 - Node.js 22 (see `.nvmrc`)
-- Rust (latest stable)
+- Rust 1.88 or newer (latest stable recommended)
 - Xcode Command Line Tools (for macOS)
 
 ### Installation
@@ -286,9 +299,9 @@ python3 -m http.server 8765 --bind 127.0.0.1 --directory docs
 Open `http://127.0.0.1:8765/`. The HTML contains the product content, navigation,
 FAQ answers, and release-page download links without requiring JavaScript.
 JavaScript resolves only assets from the latest published stable release; API
-failures retain working release-page links. Keep development features and Pro
-clearly separate from published downloads. The app release is deferred while the
-Pro offering is developed; merging code must not be treated as a release launch.
+failures retain working release-page links. Version 1.3.0 brings process families, GPU details, native app icons, resource
+histories, local-port search, the menu-bar companion and Settings to the free
+open-source desktop app. Pro is postponed and is not available to buy or install.
 
 Each public HTML page has a canonical URL, social metadata, structured data,
 and a linked Markdown equivalent. Keep the HTML, Markdown, `llms.txt`, and

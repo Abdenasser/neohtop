@@ -4,9 +4,11 @@
 
 The desktop app and NeoHtop CLI are separate projects. Desktop uses Rust/Tauri/Svelte; CLI uses Go and the Charm ecosystem. Do not infer feature parity between them.
 
-Published desktop binaries are available only through GitHub Releases. The latest published release is authoritative for available packages and shipped features. The default branch includes development work: desktop process trees with family CPU/RAM and build/release compatibility improvements are intended for a future release and may not be present in published downloads.
+NeoHtop v1.3.0 adds a shadcn-svelte desktop refresh retaining all 24 themes, native process icons, process families, explicit local-port search, GPU diagnostics, two-minute in-memory resource histories, detailed resource sheets, a menu-bar/system-tray overview and native Settings/About windows. GPU counters are driver dependent; per-process GPU engine accounting is limited to supported Linux DRM drivers. Missing readings are unavailable, not zero. The app is a local monitor, not a cleaner, firewall, security scanner, AI tool or cloud monitoring service.
 
-NeoHtop Pro is in development. Remote monitoring, historical metrics, and alerts are being explored; final scope, pricing, and launch date are not announced. Pro cannot currently be purchased or installed. The free, open-source local monitor remains the project's foundation.
+Published desktop binaries are available only through GitHub Releases; the latest published release is authoritative for available packages. v1.3.0 packages cover Linux x86_64/ARM64 (deb, rpm, AppImage), macOS Intel/Apple Silicon (DMG), and Windows x64 (NSIS installer). Checksums and a build manifest are attached. Older releases and independently maintained community packages may differ.
+
+NeoHtop Pro is postponed and is not available to purchase or install. No Pro scope, pricing or launch date is announced. The free open-source local monitor remains the focus.
 
 ## Product information
 

@@ -1,6 +1,6 @@
 {
   "name": "neohtop",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "description": "",
   "type": "module",
   "scripts": {
@@ -14,7 +14,7 @@
     "format": "prettier --write ./src ./scripts ./docs .github/workflows && cargo fmt --manifest-path src-tauri/Cargo.toml",
     "format:check": "prettier --check ./src ./scripts ./docs .github/workflows && cargo fmt --manifest-path src-tauri/Cargo.toml -- --check",
     "release:check": "node scripts/release.mjs check-version",
-    "test:release": "node --test scripts/*.test.mjs",
+    "test:release": "node --test scripts/*.test.mjs && npm run test:metrics",
     "prepare": "husky install"
   },
   "license": "MIT",

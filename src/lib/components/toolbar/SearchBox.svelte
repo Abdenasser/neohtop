@@ -13,6 +13,8 @@
     ["^kernel", "Names starting with kernel"],
     ["ssh.*server", "Regular expressions"],
     ["1234", "Find a process ID"],
+    [":3000", "Processes listening on a local port"],
+    ["port:443", "Explicit local TCP listener or UDP port"],
     ["python, node, nginx", "Several runtimes"],
     ["docker, containerd", "Container processes"],
     ["gnome, plasma", "Desktop environments"],
@@ -80,8 +82,8 @@
       ><div>
         <h2 class="text-sm font-medium">Find a process</h2>
         <p class="mt-1 text-xs text-muted-foreground">
-          Search names, commands or PIDs. Comma-separated terms match any term.
-          Name searches also support regular expressions.
+          Search names, commands, PIDs or local ports (:3000). Comma-separated
+          terms match any term. Name searches also support regular expressions.
         </p>
       </div>
       <div class="space-y-1">

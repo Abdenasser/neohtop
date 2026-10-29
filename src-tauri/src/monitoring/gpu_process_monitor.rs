@@ -193,6 +193,7 @@ fn read_process_engine_time(pid: u32) -> Option<u64> {
 fn parse_fdinfo(info: &str) -> Option<(u64, u64)> {
     let mut client_id = None;
     let mut engine_time = 0u64;
+    let mut has_engine = false;
 
     for line in info.lines() {
         let Some((key, value)) = line.split_once(':') else {
@@ -202,19 +203,23 @@ fn parse_fdinfo(info: &str) -> Option<(u64, u64)> {
 
         if key == "drm-client-id" {
             client_id = value.parse().ok();
-        } else if key.starts_with("drm-engine-") && !key.starts_with("drm-engine-capacity-") {
+        } else if key.starts_with("drm-engine-")
+            && !key.starts_with("drm-engine-capacity-")
+            && value.split_whitespace().nth(1) == Some("ns")
+        {
             // Engine lines carry a unit, as in "1693357467 ns"
             if let Some(nanoseconds) = value
                 .split_whitespace()
                 .next()
                 .and_then(|number| number.parse::<u64>().ok())
             {
+                has_engine = true;
                 engine_time = engine_time.saturating_add(nanoseconds);
             }
         }
     }
 
-    client_id.map(|id| (id, engine_time))
+    client_id.filter(|_| has_engine).map(|id| (id, engine_time))
 }
 
 #[cfg(test)]
@@ -248,6 +253,22 @@ mod tests {
     #[test]
     fn test_parse_fdinfo_rejects_non_drm() {
         assert_eq!(parse_fdinfo("pos:\t0\nflags:\t02\n"), None);
+    }
+
+    #[test]
+    fn missing_and_invalid_engine_counters_are_unknown() {
+        assert_eq!(
+            parse_fdinfo("drm-client-id: 3\ndrm-memory-vram: 20 KiB"),
+            None
+        );
+        assert_eq!(
+            parse_fdinfo("drm-client-id: 3\ndrm-engine-gfx: 20 us"),
+            None
+        );
+        assert_eq!(
+            parse_fdinfo("drm-client-id: 3\ndrm-engine-gfx: 0 ns"),
+            Some((3, 0))
+        );
     }
 
     /// The first sample only establishes a baseline, so it reports nothing
