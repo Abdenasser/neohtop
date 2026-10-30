@@ -239,17 +239,6 @@
           >
         </div>
       </aside>
-      <div class="hero-highlights" aria-label="Release highlights">
-        <Badge variant="outline" class="highlight-processes"
-          ><GitBranch />Follow every process</Badge
-        >
-        <Badge variant="outline" class="highlight-gpu"
-          ><Activity />Meet your GPU</Badge
-        >
-        <Badge variant="outline" class="highlight-companion"
-          ><Monitor />Keep it in your menu bar</Badge
-        >
-      </div>
     </section>
     <section
       class="product-stage site-shell-wide"

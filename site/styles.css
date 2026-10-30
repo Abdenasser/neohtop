@@ -135,8 +135,8 @@ nav a:hover,
   font-size: 12px;
 }
 .hero {
-  padding-top: 64px;
-  padding-bottom: 28px;
+  padding-top: 40px;
+  padding-bottom: 20px;
   display: grid;
   grid-template-columns: minmax(0, 1fr) 235px;
   column-gap: 56px;
@@ -167,7 +167,7 @@ nav a:hover,
   margin-inline: 3px;
 }
 h1 {
-  font-size: clamp(64px, 7.6vw, 106px);
+  font-size: clamp(64px, 6.8vw, 96px);
   font-weight: 580;
   line-height: 0.99;
   letter-spacing: -0.045em;
@@ -275,15 +275,6 @@ h2 span {
   line-height: 1.5;
   margin-top: 4px;
 }
-.hero-highlights {
-  grid-column: 1/-1;
-  display: flex;
-  gap: 24px;
-  flex-wrap: wrap;
-  margin-top: 44px;
-  padding-top: 20px;
-  border-top: 1px solid var(--border);
-}
 .hero-highlights [data-slot="badge"] {
   padding: 0;
   border: 0;
@@ -293,15 +284,8 @@ h2 span {
   font-weight: 400;
   color: var(--muted-foreground);
 }
-.hero-highlights svg {
-  width: 14px;
-  height: 14px;
-}
 .highlight-processes svg {
   color: var(--site-blue);
-}
-.highlight-gpu svg {
-  color: var(--site-green);
 }
 .highlight-companion svg {
   color: var(--site-lavender);
@@ -1223,9 +1207,6 @@ h2 span {
   .hero-description {
     max-width: 640px;
   }
-  .hero-highlights {
-    margin-top: 32px;
-  }
   .feature-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -1317,11 +1298,6 @@ h2 span {
   .hero-footnote {
     font-size: 9px;
     gap: 7px;
-  }
-  .hero-highlights {
-    gap: 12px 20px;
-    margin-top: 28px;
-    padding-top: 18px;
   }
   .hero-highlights [data-slot="badge"] {
     font-size: 10px;
@@ -1592,9 +1568,6 @@ h2 span {
   .hero-actions > [data-slot="button"] {
     font-size: 11px;
     padding-inline: 13px;
-  }
-  .hero-highlights {
-    display: none;
   }
   .hero {
     padding-bottom: 28px;
