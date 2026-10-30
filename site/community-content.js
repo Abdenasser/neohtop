@@ -2,8 +2,9 @@
 export const featuredPosts = [
   {
     author: "JoeyBaggaDonuts",
-    account: "haxxusj",
-    url: "https://x.com/haxxusj/status/1854590782684250487",
+    account: "UncleSniggy",
+    avatar: "assets/avatars/UncleSniggy.png",
+    url: "https://x.com/UncleSniggy/status/1854590782684250487",
     lang: "en",
     quote:
       "Neohtop is absolutely beautiful to look at. It's a modern system monitor inspired by htop, providing real-time insights into CPU, memory, disk, and network usage. A work of art!",
@@ -12,6 +13,7 @@ export const featuredPosts = [
   {
     author: "Geek",
     account: "geekbb",
+    avatar: "assets/avatars/geekbb.png",
     url: "https://x.com/geekbb/status/1854081285846888881",
     lang: "zh",
     quote:
@@ -21,6 +23,7 @@ export const featuredPosts = [
   {
     author: "Isao Shimizu",
     account: "isaoshimizu",
+    avatar: "assets/avatars/isaoshimizu.png",
     url: "https://x.com/isaoshimizu/status/1854097990698586584",
     lang: "ja",
     quote:
@@ -30,6 +33,7 @@ export const featuredPosts = [
   {
     author: "فؤاد الفرحان",
     account: "alfarhan",
+    avatar: "assets/avatars/alfarhan.png",
     url: "https://x.com/alfarhan/status/1946875726050762870",
     lang: "ar",
     quote:
@@ -39,6 +43,7 @@ export const featuredPosts = [
   {
     author: "Tw93",
     account: "HiTw93",
+    avatar: "assets/avatars/HiTw93.png",
     url: "https://x.com/HiTw93/status/1861556290474156136",
     lang: "en",
     quote:
@@ -48,6 +53,7 @@ export const featuredPosts = [
   {
     author: "Linux Handbook",
     account: "LinuxHandbook",
+    avatar: "assets/avatars/LinuxHandbook.png",
     url: "https://x.com/LinuxHandbook/status/1872534718899421215",
     lang: "en",
     quote: "NeoHtop: A beautiful GUI system monitor",
@@ -59,6 +65,7 @@ export const morePosts = [
   {
     author: "小弟调调",
     account: "jaywcjlove",
+    avatar: "assets/avatars/jaywcjlove.png",
     url: "https://x.com/jaywcjlove/status/1854089502853357880",
     lang: "zh",
     quote:
@@ -68,6 +75,7 @@ export const morePosts = [
   {
     author: "Nitin",
     account: "gniting",
+    avatar: "assets/avatars/gniting.png",
     url: "https://x.com/gniting/status/1853920938976223463",
     lang: "en",
     quote:
@@ -77,6 +85,7 @@ export const morePosts = [
   {
     author: "Durgesh Gupta",
     account: "ilearnbydoing",
+    avatar: "assets/avatars/ilearnbydoing.png",
     url: "https://x.com/ilearnbydoing/status/1854037593987428754",
     lang: "en",
     quote:
@@ -86,6 +95,7 @@ export const morePosts = [
   {
     author: "Tom Dörr",
     account: "tom_doerr",
+    avatar: "assets/avatars/tom_doerr.png",
     url: "https://x.com/tom_doerr/status/1853861836736881133",
     lang: "zxx",
     quote: null,
@@ -102,6 +112,7 @@ export const morePosts = [
   {
     author: "CodeNewbie",
     account: "CodeNewbies",
+    avatar: "assets/avatars/CodeNewbies.png",
     url: "https://x.com/CodeNewbies/status/1854886849677824003",
     lang: "en",
     quote:
@@ -111,6 +122,7 @@ export const morePosts = [
   {
     author: "Ramón Goeden 🤨",
     account: "websenat",
+    avatar: "assets/avatars/websenat.png",
     url: "https://x.com/websenat/status/1854134191480262993",
     lang: "de",
     quote: "NeoHtop: Ein Systemmonitor für macOS",
@@ -119,6 +131,7 @@ export const morePosts = [
   {
     author: "CaschysBlog",
     account: "CaschysBlog",
+    avatar: "assets/avatars/CaschysBlog.png",
     url: "https://x.com/CaschysBlog/status/1854110661502017689",
     lang: "de",
     quote: "NeoHtop: Ein Systemmonitor für macOS",
@@ -127,6 +140,7 @@ export const morePosts = [
   {
     author: "Hustle Hacker",
     account: "HustleHackerAI",
+    avatar: "assets/avatars/HustleHackerAI.png",
     url: "https://x.com/HustleHackerAI/status/1854352028304040139",
     lang: "en",
     quote:
@@ -136,6 +150,7 @@ export const morePosts = [
   {
     author: "UMERUMA",
     account: "umeruma",
+    avatar: "assets/avatars/umeruma.png",
     url: "https://x.com/umeruma/status/1855209294888902865",
     lang: "ja",
     quote:
@@ -145,6 +160,7 @@ export const morePosts = [
   {
     author: "Micha(el) Bladowski 🇩🇪 🇺🇦",
     account: "michabbb",
+    avatar: "assets/avatars/michabbb.png",
     url: "https://x.com/michabbb/status/1853971838768173409",
     lang: "en",
     quote:

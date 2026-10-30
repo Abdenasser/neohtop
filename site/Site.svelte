@@ -188,33 +188,57 @@
 <main id="main">
   {#if page === "home"}
     <section class="site-shell hero">
-      <Badge variant="outline" class="release-badge"
-        ><span class="status-dot"></span>NeoHtop {releaseSeries}<span
-          class="badge-divider">/</span
-        >GPU + menu bar, now live.<ArrowRight class="size-3" /></Badge
-      >
-      <h1>Your system.<br /><span>In plain sight.</span></h1>
-      <p class="hero-description">
-        A modern system monitor for people who like to look under the hood.<br
-          class="desktop-break"
-        /> Find the process. Follow the spike. Keep the essentials in your menu bar.
-      </p>
-      <div class="hero-actions">
-        <Button href="#download" size="lg" class="hero-download"
-          ><ArrowDown />Download NeoHtop</Button
-        ><Button
-          href={repo}
-          variant="outline"
-          size="lg"
-          target="_blank"
-          rel="noopener noreferrer"><ArrowUpRight />Explore the source</Button
+      <div class="hero-copy">
+        <Badge variant="outline" class="release-badge"
+          ><span class="status-dot"></span>NeoHtop {releaseSeries}<span
+            class="badge-divider">/</span
+          >GPU + menu bar, now live.<ArrowRight class="size-3" /></Badge
         >
+        <h1>Your system.<br /><span>In plain sight.</span></h1>
+        <p class="hero-description">
+          A modern system monitor for people who like to look under the hood.<br
+            class="desktop-break"
+          /> Find the process. Follow the spike. Keep the essentials in your menu
+          bar.
+        </p>
+        <div class="hero-actions">
+          <Button href="#download" size="lg" class="hero-download"
+            ><ArrowDown />Download NeoHtop</Button
+          ><Button
+            href={repo}
+            variant="outline"
+            size="lg"
+            target="_blank"
+            rel="noopener noreferrer"><ArrowUpRight />Explore the source</Button
+          >
+        </div>
+        <p class="hero-footnote">
+          <Check />Free & open source<span>·</span>macOS, Linux & Windows<span
+            >·</span
+          >No account required
+        </p>
       </div>
-      <p class="hero-footnote">
-        <Check />Free & open source<span>·</span>macOS, Linux & Windows<span
-          >·</span
-        >No account required
-      </p>
+      <aside class="hero-aside" aria-label="Inside NeoHtop">
+        <div class="hero-ghost">
+          <img src="assets/neohtop-icon.png" width="56" height="56" alt="" />
+        </div>
+        <p class="hero-aside-title">A better view of<br />what’s running.</p>
+        <div class="hero-aside-item">
+          <Cpu /><span
+            >Every core.<small>CPU, memory & process families</small></span
+          >
+        </div>
+        <div class="hero-aside-item">
+          <Activity /><span
+            >Every spike.<small>GPU & network activity</small></span
+          >
+        </div>
+        <div class="hero-aside-item">
+          <Monitor /><span
+            >One click away.<small>Your menu-bar companion</small></span
+          >
+        </div>
+      </aside>
       <div class="hero-highlights" aria-label="Release highlights">
         <Badge variant="outline" class="highlight-processes"
           ><GitBranch />Follow every process</Badge
@@ -231,8 +255,49 @@
       class="product-stage site-shell-wide"
       aria-label="NeoHtop desktop and menu-bar overview"
     >
+      <div class="preview-toolbar">
+        <span class="preview-label"
+          ><span class="status-dot"></span>THE REAL APP. YOUR KIND OF DESKTOP.</span
+        >
+        <div
+          class="preview-controls"
+          data-preview-controls
+          hidden
+          role="group"
+          aria-label="Preview app screens"
+        >
+          <Button
+            variant="ghost"
+            size="sm"
+            aria-pressed="true"
+            data-preview-src="assets/neohtop-desktop.png"
+            data-preview-alt="NeoHtop in Catppuccin, showing CPU, memory and GPU charts, storage, network and processes"
+            data-preview-caption="Catppuccin. The familiar ghost. A fresh desktop."
+            >Overview</Button
+          >
+          <Button
+            variant="ghost"
+            size="sm"
+            aria-pressed="false"
+            data-preview-src="screenshots/cpu-details.jpg"
+            data-preview-alt="NeoHtop CPU details with per-core activity and utilization history"
+            data-preview-caption="Every core, with a closer look at the details."
+            >CPU details</Button
+          >
+          <Button
+            variant="ghost"
+            size="sm"
+            aria-pressed="false"
+            data-preview-src="screenshots/port-search.jpg"
+            data-preview-alt="NeoHtop finding the process using a local port"
+            data-preview-caption="Find the process behind a port. Try :3000 in the app."
+            >Port search</Button
+          >
+        </div>
+      </div>
       <figure class="desktop-preview">
         <img
+          id="product-preview"
           src="assets/neohtop-desktop.png"
           alt="NeoHtop in Catppuccin, showing CPU, memory and GPU charts, storage, network and processes"
           width="1280"
@@ -240,9 +305,8 @@
           fetchpriority="high"
         />
         <figcaption>
-          <span
-            ><span class="status-dot"></span>Catppuccin. The familiar ghost. A
-            fresh desktop.</span
+          <span data-preview-caption-text
+            >Catppuccin. The familiar ghost. A fresh desktop.</span
           ><a href={`${repo}/blob/main/docs/screenshots/README.md`}
             >More screenshots<ArrowUpRight /></a
           >
@@ -255,8 +319,11 @@
           height="630"
           alt="The NeoHtop ghost icon in the macOS menu bar with its rounded resource overview open"
         />
-        <figcaption>A whole monitor in your menu bar.</figcaption>
+        <figcaption>
+          <span class="status-dot"></span>A whole monitor in your menu bar.
+        </figcaption>
       </figure>
+      <span class="sr-only" role="status" data-preview-status></span>
     </section>
     <section
       class="site-shell platform-line"
@@ -324,7 +391,7 @@
     </section>
     <section id="features" class="site-shell section-block">
       <div class="section-heading">
-        <p class="eyebrow">A CLOSER LOOK</p>
+        <p class="eyebrow">01 / UNDER THE HOOD</p>
         <h2>Follow your curiosity.<br /><span>Find what’s going on.</span></h2>
         <p>
           From a busy core to the process behind it. One clear place to explore
@@ -332,16 +399,19 @@
         </p>
       </div>
       <div class="feature-grid">
-        {#each features as feature}<Card.Root
+        {#each features as feature, index}<Card.Root
             class="feature-card"
             size="sm"
             style={`--feature-color:${feature.color}`}
             ><Card.Header
-              ><span
-                class="feature-icon"
-                style={`--feature-color:${feature.color}`}
-                ><feature.icon class="size-5" /></span
-              ><Card.Title>{feature.title}</Card.Title></Card.Header
+              ><div class="feature-card-top">
+                <span
+                  class="feature-icon"
+                  style={`--feature-color:${feature.color}`}
+                  ><feature.icon class="size-5" /></span
+                ><span class="feature-order">0{index + 1}</span>
+              </div>
+              <Card.Title>{feature.title}</Card.Title></Card.Header
             ><Card.Content
               ><p>{feature.text}</p>
               <span class="feature-detail">{feature.detail}</span></Card.Content
@@ -351,7 +421,7 @@
     </section>
     <section class="site-shell section-block resource-section">
       <div class="section-heading">
-        <p class="eyebrow">THE NUMBER IS JUST THE START</p>
+        <p class="eyebrow">02 / GO A LITTLE DEEPER</p>
         <h2>Open a card.<br /><span>Get the useful details.</span></h2>
         <p>
           Explore individual cores, inspect a short history and follow the
@@ -393,6 +463,7 @@
       <Card.Root class="theme-card"
         ><Card.Content class="theme-content"
           ><div class="theme-copy">
+            <p class="eyebrow">03 / MAKE IT YOURS</p>
             <Badge variant="outline"><Palette />24 original themes</Badge>
             <h2>Still your setup.<br /><span>Still your atmosphere.</span></h2>
             <p>
@@ -428,9 +499,24 @@
       <Card.Root size="sm" class="testimonial-card">
         <Card.Content>
           <div class="post-author">
-            <div class="author-avatar" aria-hidden="true">
-              {post.author.slice(0, 1)}
-            </div>
+            <a
+              class="author-avatar"
+              href={`https://x.com/${post.account}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={`View @${post.account} on X`}
+            >
+              <span aria-hidden="true">{post.author.slice(0, 1)}</span>
+              {#if post.avatar}<img
+                  src={post.avatar}
+                  width="44"
+                  height="44"
+                  alt=""
+                  loading="lazy"
+                  decoding="async"
+                  data-profile-avatar
+                />{/if}
+            </a>
             <div>
               <h3>{post.author}</h3>
               <a
@@ -469,9 +555,9 @@
       aria-labelledby="testimonials-heading"
     >
       <div class="section-heading">
-        <p class="eyebrow">FROM THE COMMUNITY</p>
+        <p class="eyebrow">04 / GOOD COMPANY</p>
         <h2 id="testimonials-heading">
-          You shared it.<br /><span>You made it travel.</span>
+          The ghost gets around.<br /><span>Thanks to you.</span>
         </h2>
         <p>
           Real posts from people who found NeoHtop, tried it and passed it on.
@@ -491,10 +577,17 @@
           {#each morePosts as post}{@render communityPost(post)}{/each}
         </div>
       </details>
+      <p class="community-credits">
+        Profile photos via <a
+          href="https://unavatar.io"
+          target="_blank"
+          rel="noopener noreferrer">Unavatar</a
+        >. Posts link to their original authors on X.
+      </p>
     </section>
     <section id="download" class="site-shell section-block download-section">
       <div class="section-heading">
-        <p class="eyebrow">MAKE YOURSELF AT HOME</p>
+        <p class="eyebrow">05 / YOUR NEXT DOWNLOAD</p>
         <h2>Meet your next<br /><span>favorite desktop utility.</span></h2>
         <p>
           Free, local and open source. Choose your system and get a clearer

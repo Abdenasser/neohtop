@@ -196,3 +196,33 @@ if (document.querySelector("[data-community-stat]")) {
     })
     .catch(() => {});
 }
+
+// Progressive enhancement: the real desktop screenshot remains useful without
+// JavaScript; the shadcn buttons let visitors inspect two more shipped screens.
+const preview = document.getElementById("product-preview");
+const previewControls = document.querySelector("[data-preview-controls]");
+if (preview && previewControls) {
+  previewControls.hidden = false;
+  for (const button of previewControls.querySelectorAll("[data-preview-src]")) {
+    button.addEventListener("click", () => {
+      preview.src = button.dataset.previewSrc;
+      preview.alt = button.dataset.previewAlt;
+      for (const item of previewControls.querySelectorAll("[aria-pressed]"))
+        item.setAttribute("aria-pressed", String(item === button));
+      document.querySelector("[data-preview-caption-text]").textContent =
+        button.dataset.previewCaption;
+      document.querySelector("[data-preview-status]").textContent =
+        `Showing ${button.textContent.trim()} screenshot.`;
+    });
+  }
+}
+
+// Local copies avoid third-party image requests. Keep a quiet initials fallback
+// if an image is missing or blocked, including when the request fails early.
+for (const avatar of document.querySelectorAll("[data-profile-avatar]")) {
+  const fallback = () => {
+    avatar.hidden = true;
+  };
+  avatar.addEventListener("error", fallback, { once: true });
+  if (avatar.complete && avatar.naturalWidth === 0) fallback();
+}
