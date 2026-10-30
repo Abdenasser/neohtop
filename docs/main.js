@@ -1,4 +1,5 @@
 import { resolveDownloadAssets, selectPublishedRelease } from "./downloads.js";
+import { refreshCommunityStats } from "./community.js";
 import releaseSnapshot from "./release.json" with { type: "json" };
 
 document.documentElement.classList.add("js");
@@ -165,4 +166,33 @@ for (const link of document.querySelectorAll(".download-button")) {
       });
     }
   });
+}
+
+// The static HTML already shows the checked snapshot. A failed source never
+// clears it or prevents the other sources from refreshing.
+if (document.querySelector("[data-community-stat]")) {
+  void refreshCommunityStats()
+    .then(({ stats }) => {
+      const numbers = new Intl.NumberFormat("en");
+      const dates = new Intl.DateTimeFormat("en", {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+        timeZone: "UTC",
+      });
+      for (const [source, stat] of Object.entries(stats)) {
+        const value = document.querySelector(
+          `[data-community-stat="${source}"]`,
+        );
+        const updated = document.querySelector(
+          `[data-stat-updated="${source}"]`,
+        );
+        if (value) value.textContent = numbers.format(stat.value);
+        if (updated) {
+          updated.setAttribute("datetime", stat.updatedAt);
+          updated.textContent = `Updated ${dates.format(new Date(stat.updatedAt))}`;
+        }
+      }
+    })
+    .catch(() => {});
 }

@@ -21,6 +21,12 @@ GPU support varies by driver, and operating-system permissions can restrict proc
 
 [Published GitHub releases](https://github.com/Abdenasser/neohtop/releases/latest) are authoritative for stable binaries and architectures. Older versions do not include all v1.3.0 features and may lack ARM64 Linux packages or a Windows installer. Community packages can update on a separate schedule.
 
+## Community and public download statistics
+
+The website shows separate public counters for GitHub desktop package downloads (all published releases), Homebrew cask installs (past 365 days), and the separate `neohtop-cli` npm package (past year). Sources use different time periods, can overlap, and do not count unique users. Arch, Fedora, Scoop and Solus packages are not included in these counters. A checked snapshot remains visible if live statistics are unavailable.
+
+[See the community posts](https://abdenasser.github.io/neohtop/#testimonials), with original-language excerpts and links to the original X posts. These are dated community reactions, not reviews of the latest version or paid endorsements.
+
 ## NeoHtop Pro
 
 Pro is postponed and is not available to purchase or install. The current release focuses on the free, open-source local desktop monitor. No Pro scope, price or launch date is announced.

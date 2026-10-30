@@ -22,11 +22,52 @@
     Terminal,
     ArrowRight,
     ShieldCheck,
+    Download,
+    Package,
+    ChevronDown,
   } from "@lucide/svelte";
   import { faq } from "./content.js";
+  import { featuredPosts, morePosts } from "./community-content.js";
+  import communityStats from "../docs/community-stats.json";
   import publishedRelease from "../docs/release.json";
   import { resolveDownloadAssets } from "../docs/downloads.js";
   export let page = "home";
+  const dateFormat = new Intl.DateTimeFormat("en", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+    timeZone: "UTC",
+  });
+  const numberFormat = new Intl.NumberFormat("en");
+  const distributionStats = [
+    {
+      id: "github",
+      title: "GitHub downloads",
+      period: "Desktop · all published releases",
+      icon: Download,
+      color: "var(--site-blue)",
+      href: "https://github.com/Abdenasser/neohtop/releases",
+      source: "GitHub Releases",
+    },
+    {
+      id: "homebrew",
+      title: "Homebrew installs",
+      period: "Desktop cask · past 365 days",
+      icon: Package,
+      color: "var(--site-green)",
+      href: "https://formulae.brew.sh/cask/neohtop",
+      source: "Homebrew analytics",
+    },
+    {
+      id: "npm",
+      title: "npm downloads",
+      period: "Separate CLI · past year",
+      icon: Terminal,
+      color: "var(--site-mauve)",
+      href: "https://www.npmjs.com/package/neohtop-cli",
+      source: "neohtop-cli on npm",
+    },
+  ];
   const repo = "https://github.com/Abdenasser/neohtop";
   const release = `${repo}/releases/latest`;
   const releaseTag = publishedRelease.tag_name;
@@ -133,9 +174,11 @@
     >
     <nav aria-label="Main navigation">
       <a href="./#features">Features</a><a href="./#themes">Themes</a><a
-        href="install.html">Install</a
-      ><a href={`${repo}/blob/main/CHANGELOG.md`}
-        >Changelog<ArrowUpRight class="size-3" /></a
+        href="./#testimonials"
+        class="community-nav">Community</a
+      ><a href="install.html">Install</a><a
+        href={`${repo}/blob/main/CHANGELOG.md`}
+        class="changelog-nav">Changelog<ArrowUpRight class="size-3" /></a
       >
     </nav>
     <Button href="./#download" size="sm"><ArrowDown />Download</Button>
@@ -225,6 +268,59 @@
         href={`${repo}/blob/main/LICENSE`}
         ><ShieldCheck />Open source. Always yours.</a
       >
+    </section>
+    <section
+      id="downloads-stats"
+      class="site-shell section-block stats-section"
+      aria-labelledby="stats-heading"
+    >
+      <div class="section-heading">
+        <p class="eyebrow">OUT IN THE WORLD</p>
+        <h2 id="stats-heading">
+          From this repo.<br /><span>To desktops everywhere.</span>
+        </h2>
+        <p>
+          Find NeoHtop on GitHub and in your package manager. Here’s what the
+          public counters report.
+        </p>
+      </div>
+      <div class="stats-grid">
+        {#each distributionStats as stat}
+          <Card.Root
+            size="sm"
+            class="stat-card"
+            style={`--stat-color:${stat.color}`}
+          >
+            <Card.Content>
+              <div class="stat-label">
+                <stat.icon class="size-4" />
+                <h3>{stat.title}</h3>
+              </div>
+              <p class="stat-value" data-community-stat={stat.id}>
+                {numberFormat.format(communityStats[stat.id].value)}
+              </p>
+              <p class="stat-period">{stat.period}</p>
+              <div class="stat-source">
+                <a href={stat.href} target="_blank" rel="noopener noreferrer"
+                  >{stat.source}<ArrowUpRight class="size-3" /></a
+                ><time
+                  data-stat-updated={stat.id}
+                  datetime={communityStats[stat.id].updatedAt}
+                  >Checked {dateFormat.format(
+                    new Date(communityStats[stat.id].updatedAt),
+                  )}</time
+                >
+              </div>
+            </Card.Content>
+          </Card.Root>
+        {/each}
+      </div>
+      <p class="section-note">
+        Downloads and reported installs, not unique users. Sources cover
+        different periods and can overlap, so we keep them separate. Community
+        packages for Arch, Fedora, Scoop and Solus aren’t included in these
+        counts.
+      </p>
     </section>
     <section id="features" class="site-shell section-block">
       <div class="section-heading">
@@ -327,6 +423,74 @@
           </figure></Card.Content
         ></Card.Root
       >
+    </section>
+    {#snippet communityPost(post)}
+      <Card.Root size="sm" class="testimonial-card">
+        <Card.Content>
+          <div class="post-author">
+            <div class="author-avatar" aria-hidden="true">
+              {post.author.slice(0, 1)}
+            </div>
+            <div>
+              <h3>{post.author}</h3>
+              <a
+                href={`https://x.com/${post.account}`}
+                target="_blank"
+                rel="noopener noreferrer">@{post.account}</a
+              >
+            </div>
+            <span class="post-platform" aria-label="Posted on X">𝕏</span>
+          </div>
+          {#if post.quote}<blockquote
+              lang={post.lang}
+              dir={post.lang === "ar" ? "rtl" : "auto"}
+            >
+              {post.quote}
+            </blockquote>{:else}<p class="shared-post">
+              Shared NeoHtop with their community.
+            </p>{/if}
+          <div class="post-footer">
+            <time datetime={post.date}
+              >{dateFormat.format(new Date(`${post.date}T00:00:00Z`))}</time
+            ><a
+              href={post.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={`Read the original post by @${post.account}`}
+              >Read on X<ArrowUpRight class="size-3" /></a
+            >
+          </div>
+        </Card.Content>
+      </Card.Root>
+    {/snippet}
+    <section
+      id="testimonials"
+      class="site-shell section-block testimonials-section"
+      aria-labelledby="testimonials-heading"
+    >
+      <div class="section-heading">
+        <p class="eyebrow">FROM THE COMMUNITY</p>
+        <h2 id="testimonials-heading">
+          You shared it.<br /><span>You made it travel.</span>
+        </h2>
+        <p>
+          Real posts from people who found NeoHtop, tried it and passed it on.
+          In their own words, with a link to every original.
+        </p>
+      </div>
+      <div class="testimonial-grid">
+        {#each featuredPosts as post}{@render communityPost(post)}{/each}
+      </div>
+      <details class="more-community-posts">
+        <summary
+          >More from the community<span class="community-count"
+            >{morePosts.length} posts</span
+          ><ChevronDown class="size-4" /></summary
+        >
+        <div class="testimonial-grid">
+          {#each morePosts as post}{@render communityPost(post)}{/each}
+        </div>
+      </details>
     </section>
     <section id="download" class="site-shell section-block download-section">
       <div class="section-heading">

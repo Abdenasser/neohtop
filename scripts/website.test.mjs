@@ -102,10 +102,17 @@ test("downloads work without JavaScript and AI references do not advertise an av
     for (const match of content.matchAll(
       /https:\/\/abdenasser\.github\.io\/neohtop\/([^\s)]+)/g,
     )) {
+      const [resource, fragment] = match[1].split("#");
+      const target = resource || "index.html";
       assert.ok(
-        fs.existsSync(path.join(root, match[1])),
-        `${file}: missing ${match[1]}`,
+        fs.existsSync(path.join(root, target)),
+        `${file}: missing ${target}`,
       );
+      if (fragment && target.endsWith(".html"))
+        assert.ok(
+          read(target).includes(`id="${fragment}"`),
+          `${file}: missing fragment ${match[1]}`,
+        );
     }
   }
   assert.ok(fs.existsSync(path.join(root, ".nojekyll")));
@@ -132,4 +139,42 @@ test("published downloads and their version are available before JavaScript exec
     assert.ok(script, `${file}: runtime must use a content hash`);
     assert.ok(fs.existsSync(path.join(root, script[1])));
   }
+});
+
+test("public distribution counters render without JavaScript, with separate sources and periods", () => {
+  const html = read("index.html");
+  const snapshot = JSON.parse(read("community-stats.json"));
+  for (const [source, stat] of Object.entries(snapshot)) {
+    assert.ok(Number.isSafeInteger(stat.value) && stat.value >= 0);
+    assert.ok(!Number.isNaN(Date.parse(stat.updatedAt)));
+    const value = html.match(
+      new RegExp(`data-community-stat="${source}"[^>]*>([^<]+)`),
+    )?.[1];
+    assert.equal(value?.trim(), new Intl.NumberFormat("en").format(stat.value));
+  }
+  assert.ok(html.includes("https://formulae.brew.sh/cask/neohtop"));
+  assert.ok(html.includes("https://www.npmjs.com/package/neohtop-cli"));
+  assert.ok(html.includes("Desktop · all published releases"));
+  assert.ok(html.includes("Desktop cask · past 365 days"));
+  assert.ok(html.includes("Separate CLI · past year"));
+  assert.ok(html.includes("not unique users"));
+});
+
+test("original community posts remain readable and linked when X widgets are blocked", async () => {
+  const { featuredPosts, morePosts } = await import(
+    "../site/community-content.js"
+  );
+  const posts = [...featuredPosts, ...morePosts];
+  const html = read("index.html");
+  assert.equal(posts.length, 17);
+  assert.equal(new Set(posts.map((post) => post.url)).size, posts.length);
+  for (const post of posts) {
+    assert.ok(html.includes(`href="${post.url}"`), post.account);
+    assert.ok(html.includes(`@${post.account}`), post.account);
+  }
+  assert.ok(html.includes('id="testimonials"'));
+  assert.ok(html.includes('href="./#testimonials"'));
+  assert.ok(html.includes('dir="rtl"'));
+  assert.ok(!html.includes("platform.twitter.com/widgets.js"));
+  assert.ok(html.includes("More from the community"));
 });

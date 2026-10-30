@@ -17,7 +17,8 @@
     "test:release": "node --test scripts/*.test.mjs && npm run test:metrics",
     "prepare": "husky install",
     "build:site": "node scripts/build-site.mjs",
-    "refresh:site-release": "node scripts/refresh-site-release.mjs"
+    "refresh:site-release": "node scripts/refresh-site-release.mjs",
+    "refresh:site-stats": "node scripts/refresh-site-stats.mjs"
   },
   "license": "MIT",
   "dependencies": {
