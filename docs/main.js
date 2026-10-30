@@ -226,3 +226,71 @@ for (const avatar of document.querySelectorAll("[data-profile-avatar]")) {
   avatar.addEventListener("error", fallback, { once: true });
   if (avatar.complete && avatar.naturalWidth === 0) fallback();
 }
+
+// Decorative animation is optional, respects the OS, and sleeps off screen.
+const motionToggle = document.querySelector("[data-motion-toggle]");
+if (motionToggle) {
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+  let motionChoice = null;
+  try {
+    const saved = localStorage.getItem("neohtop-site-motion");
+    if (saved === "on" || saved === "off") motionChoice = saved;
+  } catch {}
+  function updateAmbientMotion() {
+    const enabled =
+      motionChoice === "on" ||
+      (motionChoice !== "off" && !reducedMotion.matches);
+    document.documentElement.dataset.motion = enabled ? "on" : "off";
+    if (motionChoice === "on")
+      document.documentElement.dataset.motionOverride = "on";
+    else delete document.documentElement.dataset.motionOverride;
+    motionToggle.hidden = false;
+    motionToggle.setAttribute("aria-pressed", String(enabled));
+    motionToggle.title = enabled
+      ? "Pause ambient animation"
+      : reducedMotion.matches && motionChoice === null
+        ? "Enable motion for this site; your system reduced-motion setting stays unchanged"
+        : "Resume ambient animation";
+    motionToggle.querySelector("[data-motion-copy]").textContent = enabled
+      ? "Motion on"
+      : "Motion off";
+    motionToggle.querySelector("[data-motion-playing]").hidden = !enabled;
+    motionToggle.querySelector("[data-motion-paused]").hidden = enabled;
+  }
+  motionToggle.addEventListener("click", () => {
+    motionChoice =
+      document.documentElement.dataset.motion === "on" ? "off" : "on";
+    try {
+      localStorage.setItem("neohtop-site-motion", motionChoice);
+    } catch {}
+    updateAmbientMotion();
+  });
+  reducedMotion.addEventListener("change", updateAmbientMotion);
+  function updatePageVisibility() {
+    document.documentElement.classList.toggle(
+      "page-hidden",
+      document.visibilityState !== "visible",
+    );
+  }
+  document.addEventListener("visibilitychange", updatePageVisibility);
+  const animated = [
+    ...document.querySelectorAll(
+      "[data-ambient], .hero h1 span, .section-heading h2 span, .theme-copy h2 span",
+    ),
+  ];
+  for (const element of animated)
+    if (element.matches("h1 span, h2 span"))
+      element.classList.add("animated-title");
+  if ("IntersectionObserver" in window) {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries)
+          entry.target.classList.toggle("is-in-view", entry.isIntersecting);
+      },
+      { threshold: 0.05 },
+    );
+    for (const element of animated) observer.observe(element);
+  } else for (const element of animated) element.classList.add("is-in-view");
+  updatePageVisibility();
+  updateAmbientMotion();
+}

@@ -25,6 +25,8 @@
     Download,
     Package,
     ChevronDown,
+    Pause,
+    Play,
   } from "@lucide/svelte";
   import { faq } from "./content.js";
   import { featuredPosts, morePosts } from "./community-content.js";
@@ -187,13 +189,50 @@
 
 <main id="main">
   {#if page === "home"}
+    <div class="cyber-atmosphere" data-ambient aria-hidden="true">
+      <div class="ambient-grid ambient-motion"></div>
+      <div class="ambient-glow glow-cyan ambient-motion"></div>
+      <div class="ambient-glow glow-blue ambient-motion"></div>
+      <div class="ambient-scan ambient-motion"></div>
+      <svg
+        class="ambient-circuit"
+        viewBox="0 0 1600 1200"
+        preserveAspectRatio="xMidYMin slice"
+        fill="none"
+      >
+        <path
+          class="circuit-track"
+          d="M1250 0v110l-90 90v165l130 130v185l-85 85v170l100 100v165M220 0v210l90 90v190l-135 135v245l85 85v245"
+        />
+        <path
+          class="circuit-current ambient-motion"
+          pathLength="100"
+          d="M1250 0v110l-90 90v165l130 130v185l-85 85v170l100 100v165"
+        />
+        <path
+          class="circuit-current current-left ambient-motion"
+          pathLength="100"
+          d="M220 0v210l90 90v190l-135 135v245l85 85v245"
+        />
+        <path
+          class="electric-arc ambient-motion"
+          d="M1430 80l-46 108 34-8-74 146 44-18-67 128M145 320l32 86-23-8 51 109-30-10 46 96"
+        />
+      </svg>
+    </div>
     <section class="site-shell hero">
       <div class="hero-copy">
-        <Badge variant="outline" class="release-badge"
-          ><span class="status-dot"></span>NeoHtop {releaseSeries}<span
-            class="badge-divider">/</span
-          >GPU + menu bar, now live.<ArrowRight class="size-3" /></Badge
+        <a
+          href={publishedRelease.html_url}
+          class="release-link"
+          aria-label={`Read the NeoHtop ${releaseSeries} release notes`}
         >
+          <Badge variant="outline" class="release-badge"
+            >NeoHtop {releaseSeries}<span class="badge-divider">//</span><span
+              class="release-detail">Free & open source</span
+            ><ArrowRight class="size-3" /></Badge
+          >
+        </a>
         <h1>Your system.<br /><span>In plain sight.</span></h1>
         <p class="hero-description">
           A modern system monitor for people who like to look under the hood.<br
@@ -218,70 +257,84 @@
           >No account required
         </p>
       </div>
-      <aside class="hero-aside" aria-label="Inside NeoHtop">
-        <div class="hero-ghost">
-          <img src="assets/neohtop-icon.png" width="56" height="56" alt="" />
+      <div class="hero-aside" aria-hidden="true">
+        <div class="hero-ghost" data-ambient>
+          <img
+            src="assets/neohtop-icon.png"
+            width="460"
+            height="460"
+            alt=""
+            style="mask-image: url('assets/neohtop-icon.png'); mask-mode: luminance; mask-size: 100% 100%;"
+          />
         </div>
-        <p class="hero-aside-title">A better view of<br />what’s running.</p>
-        <div class="hero-aside-item">
-          <Cpu /><span
-            >Every core.<small>CPU, memory & process families</small></span
-          >
-        </div>
-        <div class="hero-aside-item">
-          <Activity /><span
-            >Every spike.<small>GPU & network activity</small></span
-          >
-        </div>
-        <div class="hero-aside-item">
-          <Monitor /><span
-            >One click away.<small>Your menu-bar companion</small></span
-          >
-        </div>
-      </aside>
+      </div>
     </section>
     <section
-      class="product-stage site-shell-wide"
+      class="product-stage site-shell-wide light-edge"
+      data-ambient
       aria-label="NeoHtop desktop and menu-bar overview"
     >
+      <svg class="edge-light" aria-hidden="true" fill="none">
+        <rect class="edge-trail ambient-motion" pathLength="100" />
+        <rect class="edge-comet ambient-motion" pathLength="100" />
+      </svg>
       <div class="preview-toolbar">
         <span class="preview-label"
           ><span class="status-dot"></span>THE REAL APP. YOUR KIND OF DESKTOP.</span
         >
-        <div
-          class="preview-controls"
-          data-preview-controls
-          hidden
-          role="group"
-          aria-label="Preview app screens"
-        >
+        <div class="preview-actions">
+          <div
+            class="preview-controls"
+            data-preview-controls
+            hidden
+            role="group"
+            aria-label="Preview app screens"
+          >
+            <Button
+              variant="ghost"
+              size="sm"
+              aria-pressed="true"
+              data-preview-src="assets/neohtop-desktop.png"
+              data-preview-alt="NeoHtop in Catppuccin, showing CPU, memory and GPU charts, storage, network and processes"
+              data-preview-caption="Catppuccin. The familiar ghost. A fresh desktop."
+              >Overview</Button
+            >
+            <Button
+              variant="ghost"
+              size="sm"
+              aria-pressed="false"
+              data-preview-src="screenshots/cpu-details.jpg"
+              data-preview-alt="NeoHtop CPU details with per-core activity and utilization history"
+              data-preview-caption="Every core, with a closer look at the details."
+              >CPU details</Button
+            >
+            <Button
+              variant="ghost"
+              size="sm"
+              aria-pressed="false"
+              data-preview-src="screenshots/port-search.jpg"
+              data-preview-alt="NeoHtop finding the process using a local port"
+              data-preview-caption="Find the process behind a port. Try :3000 in the app."
+              >Port search</Button
+            >
+          </div>
           <Button
             variant="ghost"
             size="sm"
+            class="motion-toggle"
+            data-motion-toggle
+            hidden
+            aria-label="Ambient animation"
             aria-pressed="true"
-            data-preview-src="assets/neohtop-desktop.png"
-            data-preview-alt="NeoHtop in Catppuccin, showing CPU, memory and GPU charts, storage, network and processes"
-            data-preview-caption="Catppuccin. The familiar ghost. A fresh desktop."
-            >Overview</Button
+            title="Pause ambient animation"
           >
-          <Button
-            variant="ghost"
-            size="sm"
-            aria-pressed="false"
-            data-preview-src="screenshots/cpu-details.jpg"
-            data-preview-alt="NeoHtop CPU details with per-core activity and utilization history"
-            data-preview-caption="Every core, with a closer look at the details."
-            >CPU details</Button
-          >
-          <Button
-            variant="ghost"
-            size="sm"
-            aria-pressed="false"
-            data-preview-src="screenshots/port-search.jpg"
-            data-preview-alt="NeoHtop finding the process using a local port"
-            data-preview-caption="Find the process behind a port. Try :3000 in the app."
-            >Port search</Button
-          >
+            <span data-motion-copy>Motion on</span><span
+              data-motion-playing
+              aria-hidden="true"><Pause class="size-3" /></span
+            ><span data-motion-paused hidden aria-hidden="true"
+              ><Play class="size-3" /></span
+            >
+          </Button>
         </div>
       </div>
       <figure class="desktop-preview">
@@ -449,12 +502,15 @@
       </p>
     </section>
     <section id="themes" class="site-shell section-block">
-      <Card.Root class="theme-card"
-        ><Card.Content class="theme-content"
+      <Card.Root class="theme-card light-edge" data-ambient
+        ><svg class="edge-light" aria-hidden="true" fill="none">
+          <rect class="edge-trail ambient-motion" pathLength="100" />
+          <rect class="edge-comet ambient-motion" pathLength="100" />
+        </svg><Card.Content class="theme-content"
           ><div class="theme-copy">
             <p class="eyebrow">03 / MAKE IT YOURS</p>
             <Badge variant="outline"><Palette />24 original themes</Badge>
-            <h2>Still your setup.<br /><span>Still your atmosphere.</span></h2>
+            <h2>24 themes.<br /><span>Still yours.</span></h2>
             <p>
               Catppuccin, front and center. Light, dark, colorful and retro when
               you want a change. The themes you love, with consistent controls
