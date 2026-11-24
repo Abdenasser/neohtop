@@ -3,6 +3,8 @@
 //! This module handles collection and monitoring of system-wide statistics
 //! including CPU, memory, network, and disk usage.
 
+#[cfg(target_os = "macos")]
+use super::MemoryPressure;
 use super::{InterfaceDetails, ResourceDetails, SystemIdentity, SystemStats, VolumeDetails};
 use std::collections::BTreeMap;
 use std::fmt::Debug;
@@ -99,6 +101,8 @@ impl SystemMonitor {
             memory_free: sys.total_memory() - sys.used_memory(),
             memory_cached: sys.total_memory()
                 - (sys.used_memory() + (sys.total_memory() - sys.used_memory())),
+            #[cfg(target_os = "macos")]
+            memory_pressure: read_memory_pressure(),
             uptime: System::uptime(),
             load_avg: [load_average.one, load_average.five, load_average.fifteen],
             network_rx_bytes: network_rx,
@@ -165,6 +169,38 @@ impl SystemMonitor {
     }
 }
 
+#[cfg(target_os = "macos")]
+fn read_memory_pressure() -> Option<MemoryPressure> {
+    let mut flags = 0_u32;
+    let mut length = std::mem::size_of_val(&flags);
+    // SAFETY: The output buffer is writable and its size is supplied to sysctl.
+    // A null input buffer makes this a read-only request.
+    let result = unsafe {
+        libc::sysctlbyname(
+            c"kern.memorystatus_vm_pressure_level".as_ptr(),
+            std::ptr::from_mut(&mut flags).cast(),
+            &mut length,
+            std::ptr::null_mut(),
+            0,
+        )
+    };
+    if result != 0 || length != std::mem::size_of_val(&flags) {
+        return None;
+    }
+    decode_memory_pressure(flags)
+}
+
+#[cfg(target_os = "macos")]
+fn decode_memory_pressure(flags: u32) -> Option<MemoryPressure> {
+    // The sysctl returns NOTE_MEMORYSTATUS_PRESSURE_* flags from XNU's event_private.h.
+    match flags {
+        0x1 => Some(MemoryPressure::Normal),
+        0x2 => Some(MemoryPressure::Warning),
+        0x4 => Some(MemoryPressure::Critical),
+        _ => None,
+    }
+}
+
 fn rate_total(mut rates: impl Iterator<Item = Option<u64>>) -> Option<u64> {
     let first = rates.next()??;
     rates.try_fold(first, |total, value| Some(total.saturating_add(value?)))
@@ -198,6 +234,23 @@ fn interface_rates(
 mod tests {
     use super::*;
     use sysinfo::System;
+
+    #[cfg(target_os = "macos")]
+    #[test]
+    fn decodes_macos_memory_pressure_flags() {
+        for (flags, json) in [
+            (0x1, "\"normal\""),
+            (0x2, "\"warning\""),
+            (0x4, "\"critical\""),
+            (0x0, "null"),
+            (0x3, "null"),
+        ] {
+            assert_eq!(
+                serde_json::to_string(&decode_memory_pressure(flags)).unwrap(),
+                json
+            );
+        }
+    }
 
     #[test]
     fn counter_resets_are_unknown_not_underflows() {

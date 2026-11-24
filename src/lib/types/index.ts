@@ -57,6 +57,7 @@ export interface SystemStats {
   memory_used: number;
   memory_free: number;
   memory_cached: number;
+  memory_pressure?: "normal" | "warning" | "critical" | null;
   uptime: number;
   load_avg: [number, number, number];
   network_rx_bytes: number | null;

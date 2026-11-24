@@ -92,6 +92,15 @@ pub struct ProcessInfo {
     pub ports: Vec<u16>,
 }
 
+#[cfg(target_os = "macos")]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize)]
+#[serde(rename_all = "snake_case")]
+pub enum MemoryPressure {
+    Normal,
+    Warning,
+    Critical,
+}
+
 /// System-wide statistics exposed to the frontend
 /// Provides overall system resource usage and performance metrics
 #[derive(Clone, Serialize, Debug)]
@@ -107,6 +116,8 @@ pub struct SystemStats {
     pub memory_free: u64,
     /// Cached memory in bytes
     pub memory_cached: u64,
+    #[cfg(target_os = "macos")]
+    pub memory_pressure: Option<MemoryPressure>,
     /// System uptime in seconds
     pub uptime: u64,
     /// Load averages for 1, 5, and 15 minutes

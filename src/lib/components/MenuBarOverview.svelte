@@ -33,6 +33,11 @@
   let poll: ReturnType<typeof setTimeout>;
   let ticker: ReturnType<typeof setInterval>;
   const listeners: UnlistenFn[] = [];
+  const memoryPressureLabels = {
+    normal: "Normal",
+    warning: "Elevated",
+    critical: "Critical",
+  } as const;
   $: cpu =
     data?.history.at(-1)?.cpu ??
     (data?.stats.cpu_usage.length
@@ -44,6 +49,7 @@
       ? (data.stats.memory_used / data.stats.memory_total) * 100
       : null;
   $: gpu = data?.gpus.find((g) => g.id === gpuId) ?? data?.gpus[0];
+  $: memoryPressure = data?.stats.memory_pressure;
   $: age = data
     ? Math.max(0, Math.floor((clock - data.captured_at) / 1000))
     : 0;
@@ -200,7 +206,7 @@
           {error}<Button variant="link" size="sm" onclick={read}>Retry</Button>
         </div>{/if}
       <div class="grid grid-cols-3 divide-x divide-border">
-        {#each [{ name: "CPU", value: cpu, icon: Cpu, color: "var(--chart-1)", detail: `${data?.stats.cpu_usage.length ?? 0} cores` }, { name: "Memory", value: memory, icon: MemoryStick, color: "var(--chart-3)", detail: data ? `${formatBytes(data.stats.memory_used)} used` : "Reading…" }, { name: "GPU", value: gpu?.utilization, icon: Gpu, color: "var(--chart-2)", detail: gpu?.name ?? "Unavailable" }] as metric}
+        {#each [{ id: "cpu", name: "CPU", value: cpu, icon: Cpu, color: "var(--chart-1)", detail: `${data?.stats.cpu_usage.length ?? 0} cores` }, { id: "memory", name: "Memory", value: memory, icon: MemoryStick, color: "var(--chart-3)", detail: data ? `${formatBytes(data.stats.memory_used)} used` : "Reading…" }, { id: "gpu", name: "GPU", value: gpu?.utilization, icon: Gpu, color: "var(--chart-2)", detail: gpu?.name ?? "Unavailable" }] as metric}
           <div class="min-w-0 px-3 first:pl-0 last:pr-0 space-y-2">
             <div
               class="flex items-center gap-1.5 text-xs text-muted-foreground"
@@ -230,6 +236,20 @@
             >
               {metric.detail}
             </p>
+            {#if metric.id === "memory" && data?.stats.details.identity.platform === "macos"}
+              <p class="text-[10px] text-muted-foreground">
+                Memory pressure
+                <span
+                  class="font-medium {memoryPressure === 'critical'
+                    ? 'text-destructive'
+                    : 'text-foreground'}"
+                >
+                  {memoryPressure
+                    ? memoryPressureLabels[memoryPressure]
+                    : "Unavailable"}
+                </span>
+              </p>
+            {/if}
           </div>
         {/each}
       </div>
