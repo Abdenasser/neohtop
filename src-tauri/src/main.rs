@@ -4,6 +4,8 @@
 //! This is the main entry point for the application. It sets up the Tauri
 //! application, initializes plugins, and configures window effects.
 
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+mod ane;
 mod commands;
 mod companion;
 mod desktop;

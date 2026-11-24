@@ -20,6 +20,7 @@
     ArrowUp,
   } from "@lucide/svelte";
   import ProcessIcon from "./process/ProcessIcon.svelte";
+  import AnePowerSummary from "./stats/AnePowerSummary.svelte";
   import { formatBytes } from "$lib/utils";
   import { themeStore } from "$lib/stores/theme";
   import type { OverviewSnapshot } from "$lib/types";
@@ -263,6 +264,13 @@
           </p>
         </div>
       </div>
+      {#if data?.ane}
+        <AnePowerSummary
+          power={data.ane}
+          end={data.captured_at}
+          unavailable={!data.paused && (stale || !!error)}
+        />
+      {/if}
       <section aria-label="Top CPU processes">
         <div class="mb-2 flex justify-between text-xs text-muted-foreground">
           <h2 class="font-medium text-foreground">Top CPU processes</h2>

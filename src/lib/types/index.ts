@@ -203,8 +203,19 @@ export interface MonitorSnapshot {
   interval: number;
   error: string | null;
 }
+export interface AnePowerSnapshot {
+  window_ms: number;
+  covered_ms: number;
+  watts: number | null;
+  average_watts: number | null;
+  peak_watts: number | null;
+  joules: number | null;
+  points: { timestamp: number; watts: number | null }[];
+}
+
 export interface OverviewSnapshot {
   captured_at: number;
+  ane?: AnePowerSnapshot;
   stats: SystemStats;
   gpus: GpuDevice[];
   history: ResourceSample[];

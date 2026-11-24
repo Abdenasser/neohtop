@@ -42,6 +42,9 @@ png = "0.17"
 objc2 = "0.6.4"
 core-foundation = "0.10"
 
+[target.'cfg(all(target_os = "macos", target_arch = "aarch64"))'.dependencies]
+libc = "0.2"
+
 [target.'cfg(target_os = "linux")'.dependencies]
 freedesktop-icons = "0.4"
 

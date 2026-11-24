@@ -1973,6 +1973,7 @@ dependencies = [
  "core-foundation",
  "file_icon_provider",
  "freedesktop-icons",
+ "libc",
  "listeners",
  "nvml-wrapper",
  "objc2 0.6.5",

@@ -32,6 +32,9 @@ pub struct Frame {
     pub processes: Vec<ProcessInfo>,
     pub stats: SystemStats,
     pub gpus: Vec<GpuDevice>,
+    #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+    #[serde(skip)]
+    ane: Option<crate::ane::Reading>,
 }
 #[derive(Clone, Debug, Serialize)]
 pub struct Sample {
@@ -42,6 +45,9 @@ pub struct Sample {
     pub received: Option<u64>,
     pub sent: Option<u64>,
     pub gpus: BTreeMap<String, Option<f64>>,
+    #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+    #[serde(skip)]
+    ane: Option<crate::ane::Reading>,
 }
 impl Sample {
     fn gap(timestamp: u64, interval: u64) -> Self {
@@ -53,6 +59,8 @@ impl Sample {
             received: None,
             sent: None,
             gpus: BTreeMap::new(),
+            #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+            ane: None,
         }
     }
     fn from_frame(frame: &Frame, interval: u64) -> Self {
@@ -78,6 +86,8 @@ impl Sample {
                 .iter()
                 .map(|g| (g.id.clone(), g.utilization))
                 .collect(),
+            #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+            ane: frame.ane,
             ..Self::gap(frame.captured_at, interval)
         }
     }
@@ -113,6 +123,8 @@ pub struct Hub {
     pub frame: Option<Arc<Frame>>,
     pub process_gpu: bool,
     gpu_process_monitor: crate::monitoring::GpuProcessMonitor,
+    #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+    ane: crate::ane::Monitor,
     history: VecDeque<Sample>,
     pub interval: u64,
     pub paused: bool,
@@ -126,6 +138,8 @@ impl Default for Hub {
             frame: None,
             process_gpu: false,
             gpu_process_monitor: crate::monitoring::GpuProcessMonitor::new(),
+            #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+            ane: crate::ane::Monitor::default(),
             history: VecDeque::new(),
             interval: 3000,
             paused: false,
@@ -157,6 +171,8 @@ impl Hub {
             return;
         }
         self.paused = paused;
+        #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+        self.ane.reset();
         append(&mut self.history, Sample::gap(now_ms(), self.interval));
         // Preserve the CPU minimum refresh window when resuming immediately.
         if !paused
@@ -177,6 +193,8 @@ impl Hub {
                     self.error = None;
                 }
                 Err(error) => {
+                    #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+                    self.ane.reset();
                     append(&mut self.history, Sample::gap(now_ms(), self.interval));
                     self.error = Some(error);
                 }
@@ -224,6 +242,8 @@ impl Hub {
             self.gpu_process_monitor.reset();
         }
         let gpus = state.gpu.lock().map_err(|e| e.to_string())?.collect();
+        #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+        let ane = self.ane.sample(self.interval);
         self.sequence += 1;
         Ok(Frame {
             captured_at: now_ms(),
@@ -231,6 +251,8 @@ impl Hub {
             processes,
             stats,
             gpus,
+            #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+            ane,
         })
     }
 }
@@ -253,6 +275,9 @@ pub struct Overview {
     pub paused: bool,
     pub interval: u64,
     pub error: Option<String>,
+    #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub ane: Option<crate::ane::Overview>,
 }
 impl From<Snapshot> for Overview {
     fn from(s: Snapshot) -> Self {
@@ -265,6 +290,14 @@ impl From<Snapshot> for Overview {
         });
         Self {
             captured_at: s.frame.captured_at,
+            #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+            ane: crate::ane::Overview::from_history(
+                s.frame.captured_at,
+                s.frame.ane,
+                s.history
+                    .iter()
+                    .map(|sample| (sample.timestamp, sample.ane)),
+            ),
             stats: s.frame.stats.clone(),
             gpus: s.frame.gpus.clone(),
             history: s.history,
@@ -415,6 +448,8 @@ mod tests {
                 device("adapter-b", Some(75.0)),
                 device("adapter-c", None),
             ],
+            #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+            ane: None,
         };
         let sample = Sample::from_frame(&frame, 3000);
         let mut history = VecDeque::new();
