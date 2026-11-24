@@ -4,6 +4,8 @@
 //! and processes. It includes process monitoring, system statistics collection,
 //! and data structures for representing system state.
 
+#[cfg(target_os = "macos")]
+mod disk_io;
 mod gpu_process_monitor;
 mod port_monitor;
 pub use port_monitor::collect_ports_by_pid;

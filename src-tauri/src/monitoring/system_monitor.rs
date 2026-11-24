@@ -3,6 +3,8 @@
 //! This module handles collection and monitoring of system-wide statistics
 //! including CPU, memory, network, and disk usage.
 
+#[cfg(target_os = "macos")]
+use super::disk_io::DiskIoMonitor;
 use super::{InterfaceDetails, ResourceDetails, SystemIdentity, SystemStats, VolumeDetails};
 use std::collections::BTreeMap;
 use std::fmt::Debug;
@@ -17,6 +19,8 @@ pub struct SystemMonitor {
     last_network_update: Instant,
     last_interfaces: BTreeMap<String, (u64, u64)>,
     identity: Option<SystemIdentity>,
+    #[cfg(target_os = "macos")]
+    disk_io: DiskIoMonitor,
 }
 
 impl SystemMonitor {
@@ -38,6 +42,8 @@ impl SystemMonitor {
                 })
                 .collect(),
             identity: None,
+            #[cfg(target_os = "macos")]
+            disk_io: DiskIoMonitor::default(),
         }
     }
 
@@ -106,6 +112,8 @@ impl SystemMonitor {
             disk_total_bytes: disk_total,
             disk_used_bytes: disk_used,
             disk_free_bytes: disk_free,
+            #[cfg(target_os = "macos")]
+            disk_io: self.disk_io.sample(),
         }
     }
 
@@ -171,12 +179,14 @@ fn rate_total(mut rates: impl Iterator<Item = Option<u64>>) -> Option<u64> {
 }
 
 fn network_rate(current: u64, previous: u64, elapsed: f64) -> Option<u64> {
+    bytes_per_second(current.checked_sub(previous)?, elapsed)
+}
+
+pub(super) fn bytes_per_second(delta: u64, elapsed: f64) -> Option<u64> {
     if elapsed <= 0.0 || !elapsed.is_finite() {
         return None;
     }
-    current
-        .checked_sub(previous)
-        .map(|delta| (delta as f64 / elapsed) as u64)
+    Some((delta as f64 / elapsed) as u64)
 }
 
 fn interface_rates(

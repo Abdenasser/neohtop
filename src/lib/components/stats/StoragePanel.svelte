@@ -19,6 +19,8 @@
   $: percentage = ready
     ? Math.max(0, Math.min(100, (diskUsedBytes / diskTotalBytes) * 100))
     : null;
+  const rate = (value: number | null) =>
+    value === null ? "—" : `${formatBytes(value)}/s`;
 </script>
 
 <Card.Root size="sm" class="h-60 gap-3">
@@ -52,6 +54,16 @@
       label="Used"
       value={ready ? formatBytes(diskUsedBytes) : "Unavailable"}
     />
+    {#if stats.disk_io}
+      <StatItem
+        label="Read"
+        value={rate(stats.disk_io.read_bytes_per_second)}
+      />
+      <StatItem
+        label="Write"
+        value={rate(stats.disk_io.write_bytes_per_second)}
+      />
+    {/if}
     <div class="mt-auto space-y-2 pb-0.5">
       <Progress
         value={percentage}

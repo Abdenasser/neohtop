@@ -92,6 +92,13 @@ pub struct ProcessInfo {
     pub ports: Vec<u16>,
 }
 
+#[cfg(target_os = "macos")]
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize)]
+pub struct DiskIoRates {
+    pub read_bytes_per_second: Option<u64>,
+    pub write_bytes_per_second: Option<u64>,
+}
+
 /// System-wide statistics exposed to the frontend
 /// Provides overall system resource usage and performance metrics
 #[derive(Clone, Serialize, Debug)]
@@ -121,6 +128,8 @@ pub struct SystemStats {
     pub disk_used_bytes: u64,
     /// Free disk space in bytes
     pub disk_free_bytes: u64,
+    #[cfg(target_os = "macos")]
+    pub disk_io: DiskIoRates,
 }
 
 #[derive(Clone, Debug, Serialize)]

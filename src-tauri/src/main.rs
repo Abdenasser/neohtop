@@ -8,6 +8,8 @@ mod commands;
 mod companion;
 mod desktop;
 mod gpu;
+#[cfg(target_os = "macos")]
+mod macos_io_registry;
 mod monitoring;
 mod native_icons;
 mod preferences;

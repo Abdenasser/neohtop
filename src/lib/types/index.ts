@@ -64,6 +64,10 @@ export interface SystemStats {
   disk_total_bytes: number;
   disk_used_bytes: number;
   disk_free_bytes: number;
+  disk_io?: {
+    read_bytes_per_second: number | null;
+    write_bytes_per_second: number | null;
+  };
 }
 
 /** Volatile resource observations, timed at completion of the existing read. */

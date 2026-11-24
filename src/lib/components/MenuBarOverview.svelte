@@ -44,6 +44,7 @@
       ? (data.stats.memory_used / data.stats.memory_total) * 100
       : null;
   $: gpu = data?.gpus.find((g) => g.id === gpuId) ?? data?.gpus[0];
+  $: diskIo = data?.stats.disk_io;
   $: age = data
     ? Math.max(0, Math.floor((clock - data.captured_at) / 1000))
     : 0;
@@ -234,7 +235,9 @@
         {/each}
       </div>
       <div
-        class="grid grid-cols-2 gap-3 rounded-lg border border-border bg-muted/30 p-3 text-xs"
+        class="grid gap-3 rounded-lg border border-border bg-muted/30 p-3 text-xs {diskIo
+          ? 'grid-cols-3'
+          : 'grid-cols-2'}"
       >
         <div class="space-y-1.5">
           <p class="text-muted-foreground">Network</p>
@@ -249,6 +252,23 @@
             <ArrowUp class="size-3" />{rate(data?.stats.network_tx_bytes)}
           </p>
         </div>
+        {#if diskIo}
+          <div class="space-y-1.5">
+            <p class="text-muted-foreground">Disk I/O</p>
+            <p class="flex flex-wrap items-baseline gap-x-1.5 tabular-nums">
+              <span class="text-muted-foreground">Read</span>
+              <span class="whitespace-nowrap font-medium"
+                >{rate(diskIo.read_bytes_per_second)}</span
+              >
+            </p>
+            <p class="flex flex-wrap items-baseline gap-x-1.5 tabular-nums">
+              <span class="text-muted-foreground">Write</span>
+              <span class="whitespace-nowrap font-medium"
+                >{rate(diskIo.write_bytes_per_second)}</span
+              >
+            </p>
+          </div>
+        {/if}
         <div class="space-y-1.5">
           <p class="flex items-center gap-1.5 text-muted-foreground">
             <HardDrive class="size-3" />Storage free
