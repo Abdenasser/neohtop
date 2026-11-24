@@ -1,7 +1,11 @@
 //! One serialized source of preferences for all desktop windows.
 use serde::Serialize;
 use serde_json::Value;
-use std::{fs, path::Path, sync::Mutex};
+use std::{
+    fs,
+    path::{Path, PathBuf},
+    sync::Mutex,
+};
 use tauri::{AppHandle, Emitter, Manager, WebviewWindow};
 
 fn defaults() -> Value {
@@ -49,7 +53,9 @@ fn merge(config: &mut Value, patch: &Value) {
                     .as_u64()
                     .is_some_and(|n| [15, 25, 50, 100, 250, 500].contains(&n)),
                 "refreshRate" => value.as_u64().is_some_and(|n| (1000..=30000).contains(&n)),
-                "menuBarEnabled" | "keepRunning" | "usageAnalytics" => value.is_boolean(),
+                "menuBarEnabled" | "keepRunning" | "hideDockIcon" | "usageAnalytics" => {
+                    value.is_boolean()
+                }
                 "processView" => matches!(value.as_str(), Some("flat" | "tree")),
                 "defaultStatusFilter" => matches!(
                     value.as_str(),
@@ -61,6 +67,9 @@ fn merge(config: &mut Value, patch: &Value) {
                 config[group][key] = value.clone();
             }
         }
+    }
+    if config["behavior"]["menuBarEnabled"] != true || config["behavior"]["keepRunning"] != true {
+        config["behavior"]["hideDockIcon"] = Value::Bool(false);
     }
     config["appearance"]["columnVisibility"]["name"] = Value::Bool(true);
 }
@@ -97,6 +106,24 @@ fn load(path: &Path, legacy: Option<&Value>) -> Result<Option<Value>, String> {
     }
     Ok(Some(config))
 }
+
+fn settings_path(app: &AppHandle) -> Result<PathBuf, String> {
+    app.path()
+        .app_config_dir()
+        .map(|dir| dir.join("settings.json"))
+        .map_err(|error| error.to_string())
+}
+
+#[cfg(target_os = "macos")]
+pub fn saved_behavior(app: &AppHandle) -> Value {
+    let mut config = settings_path(app)
+        .and_then(|path| load(&path, None))
+        .ok()
+        .flatten()
+        .unwrap_or_else(defaults);
+    config["behavior"].take()
+}
+
 #[tauri::command]
 pub async fn read_preferences(
     app: AppHandle,
@@ -108,11 +135,7 @@ pub async fn read_preferences(
         let service = app.state::<Preferences>();
         let mut state = service.0.lock().map_err(|e| e.to_string())?;
         if !state.ready {
-            let path = app
-                .path()
-                .app_config_dir()
-                .map_err(|e| e.to_string())?
-                .join("settings.json");
+            let path = settings_path(&app)?;
             if let Some(config) = load(&path, if migrate { legacy.as_ref() } else { None })? {
                 state.config = config;
                 state.ready = true;
@@ -145,11 +168,7 @@ pub async fn update_preferences(app: AppHandle, patch: Value) -> Result<Snapshot
         let mut next = state.config.clone();
         merge(&mut next, &patch);
         if next != state.config {
-            let path = app
-                .path()
-                .app_config_dir()
-                .map_err(|e| e.to_string())?
-                .join("settings.json");
+            let path = settings_path(&app)?;
             persist(&path, &next)?;
             if let Err(error) = crate::telemetry::configure(
                 &app,
@@ -189,6 +208,22 @@ mod tests {
         assert!(config["appearance"]["columnVisibility"]
             .get("unknown")
             .is_none());
+    }
+    #[test]
+    fn menu_bar_only_requires_the_tray_and_background_running() {
+        let mut config = defaults();
+        merge(
+            &mut config,
+            &json!({"behavior":{"menuBarEnabled":true,"keepRunning":true,"hideDockIcon":true}}),
+        );
+        assert_eq!(config["behavior"]["hideDockIcon"], true);
+        merge(&mut config, &json!({"behavior":{"menuBarEnabled":false}}));
+        assert_eq!(config["behavior"]["hideDockIcon"], false);
+        merge(
+            &mut config,
+            &json!({"behavior":{"menuBarEnabled":true,"keepRunning":false,"hideDockIcon":true}}),
+        );
+        assert_eq!(config["behavior"]["hideDockIcon"], false);
     }
     #[test]
     fn independent_patches_do_not_overwrite_other_windows() {

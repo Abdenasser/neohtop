@@ -8,6 +8,7 @@ mod commands;
 mod companion;
 mod desktop;
 mod gpu;
+mod login_item;
 mod monitoring;
 mod native_icons;
 mod preferences;
@@ -33,11 +34,26 @@ fn main() {
         std::env::set_var("WEBKIT_DISABLE_DMABUF_RENDERER", "1");
     }
 
-    tauri::Builder::default()
+    let app = tauri::Builder::default()
         .setup(|app| {
             let window = app.get_webview_window("main").unwrap();
             ui::setup_window_effects(&window).expect("Failed to apply window effects");
             desktop::setup(app.handle())?;
+            #[cfg(target_os = "macos")]
+            {
+                let behavior = preferences::saved_behavior(app.handle());
+                if login_item::starts_in_background() {
+                    match companion::start_at_login(app.handle(), &behavior) {
+                        Ok(()) => return Ok(()),
+                        Err(error) => eprintln!("Could not start in the menu bar: {error}"),
+                    }
+                }
+                if behavior["hideDockIcon"] != true {
+                    app.set_activation_policy(tauri::ActivationPolicy::Regular);
+                }
+            }
+            window.show()?;
+            window.set_focus()?;
             Ok(())
         })
         .plugin(tauri_plugin_shell::init())
@@ -51,6 +67,8 @@ fn main() {
         .invoke_handler(tauri::generate_handler![
             telemetry::track_usage,
             telemetry::analytics_configured,
+            login_item::login_item_status,
+            login_item::set_login_item_enabled,
             preferences::read_preferences,
             preferences::update_preferences,
             desktop::open_settings,
@@ -69,25 +87,37 @@ fn main() {
             companion::quit_app,
         ])
         .build(tauri::generate_context!())
-        .expect("error while building tauri application")
-        .run(|app, event| {
-            #[cfg(target_os = "macos")]
-            if let tauri::RunEvent::Reopen {
-                has_visible_windows,
-                ..
-            } = event
-            {
-                // Reactivating the app must not steal focus from Settings or About.
-                // Restore the monitor when all document windows are hidden instead.
-                let auxiliary_visible = ["settings", "about"].iter().any(|label| {
-                    app.get_webview_window(label)
-                        .is_some_and(|window| window.is_visible().unwrap_or(false))
-                });
-                if !has_visible_windows || !auxiliary_visible {
-                    let _ = companion::open_main(app);
-                }
+        .expect("error while building tauri application");
+    #[cfg(target_os = "macos")]
+    let app = {
+        let mut app = app;
+        if preferences::saved_behavior(app.handle())["hideDockIcon"] == true
+            || login_item::login_item_status() == login_item::Status::Enabled
+        {
+            app.set_activation_policy(tauri::ActivationPolicy::Accessory);
+        }
+        app
+    };
+    app.run(|app, event| {
+        #[cfg(target_os = "macos")]
+        if let tauri::RunEvent::Reopen {
+            has_visible_windows,
+            ..
+        } = event
+        {
+            // Reactivating the app must not steal focus from Settings or About.
+            // Restore the monitor when all document windows are hidden instead.
+            let auxiliary_visible = ["settings", "about"].iter().any(|label| {
+                app.get_webview_window(label)
+                    .is_some_and(|window| window.is_visible().unwrap_or(false))
+            });
+            if !has_visible_windows || !auxiliary_visible {
+                let _ = companion::open_main(app);
             }
-            #[cfg(not(target_os = "macos"))]
-            let _ = (app, event);
-        });
+            // Launch Services can promote an already running accessory app.
+            companion::restore_dock_policy(app);
+        }
+        #[cfg(not(target_os = "macos"))]
+        let _ = (app, event);
+    });
 }

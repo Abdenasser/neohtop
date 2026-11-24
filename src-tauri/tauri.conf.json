@@ -46,7 +46,8 @@
         "titleBarStyle": "Overlay",
         "hiddenTitle": true,
         "transparent": true,
-        "label": "main"
+        "label": "main",
+        "visible": false
       },
       {
         "label": "overview",

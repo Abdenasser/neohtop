@@ -121,13 +121,7 @@ pub fn setup(app: &AppHandle) -> tauri::Result<()> {
             "app-about" => open_about(app.clone(), false),
             "app-updates" => open_about(app.clone(), true),
             "view-appearance" => open_settings(app.clone(), Some("appearance".into())),
-            "view-overview" => {
-                let handle = app.clone();
-                tauri::async_runtime::spawn(async move {
-                    let _ = crate::companion::show_companion(handle).await;
-                });
-                Ok(())
-            }
+            "view-overview" => crate::companion::show_companion(app.clone()),
             command @ ("view-list" | "view-tree") => {
                 crate::companion::open_main(app).and_then(|_| {
                     app.emit_to("main", "app-command", command)

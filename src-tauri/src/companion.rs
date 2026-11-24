@@ -4,17 +4,36 @@ use std::{
     sync::Mutex,
     time::{Duration, Instant},
 };
+#[cfg(not(target_os = "macos"))]
 use tauri::{
     menu::{Menu, MenuItem},
     tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent},
 };
 use tauri::{AppHandle, Emitter, Manager, PhysicalPosition, Rect, WindowEvent};
 
+#[cfg(target_os = "macos")]
+mod mac_tray;
+
+#[cfg(not(target_os = "macos"))]
 const TRAY_ID: &str = "neohtop-overview";
+const TRAY_TOOLTIP: &str = "NeoHtop — system overview";
+const TRAY_LABELS: [&str; 3] = ["Show overview", "Open NeoHtop", "Quit NeoHtop"];
 #[derive(Debug, Default)]
 pub struct CompanionState {
     pub keep_running: bool,
     pub hidden_at: Option<Instant>,
+    #[cfg(target_os = "macos")]
+    dock_hidden: bool,
+    #[cfg(target_os = "macos")]
+    login_preferences: Option<WindowPreferences>,
+}
+
+#[cfg(target_os = "macos")]
+#[derive(Debug)]
+struct WindowPreferences {
+    menu_bar_enabled: bool,
+    keep_running: bool,
+    hide_dock_icon: bool,
 }
 
 // A monochrome pixel ghost, matching the public app's silhouette. macOS treats
@@ -57,20 +76,32 @@ fn ghost() -> tauri::image::Image<'static> {
     tauri::image::Image::new_owned(rgba, 32, 32)
 }
 
-fn configure(app: &AppHandle, enabled: bool, keep_running: bool) -> Result<(), String> {
+#[cfg(not(target_os = "macos"))]
+fn tray_menu(app: &AppHandle) -> tauri::Result<Menu<tauri::Wry>> {
+    let [overview, open, quit] = TRAY_LABELS;
+    let overview = MenuItem::with_id(app, "overview", overview, true, None::<&str>)?;
+    let open = MenuItem::with_id(app, "open-main", open, true, None::<&str>)?;
+    let quit = MenuItem::with_id(app, "quit", quit, true, None::<&str>)?;
+    Menu::with_items(app, &[&overview, &open, &quit])
+}
+
+fn configure(
+    app: &AppHandle,
+    enabled: bool,
+    keep_running: bool,
+    hide_dock_icon: bool,
+) -> Result<(), String> {
     // Called only on the main thread: native menus and tray destruction require it.
+    let service = app.state::<Mutex<CompanionState>>();
+    #[cfg(target_os = "macos")]
+    mac_tray::configure(app, enabled, TRAY_TOOLTIP)?;
+    #[cfg(not(target_os = "macos"))]
     if enabled && app.tray_by_id(TRAY_ID).is_none() {
-        let overview = MenuItem::with_id(app, "overview", "Show overview", true, None::<&str>)
-            .map_err(|e| e.to_string())?;
-        let open = MenuItem::with_id(app, "open-main", "Open NeoHtop", true, None::<&str>)
-            .map_err(|e| e.to_string())?;
-        let quit = MenuItem::with_id(app, "quit", "Quit NeoHtop", true, None::<&str>)
-            .map_err(|e| e.to_string())?;
-        let menu = Menu::with_items(app, &[&overview, &open, &quit]).map_err(|e| e.to_string())?;
+        let menu = tray_menu(app).map_err(|e| e.to_string())?;
         TrayIconBuilder::with_id(TRAY_ID)
             .icon(ghost())
             .icon_as_template(true)
-            .tooltip("NeoHtop — system overview")
+            .tooltip(TRAY_TOOLTIP)
             .menu(&menu)
             .menu_on_left_click(false)
             .on_menu_event(|app, event| {
@@ -92,35 +123,66 @@ fn configure(app: &AppHandle, enabled: bool, keep_running: bool) -> Result<(), S
                     ..
                 } = event
                 {
-                    let app = tray.app_handle();
-                    let Some(window) = app.get_webview_window("overview") else {
-                        return;
-                    };
-                    if window.is_visible().unwrap_or(false) {
-                        hide(app);
-                    } else {
-                        let recent = app
-                            .state::<Mutex<CompanionState>>()
-                            .lock()
-                            .ok()
-                            .and_then(|s| s.hidden_at)
-                            .is_some_and(|t| t.elapsed() < Duration::from_millis(200));
-                        if !recent {
-                            let _ = show(app, Some(rect));
-                        }
-                    }
+                    toggle_overview(tray.app_handle(), Some(rect));
                 }
             })
             .build(app)
             .map_err(|e| e.to_string())?;
-    } else if !enabled {
+    }
+    #[cfg(target_os = "macos")]
+    {
+        let hide = hide_dock_icon && enabled && keep_running;
+        let dock_hidden = service.lock().map_err(|e| e.to_string())?.dock_hidden;
+        if hide != dock_hidden {
+            app.set_activation_policy(if hide {
+                tauri::ActivationPolicy::Accessory
+            } else {
+                tauri::ActivationPolicy::Regular
+            })
+            .map_err(|e| e.to_string())?;
+            service.lock().map_err(|e| e.to_string())?.dock_hidden = hide;
+        }
+    }
+    #[cfg(not(target_os = "macos"))]
+    let _ = hide_dock_icon;
+    #[cfg(not(target_os = "macos"))]
+    if !enabled {
         drop(app.remove_tray_by_id(TRAY_ID));
     }
     // Only opt in to hiding the main window when the tray actually exists.
-    app.state::<Mutex<CompanionState>>()
-        .lock()
-        .map_err(|e| e.to_string())?
-        .keep_running = enabled && keep_running;
+    let mut state = service.lock().map_err(|e| e.to_string())?;
+    state.keep_running = enabled && keep_running;
+    Ok(())
+}
+
+fn toggle_overview(app: &AppHandle, rect: Option<Rect>) {
+    let Some(window) = app.get_webview_window("overview") else {
+        return;
+    };
+    if window.is_visible().unwrap_or(false) {
+        hide(app);
+    } else {
+        let recent = app
+            .state::<Mutex<CompanionState>>()
+            .lock()
+            .ok()
+            .and_then(|s| s.hidden_at)
+            .is_some_and(|t| t.elapsed() < Duration::from_millis(200));
+        if !recent {
+            let _ = show(app, rect);
+        }
+    }
+}
+
+#[cfg(target_os = "macos")]
+pub fn start_at_login(app: &AppHandle, behavior: &serde_json::Value) -> Result<(), String> {
+    configure(app, true, true, true)?;
+    let service = app.state::<Mutex<CompanionState>>();
+    service.lock().map_err(|e| e.to_string())?.login_preferences = Some(WindowPreferences {
+        menu_bar_enabled: behavior["menuBarEnabled"] == true,
+        keep_running: behavior["keepRunning"] == true,
+        hide_dock_icon: behavior["hideDockIcon"] == true,
+    });
     Ok(())
 }
 
@@ -167,13 +229,14 @@ fn show(app: &AppHandle, rect: Option<Rect>) -> Result<(), String> {
     let window = app
         .get_webview_window("overview")
         .ok_or("Overview window unavailable")?;
+    #[cfg(target_os = "macos")]
+    let rect = rect.or_else(mac_tray::rect);
+    #[cfg(not(target_os = "macos"))]
     let rect = rect.or_else(|| {
         app.tray_by_id(TRAY_ID)
             .and_then(|tray| tray.rect().ok().flatten())
     });
     let anchor = rect.map(|r| {
-        // Tray rects are converted using the monitor scale below. Tauri tray
-        // events currently provide physical coordinates on macOS and Windows.
         let p = r.position.to_physical::<f64>(1.0);
         let s = r.size.to_physical::<f64>(1.0);
         (p.x, p.y, s.width, s.height)
@@ -208,6 +271,42 @@ fn show(app: &AppHandle, rect: Option<Rect>) -> Result<(), String> {
         .map_err(|e| e.to_string())
 }
 pub fn open_main(app: &AppHandle) -> Result<(), String> {
+    #[cfg(target_os = "macos")]
+    if app
+        .state::<Mutex<CompanionState>>()
+        .lock()
+        .is_ok_and(|state| state.login_preferences.is_some())
+    {
+        let handle = app.clone();
+        return app
+            .run_on_main_thread(move || {
+                let service = handle.state::<Mutex<CompanionState>>();
+                let preferences = service
+                    .lock()
+                    .ok()
+                    .and_then(|mut state| state.login_preferences.take());
+                if let Some(preferences) = preferences {
+                    // The quiet launch only overrides the saved window preferences
+                    // until the user chooses to open the full monitor.
+                    if let Err(error) = configure(
+                        &handle,
+                        preferences.menu_bar_enabled,
+                        preferences.keep_running,
+                        preferences.hide_dock_icon,
+                    ) {
+                        eprintln!("Could not restore window preferences: {error}");
+                    }
+                }
+                if let Err(error) = reveal_main(&handle) {
+                    eprintln!("Could not open the main window: {error}");
+                }
+            })
+            .map_err(|e| e.to_string());
+    }
+    reveal_main(app)
+}
+
+fn reveal_main(app: &AppHandle) -> Result<(), String> {
     hide(app);
     let window = app
         .get_webview_window("main")
@@ -216,6 +315,18 @@ pub fn open_main(app: &AppHandle) -> Result<(), String> {
     window.show().map_err(|e| e.to_string())?;
     window.set_focus().map_err(|e| e.to_string())
 }
+
+#[cfg(target_os = "macos")]
+pub fn restore_dock_policy(app: &AppHandle) {
+    let hidden = app
+        .state::<Mutex<CompanionState>>()
+        .lock()
+        .is_ok_and(|state| state.dock_hidden);
+    if hidden {
+        let _ = app.set_activation_policy(tauri::ActivationPolicy::Accessory);
+    }
+}
+
 pub fn window_event(window: &tauri::Window, event: &WindowEvent) {
     let app = window.app_handle();
     match (window.label(), event) {
@@ -250,11 +361,33 @@ pub async fn configure_companion(
     app: AppHandle,
     enabled: bool,
     keep_running: bool,
+    hide_dock_icon: bool,
 ) -> Result<(), String> {
     let (sender, mut receiver) = tauri::async_runtime::channel(1);
     let handle = app.clone();
     app.run_on_main_thread(move || {
-        let result = configure(&handle, enabled, keep_running);
+        #[cfg(target_os = "macos")]
+        let (enabled, keep_running, hide_dock_icon) = {
+            let service = handle.state::<Mutex<CompanionState>>();
+            let mut state = match service.lock() {
+                Ok(state) => state,
+                Err(error) => {
+                    let _ = sender.try_send(Err(error.to_string()));
+                    return;
+                }
+            };
+            if let Some(preferences) = &mut state.login_preferences {
+                *preferences = WindowPreferences {
+                    menu_bar_enabled: enabled,
+                    keep_running,
+                    hide_dock_icon,
+                };
+                (true, true, true)
+            } else {
+                (enabled, keep_running, hide_dock_icon)
+            }
+        };
+        let result = configure(&handle, enabled, keep_running, hide_dock_icon);
         let _ = sender.try_send(result);
     })
     .map_err(|e| e.to_string())?;
@@ -264,7 +397,7 @@ pub async fn configure_companion(
         .ok_or("Companion configuration was interrupted")?
 }
 #[tauri::command]
-pub async fn show_companion(app: AppHandle) -> Result<(), String> {
+pub fn show_companion(app: AppHandle) -> Result<(), String> {
     show(&app, None)
 }
 #[tauri::command]

@@ -24,6 +24,7 @@
     "refreshRate": 3000,
     "menuBarEnabled": true,
     "keepRunning": false,
+    "hideDockIcon": false,
     "defaultStatusFilter": "all",
     "processView": "flat",
     "usageAnalytics": false

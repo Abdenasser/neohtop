@@ -138,6 +138,7 @@ export interface AppConfig {
     menuBarEnabled: boolean;
     usageAnalytics: boolean;
     keepRunning: boolean;
+    hideDockIcon: boolean;
   };
 }
 

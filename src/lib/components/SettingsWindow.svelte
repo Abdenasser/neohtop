@@ -1,6 +1,7 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import { invoke } from "@tauri-apps/api/core";
+  import { invoke, isTauri } from "@tauri-apps/api/core";
+  import { platform } from "@tauri-apps/plugin-os";
   import { emit, listen } from "@tauri-apps/api/event";
   import { settingsStore, settingsStatus } from "$lib/stores/settings";
   import { REFRESH_RATE_OPTIONS } from "$lib/constants";
@@ -13,6 +14,16 @@
   import * as ToggleGroup from "$lib/components/ui/toggle-group/index.js";
   import { Settings2, Palette, ShieldCheck } from "@lucide/svelte";
   let pane = "general";
+  const isMacOS = isTauri() && platform() === "macos";
+  type LoginItemStatus =
+    | "unavailable"
+    | "disabled"
+    | "enabled"
+    | "requiresApproval";
+  let loginItem: LoginItemStatus | undefined;
+  let loginItemChecked = false;
+  let loginItemBusy = false;
+  let loginItemError = false;
   let runtimeError = "";
   let analyticsConfigured = false;
   $: rate = $settingsStore.behavior.refreshRate;
@@ -32,11 +43,49 @@
     key: "refreshRate" | "menuBarEnabled" | "keepRunning" | "usageAnalytics",
     value: number | boolean,
   ) {
-    settingsStore.updateConfig({
-      behavior: { ...$settingsStore.behavior, [key]: value },
-    });
+    const behavior = { ...$settingsStore.behavior, [key]: value };
+    if (!behavior.menuBarEnabled || !behavior.keepRunning)
+      behavior.hideDockIcon = false;
+    settingsStore.updateConfig({ behavior });
+  }
+  function setMenuBarOnly(enabled: boolean) {
+    const behavior = { ...$settingsStore.behavior, hideDockIcon: enabled };
+    if (enabled) {
+      behavior.menuBarEnabled = true;
+      behavior.keepRunning = true;
+    }
+    settingsStore.updateConfig({ behavior });
+  }
+  async function refreshLoginItem() {
+    if (!isMacOS || loginItemBusy) return;
+    try {
+      const status = await invoke<LoginItemStatus>("login_item_status");
+      if (!loginItemBusy) {
+        loginItem = status;
+        loginItemChecked =
+          status === "enabled" || status === "requiresApproval";
+      }
+    } catch {
+      loginItemError = true;
+    }
+  }
+  async function setLoginItem(enabled: boolean) {
+    loginItemBusy = true;
+    loginItemError = false;
+    try {
+      loginItem = await invoke<LoginItemStatus>("set_login_item_enabled", {
+        enabled,
+      });
+    } catch {
+      loginItemError = true;
+    } finally {
+      loginItemChecked =
+        loginItem === "enabled" || loginItem === "requiresApproval";
+      loginItemBusy = false;
+    }
   }
   onMount(() => {
+    void refreshLoginItem();
     let disposed = false;
     const stops: (() => void)[] = [];
     void (async () => {
@@ -70,6 +119,8 @@
     };
   });
 </script>
+
+<svelte:window on:focus={refreshLoginItem} />
 
 <div class="flex h-screen flex-col bg-background">
   <header
@@ -167,6 +218,57 @@
                 </p>
               </div>
             </div>
+            {#if isMacOS}
+              <div class="flex items-start gap-3">
+                <Checkbox
+                  id="menu-bar-only"
+                  class="mt-0.5"
+                  checked={$settingsStore.behavior.hideDockIcon}
+                  onCheckedChange={setMenuBarOnly}
+                />
+                <div>
+                  <Label for="menu-bar-only">Run in the menu bar only</Label>
+                  <p class="mt-1 text-xs leading-relaxed text-muted-foreground">
+                    Hide the Dock icon and keep monitoring after the window
+                    closes.
+                  </p>
+                </div>
+              </div>
+              {#if loginItem !== "unavailable"}
+                <div class="flex items-start gap-3">
+                  <Checkbox
+                    id="launch-at-login"
+                    class="mt-0.5"
+                    bind:checked={loginItemChecked}
+                    disabled={!loginItem || loginItemBusy}
+                    onCheckedChange={setLoginItem}
+                  />
+                  <div>
+                    <Label for="launch-at-login">Launch at login</Label>
+                    <p
+                      class="mt-1 text-xs leading-relaxed text-muted-foreground"
+                    >
+                      Start in the menu bar when you log in, without opening the
+                      main window.
+                    </p>
+                    {#if loginItemError}
+                      <p role="status" class="mt-1 text-xs text-destructive">
+                        Could not update the login item. Try again or check
+                        System Settings.
+                      </p>
+                    {:else if loginItem === "requiresApproval"}
+                      <p
+                        role="status"
+                        class="mt-1 text-xs text-muted-foreground"
+                      >
+                        Allow NeoHtop in System Settings → General → Login Items
+                        & Extensions.
+                      </p>
+                    {/if}
+                  </div>
+                </div>
+              {/if}
+            {/if}
           </Card.Content></Card.Root
         >
       </fieldset>

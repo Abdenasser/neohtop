@@ -12,6 +12,7 @@ function apply() {
     behavior.refreshRate,
     behavior.menuBarEnabled,
     behavior.keepRunning,
+    behavior.hideDockIcon,
   ]);
   if (key === applied) return queue;
   applied = key;
@@ -23,6 +24,7 @@ function apply() {
       await invoke("configure_companion", {
         enabled: behavior.menuBarEnabled,
         keepRunning: behavior.keepRunning,
+        hideDockIcon: behavior.hideDockIcon,
       });
       monitoringPreferencesError.set("");
     } catch (error) {
