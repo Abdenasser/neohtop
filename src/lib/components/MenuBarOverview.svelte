@@ -7,6 +7,7 @@
   import { Button } from "$lib/components/ui/button/index.js";
   import { Badge } from "$lib/components/ui/badge/index.js";
   import { Progress } from "$lib/components/ui/progress/index.js";
+  import * as ToggleGroup from "$lib/components/ui/toggle-group/index.js";
   import {
     Cpu,
     MemoryStick,
@@ -29,6 +30,7 @@
   let destroyed = false;
   let clock = Date.now();
   let gpuId = "";
+  let processRank: "cpu" | "memory" = "cpu";
   let inFlight: Promise<void> | null = null;
   let poll: ReturnType<typeof setTimeout>;
   let ticker: ReturnType<typeof setInterval>;
@@ -44,6 +46,8 @@
       ? (data.stats.memory_used / data.stats.memory_total) * 100
       : null;
   $: gpu = data?.gpus.find((g) => g.id === gpuId) ?? data?.gpus[0];
+  $: rankedProcesses =
+    (processRank === "memory" ? data?.memory_processes : data?.processes) ?? [];
   $: age = data
     ? Math.max(0, Math.floor((clock - data.captured_at) / 1000))
     : 0;
@@ -263,17 +267,27 @@
           </p>
         </div>
       </div>
-      <section aria-label="Top CPU processes">
-        <div class="mb-2 flex justify-between text-xs text-muted-foreground">
-          <h2 class="font-medium text-foreground">Top CPU processes</h2>
-          <span>CPU · RAM</span>
+      <section aria-label="Top processes">
+        <div class="mb-2 flex items-center justify-between gap-2 text-xs">
+          <h2 class="font-medium text-foreground">Top processes</h2>
+          <ToggleGroup.Root
+            type="single"
+            size="sm"
+            variant="outline"
+            value={processRank}
+            onValueChange={(value) => {
+              if (value === "cpu" || value === "memory") processRank = value;
+            }}
+            aria-label="Rank processes by"
+          >
+            <ToggleGroup.Item value="cpu">CPU</ToggleGroup.Item>
+            <ToggleGroup.Item value="memory">Memory</ToggleGroup.Item>
+          </ToggleGroup.Root>
         </div>
         <div
           class="overflow-hidden rounded-lg border border-border divide-y divide-border"
         >
-          {#each data?.processes ?? [] as process (process.pid)}<div
-              class="flex"
-            >
+          {#each rankedProcesses as process (process.pid)}<div class="flex">
               <Button
                 variant="ghost"
                 class="h-auto w-full justify-start gap-2.5 rounded-none border-0 px-3 py-2 text-left font-normal focus-visible:ring-inset"

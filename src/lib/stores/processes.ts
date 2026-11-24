@@ -69,12 +69,14 @@ function createProcessStore() {
 
   let inFlight: Promise<void> | null = null;
   let gpuDetails = false;
-  const readProcesses = async () => {
+  const readProcesses = async (backgroundWhenHidden: boolean) => {
     try {
-      const result = await invoke<MonitorSnapshot>("get_processes", {
+      const result = await invoke<MonitorSnapshot | null>("get_processes", {
         includeGpu: gpuDetails,
         includePorts: searchHasPortQuery(get({ subscribe }).searchTerm),
+        backgroundWhenHidden,
       });
+      if (!result) return;
       update((state) => ({
         ...state,
         processes: result.frame.processes,
@@ -102,9 +104,9 @@ function createProcessStore() {
   };
 
   // Share an in-flight read so manual actions and timer ticks cannot reorder history.
-  const getProcesses = () => {
+  const getProcesses = (backgroundWhenHidden = false) => {
     if (inFlight) return inFlight;
-    inFlight = readProcesses().finally(() => {
+    inFlight = readProcesses(backgroundWhenHidden).finally(() => {
       inFlight = null;
     });
     return inFlight;

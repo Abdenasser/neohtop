@@ -146,11 +146,15 @@ pub struct Snapshot {
 }
 impl Hub {
     fn due(&self) -> bool {
+        self.due_at(self.interval)
+    }
+
+    fn due_at(&self, cadence: u64) -> bool {
         self.frame.is_none()
             || (!self.paused
                 && self
                     .last_attempt
-                    .is_none_or(|i| i.elapsed() >= Duration::from_millis(self.interval)))
+                    .is_none_or(|i| i.elapsed() >= Duration::from_millis(cadence)))
     }
     pub fn pause(&mut self, paused: bool) {
         if self.paused == paused {
@@ -169,18 +173,7 @@ impl Hub {
     }
     pub fn read(&mut self, state: &AppState) -> Result<Snapshot, String> {
         if self.due() {
-            self.last_attempt = Some(Instant::now());
-            match self.capture(state) {
-                Ok(frame) => {
-                    append(&mut self.history, Sample::from_frame(&frame, self.interval));
-                    self.frame = Some(Arc::new(frame));
-                    self.error = None;
-                }
-                Err(error) => {
-                    append(&mut self.history, Sample::gap(now_ms(), self.interval));
-                    self.error = Some(error);
-                }
-            }
+            self.sample(state, self.interval);
         }
         Ok(Snapshot {
             port_error: None,
@@ -195,6 +188,29 @@ impl Hub {
             error: self.error.clone(),
         })
     }
+    pub fn sample_in_background(&mut self, state: &AppState) {
+        let cadence = self.interval.max(30_000);
+        self.process_gpu = false;
+        if self.due_at(cadence) {
+            self.sample(state, cadence);
+        }
+    }
+
+    fn sample(&mut self, state: &AppState, cadence: u64) {
+        self.last_attempt = Some(Instant::now());
+        match self.capture(state) {
+            Ok(frame) => {
+                append(&mut self.history, Sample::from_frame(&frame, cadence));
+                self.frame = Some(Arc::new(frame));
+                self.error = None;
+            }
+            Err(error) => {
+                append(&mut self.history, Sample::gap(now_ms(), cadence));
+                self.error = Some(error);
+            }
+        }
+    }
+
     fn capture(&mut self, state: &AppState) -> Result<Frame, String> {
         let (mut processes, stats) = {
             let mut sys = state.sys.lock().map_err(|e| e.to_string())?;
@@ -250,35 +266,51 @@ pub struct Overview {
     pub gpus: Vec<GpuDevice>,
     pub history: Vec<Sample>,
     pub processes: Vec<BusyProcess>,
+    pub memory_processes: Vec<BusyProcess>,
     pub paused: bool,
     pub interval: u64,
     pub error: Option<String>,
 }
+fn top_processes(
+    processes: &[ProcessInfo],
+    compare: impl Fn(&ProcessInfo, &ProcessInfo) -> std::cmp::Ordering,
+) -> Vec<BusyProcess> {
+    const LIMIT: usize = 5;
+    let mut candidates = processes.iter().collect::<Vec<_>>();
+    let compare =
+        |a: &&ProcessInfo, b: &&ProcessInfo| compare(a, b).then_with(|| a.pid.cmp(&b.pid));
+    if candidates.len() > LIMIT {
+        candidates.select_nth_unstable_by(LIMIT, compare);
+        candidates.truncate(LIMIT);
+    }
+    candidates.sort_unstable_by(compare);
+    candidates
+        .into_iter()
+        .map(|p| BusyProcess {
+            pid: p.pid,
+            start_time: p.start_time,
+            name: p.name.clone(),
+            cpu_usage: p.cpu_usage,
+            memory_usage: p.memory_usage,
+        })
+        .collect()
+}
+
 impl From<Snapshot> for Overview {
     fn from(s: Snapshot) -> Self {
-        let mut processes = s.frame.processes.iter().collect::<Vec<_>>();
-        processes.sort_by(|a, b| {
-            b.cpu_usage
-                .total_cmp(&a.cpu_usage)
-                .then_with(|| b.memory_usage.cmp(&a.memory_usage))
-                .then_with(|| a.pid.cmp(&b.pid))
-        });
+        let cpu = |a: &ProcessInfo, b: &ProcessInfo| b.cpu_usage.total_cmp(&a.cpu_usage);
+        let memory = |a: &ProcessInfo, b: &ProcessInfo| b.memory_usage.cmp(&a.memory_usage);
         Self {
             captured_at: s.frame.captured_at,
             stats: s.frame.stats.clone(),
             gpus: s.frame.gpus.clone(),
             history: s.history,
-            processes: processes
-                .into_iter()
-                .take(5)
-                .map(|p| BusyProcess {
-                    pid: p.pid,
-                    start_time: p.start_time,
-                    name: p.name.clone(),
-                    cpu_usage: p.cpu_usage,
-                    memory_usage: p.memory_usage,
-                })
-                .collect(),
+            processes: top_processes(&s.frame.processes, |a, b| {
+                cpu(a, b).then_with(|| memory(a, b))
+            }),
+            memory_processes: top_processes(&s.frame.processes, |a, b| {
+                memory(a, b).then_with(|| cpu(a, b))
+            }),
             paused: s.paused,
             interval: s.interval,
             error: s.error,
@@ -385,6 +417,51 @@ mod tests {
         assert_eq!(resumed.frame.sequence, main.frame.sequence + 1);
         let overview: Overview = resumed.into();
         assert!(overview.processes.len() <= 5);
+    }
+    #[test]
+    fn hidden_polling_slows_down_without_delaying_visible_readers() {
+        let state = AppState::new();
+        let mut hub = Hub::default();
+        let first = hub.read(&state).unwrap();
+        hub.last_attempt = Some(Instant::now() - Duration::from_secs(4));
+        hub.sample_in_background(&state);
+        assert!(Arc::ptr_eq(&first.frame, hub.frame.as_ref().unwrap()));
+        let visible = hub.read(&state).unwrap();
+        assert_eq!(visible.frame.sequence, first.frame.sequence + 1);
+        hub.last_attempt = Some(Instant::now() - Duration::from_secs(31));
+        hub.sample_in_background(&state);
+        assert_eq!(
+            hub.frame.as_ref().unwrap().sequence,
+            visible.frame.sequence + 1
+        );
+        assert_eq!(hub.history.back().unwrap().interval, 30_000);
+        hub.pause(true);
+        hub.last_attempt = Some(Instant::now() - Duration::from_secs(31));
+        hub.sample_in_background(&state);
+        assert_eq!(
+            hub.frame.as_ref().unwrap().sequence,
+            visible.frame.sequence + 1
+        );
+    }
+    #[test]
+    fn overview_rankings_take_five_with_deterministic_ties() {
+        let state = AppState::new();
+        let mut snapshot = Hub::default().read(&state).unwrap();
+        let frame = Arc::make_mut(&mut snapshot.frame);
+        let template = frame.processes.first().unwrap().clone();
+        frame.processes = (1..=7)
+            .rev()
+            .map(|pid| ProcessInfo {
+                pid,
+                cpu_usage: if pid <= 2 { 10.0 } else { pid as f32 },
+                memory_usage: if pid <= 2 { 1 } else { pid as u64 },
+                ..template.clone()
+            })
+            .collect();
+        let overview = Overview::from(snapshot);
+        let pids = |processes: &[BusyProcess]| processes.iter().map(|p| p.pid).collect::<Vec<_>>();
+        assert_eq!(pids(&overview.processes), [1, 2, 7, 6, 5]);
+        assert_eq!(pids(&overview.memory_processes), [7, 6, 5, 4, 3]);
     }
     #[test]
     fn gpu_history_keeps_adapter_identity_and_real_zeros() {

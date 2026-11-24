@@ -212,6 +212,7 @@ export interface OverviewSnapshot {
     Process,
     "pid" | "start_time" | "name" | "cpu_usage" | "memory_usage"
   >[];
+  memory_processes: OverviewSnapshot["processes"];
   paused: boolean;
   interval: number;
   error: string | null;

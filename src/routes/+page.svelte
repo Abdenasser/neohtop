@@ -13,6 +13,7 @@
   } from "$lib/stores/monitoring-preferences";
   import MenuBarOverview from "$lib/components/MenuBarOverview.svelte";
   import { listen, type UnlistenFn } from "@tauri-apps/api/event";
+  import { getCurrentWindow } from "@tauri-apps/api/window";
   import { onMount, onDestroy } from "svelte";
   import {
     debounce,
@@ -198,7 +199,7 @@
       // Use adaptive refresh rate - slightly slower for 1s to reduce CPU usage
       const adaptiveRefreshRate = refreshRate === 1000 ? 1500 : refreshRate;
       intervalId = setInterval(() => {
-        processStore.getProcesses();
+        processStore.getProcesses(true);
       }, adaptiveRefreshRate);
     }
   }
@@ -253,6 +254,11 @@
       const stopControl = await listen("monitor-control", () => {
         void processStore.refreshControl();
       });
+      const stopFocus = await getCurrentWindow().onFocusChanged(
+        ({ payload }) => {
+          if (payload) void processStore.refreshControl();
+        },
+      );
       const stopOpen = await listen<{ pid: number; start_time: number }>(
         "open-process",
         async ({ payload }) => {
@@ -270,11 +276,12 @@
       );
       if (disposed) {
         stopControl();
+        stopFocus();
         stopOpen();
         return;
       }
-      listeners.push(stopControl, stopOpen);
-      await processStore.getProcesses();
+      listeners.push(stopControl, stopFocus, stopOpen);
+      await processStore.getProcesses(true);
       if (!disposed) processStore.setIsLoading(false);
     })();
   });

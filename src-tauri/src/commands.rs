@@ -12,13 +12,21 @@ use tauri::State;
 #[tauri::command]
 pub async fn get_processes(
     app: tauri::AppHandle,
+    window: tauri::WebviewWindow,
     include_gpu: Option<bool>,
     include_ports: Option<bool>,
-) -> Result<crate::sampling::Snapshot, String> {
+    background_when_hidden: Option<bool>,
+) -> Result<Option<crate::sampling::Snapshot>, String> {
+    let background = background_when_hidden.unwrap_or(false)
+        && (!window.is_visible().unwrap_or(true) || window.is_minimized().unwrap_or(false));
     tauri::async_runtime::spawn_blocking(move || {
         use tauri::Manager;
         let state = app.state::<AppState>();
         let mut hub = state.hub.lock().map_err(|e| e.to_string())?;
+        if background {
+            hub.sample_in_background(&state);
+            return Ok(None);
+        }
         hub.process_gpu = include_gpu.unwrap_or(false);
         let mut snapshot = hub.read(&state)?;
         drop(hub);
@@ -37,7 +45,7 @@ pub async fn get_processes(
                 }
             }
         }
-        Ok(snapshot)
+        Ok(Some(snapshot))
     })
     .await
     .map_err(|e| e.to_string())?
