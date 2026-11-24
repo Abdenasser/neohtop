@@ -1,7 +1,7 @@
 /** @typedef {import('../types').Process} Process */
 /** @typedef {import('../types').ProcessTreeRow} ProcessTreeRow */
 
-/** @param {Process} process */
+/** @param {Pick<Process, "pid" | "start_time">} process */
 export function processIdentity(process) {
   return `${process.pid}:${process.start_time}`;
 }

@@ -3,6 +3,11 @@
   import { tableWidth } from "$lib/utils/table-layout.js";
   import { TableHeader, ProcessRow } from "$lib/components";
   import { processIdentity } from "$lib/utils/process-tree.js";
+  import {
+    moveProcessFocus,
+    preserveProcessFocus,
+    processButton,
+  } from "$lib/utils/process-navigation";
   import { Button } from "$lib/components/ui/button/index.js";
   import * as Table from "$lib/components/ui/table/index.js";
   import { Search } from "@lucide/svelte";
@@ -37,26 +42,52 @@
           familyMemoryUsage: process.memory_usage,
           familyProcessCount: 1,
         }));
+
+  function keydown(event: KeyboardEvent & { currentTarget: HTMLDivElement }) {
+    if (moveProcessFocus(event, event.currentTarget)) return;
+    if (event.defaultPrevented || event.isComposing) return;
+
+    if (
+      event.target === event.currentTarget &&
+      (event.key === "ArrowLeft" || event.key === "ArrowRight")
+    ) {
+      event.preventDefault();
+      event.currentTarget.scrollBy({
+        left: event.key === "ArrowRight" ? 160 : -160,
+      });
+    }
+
+    if (
+      (event.key === "Delete" || event.key === "Backspace") &&
+      !event.repeat &&
+      !event.altKey &&
+      !event.ctrlKey &&
+      !event.metaKey &&
+      !event.shiftKey
+    ) {
+      const key = processButton(event.target)?.dataset.processNavigation;
+      const row = rows.find((row) => row.key === key);
+      if (!row) return;
+      event.preventDefault();
+      onKillProcess(row.process);
+    }
+  }
 </script>
 
 <section class="flex min-h-0 min-w-0 flex-1 flex-col" aria-label="Processes">
-  <!-- svelte-ignore a11y_no_noninteractive_tabindex a11y_no_noninteractive_element_interactions (The labeled scroll region supports WebKit keyboard scrolling.) -->
+  <p id="process-table-keys" class="sr-only">
+    Use Up and Down to choose a process. Press Enter for details or Delete to
+    open the confirmation.
+  </p>
+  <!-- svelte-ignore a11y_no_noninteractive_tabindex a11y_no_noninteractive_element_interactions (The labeled scroll region supports process navigation and WebKit keyboard scrolling.) -->
   <div
+    use:preserveProcessFocus
     class="process-table-region focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring"
     role="region"
     aria-label="Process table"
+    aria-describedby="process-table-keys"
     tabindex="0"
-    onkeydown={(event) => {
-      if (
-        event.target === event.currentTarget &&
-        (event.key === "ArrowLeft" || event.key === "ArrowRight")
-      ) {
-        event.preventDefault();
-        event.currentTarget.scrollBy({
-          left: event.key === "ArrowRight" ? 160 : -160,
-        });
-      }
-    }}
+    onkeydown={keydown}
   >
     <Table.Root
       style={`width:max(100%,${tableWidth(columns, viewMode === "tree")}px)`}

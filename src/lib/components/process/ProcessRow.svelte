@@ -2,6 +2,7 @@
   import type { Process, Column, ProcessTreeRow } from "$lib/types";
   import { ProcessIcon, ActionButtons } from "$lib/components";
   import { Button } from "$lib/components/ui/button/index.js";
+  import { processIdentity } from "$lib/utils/process-tree.js";
   import { Badge } from "$lib/components/ui/badge/index.js";
   import * as Table from "$lib/components/ui/table/index.js";
   import { ChevronRight, ChevronDown, Pin } from "@lucide/svelte";
@@ -59,6 +60,8 @@
               startTime={process.start_time}
             /><Button
               variant="link"
+              data-process-navigation={processIdentity(process)}
+              aria-keyshortcuts="Enter Delete Backspace"
               class="h-auto min-w-0 shrink justify-start truncate p-0 text-left text-[13px] font-normal text-foreground"
               title={process.name}
               onclick={() => onShowDetails(process)}

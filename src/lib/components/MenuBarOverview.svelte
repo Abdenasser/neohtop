@@ -21,6 +21,11 @@
   } from "@lucide/svelte";
   import ProcessIcon from "./process/ProcessIcon.svelte";
   import { formatBytes } from "$lib/utils";
+  import { processIdentity } from "$lib/utils/process-tree.js";
+  import {
+    moveProcessFocus,
+    preserveProcessFocus,
+  } from "$lib/utils/process-navigation";
   import { themeStore } from "$lib/stores/theme";
   import type { OverviewSnapshot } from "$lib/types";
   let data: OverviewSnapshot | null = null;
@@ -29,6 +34,7 @@
   let destroyed = false;
   let clock = Date.now();
   let gpuId = "";
+  let processList: HTMLDivElement;
   let inFlight: Promise<void> | null = null;
   let poll: ReturnType<typeof setTimeout>;
   let ticker: ReturnType<typeof setInterval>;
@@ -89,10 +95,12 @@
     );
   }
   async function visibility(value: boolean) {
+    const opening = value && !visible;
     visible = value;
     clearTimeout(poll);
     clearInterval(ticker);
     if (visible && !destroyed) {
+      if (opening) processList?.focus({ preventScroll: true });
       ticker = setInterval(() => {
         clock = Date.now();
       }, 1000);
@@ -268,14 +276,26 @@
           <h2 class="font-medium text-foreground">Top CPU processes</h2>
           <span>CPU · RAM</span>
         </div>
+        <p id="overview-process-keys" class="sr-only">
+          Use Up and Down to choose a process. Press Enter to inspect it.
+        </p>
+        <!-- svelte-ignore a11y_no_noninteractive_tabindex a11y_no_noninteractive_element_interactions (The labeled list supports arrow navigation between process buttons.) -->
         <div
-          class="overflow-hidden rounded-lg border border-border divide-y divide-border"
+          bind:this={processList}
+          use:preserveProcessFocus
+          class="overflow-hidden rounded-lg border border-border divide-y divide-border focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring"
+          role="group"
+          aria-label="Top processes"
+          aria-describedby="overview-process-keys"
+          tabindex="0"
+          onkeydown={(event) => moveProcessFocus(event, event.currentTarget)}
         >
-          {#each data?.processes ?? [] as process (process.pid)}<div
+          {#each data?.processes ?? [] as process (processIdentity(process))}<div
               class="flex"
             >
               <Button
                 variant="ghost"
+                data-process-navigation={processIdentity(process)}
                 class="h-auto w-full justify-start gap-2.5 rounded-none border-0 px-3 py-2 text-left font-normal focus-visible:ring-inset"
                 onclick={() =>
                   open({ pid: process.pid, start_time: process.start_time })}

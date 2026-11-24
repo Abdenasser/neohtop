@@ -88,7 +88,7 @@ pub fn setup(app: &AppHandle) -> tauri::Result<()> {
         "view-overview",
         "Menu-bar Overview",
         true,
-        None::<&str>,
+        Some("CmdOrCtrl+Shift+O"),
     )?;
     let view = Submenu::with_items(
         app,
