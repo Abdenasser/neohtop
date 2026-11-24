@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { t } from "$lib/i18n";
+  import type { AppConfig } from "$lib/types";
   import { onMount } from "svelte";
   import { invoke } from "@tauri-apps/api/core";
   import { emit, listen } from "@tauri-apps/api/event";
@@ -28,13 +30,12 @@
       /* Session selection remains available. */
     }
   }
-  function save(
-    key: "refreshRate" | "menuBarEnabled" | "keepRunning" | "usageAnalytics",
-    value: number | boolean,
+  function save<K extends keyof AppConfig["behavior"]>(
+    key: K,
+    value: AppConfig["behavior"][K],
   ) {
-    settingsStore.updateConfig({
-      behavior: { ...$settingsStore.behavior, [key]: value },
-    });
+    const behavior = { ...$settingsStore.behavior, [key]: value };
+    settingsStore.updateConfig({ behavior });
   }
   onMount(() => {
     let disposed = false;
@@ -80,34 +81,59 @@
       value={pane}
       onValueChange={select}
       variant="outline"
-      aria-label="Settings section"
+      aria-label={$t("settingsWindow.settingsSection")}
     >
       <ToggleGroup.Item value="general" class="px-5"
-        ><Settings2 />General</ToggleGroup.Item
+        ><Settings2 />{$t("settingsWindow.general")}</ToggleGroup.Item
       >
       <ToggleGroup.Item value="appearance" class="px-5"
-        ><Palette />Appearance</ToggleGroup.Item
+        ><Palette />{$t("settingsWindow.appearance")}</ToggleGroup.Item
       >
       <ToggleGroup.Item value="privacy" class="px-5"
-        ><ShieldCheck />Privacy</ToggleGroup.Item
+        ><ShieldCheck />{$t("settingsWindow.privacy")}</ToggleGroup.Item
       >
     </ToggleGroup.Root>
   </header>
   <div class="min-h-0 flex-1 overflow-y-auto p-6">
     {#if pane === "general"}
-      <h1 class="text-lg font-semibold tracking-tight">General</h1>
+      <h1 class="text-lg font-semibold tracking-tight">
+        {$t("settingsWindow.general")}
+      </h1>
       <p class="mt-1 mb-5 text-sm text-muted-foreground">
-        Choose how NeoHtop monitors your system.
+        {$t("settingsWindow.chooseHowNeohtopMonitorsYourSystem")}
       </p>
       <fieldset disabled={!$settingsStatus.ready} class="space-y-5">
+        <Card.Root size="sm">
+          <Card.Content class="flex-row items-center justify-between gap-6">
+            <Label for="display-language">{$t("settingsWindow.language")}</Label
+            >
+            <NativeSelect.Root
+              id="display-language"
+              class="w-28"
+              value={$settingsStore.behavior.language}
+              onchange={(event) =>
+                save(
+                  "language",
+                  event.currentTarget.value === "en" ? "en" : "zh-CN",
+                )}
+            >
+              <option value="zh-CN">简体中文</option>
+              <option value="en">English</option>
+            </NativeSelect.Root>
+          </Card.Content>
+        </Card.Root>
         <Card.Root size="sm"
-          ><Card.Header><Card.Title>Monitoring</Card.Title></Card.Header
+          ><Card.Header
+            ><Card.Title>{$t("settingsWindow.monitoring")}</Card.Title
+            ></Card.Header
           ><Card.Content>
             <div class="flex items-center justify-between gap-6">
               <div>
-                <Label for="refresh-interval">Refresh interval</Label>
+                <Label for="refresh-interval"
+                  >{$t("settingsWindow.refreshInterval")}</Label
+                >
                 <p class="mt-1 text-xs leading-relaxed text-muted-foreground">
-                  Applies to the app and menu-bar overview.
+                  {$t("settingsWindow.appliesToTheAppAndMenuBar")}
                 </p>
               </div>
               <NativeSelect.Root
@@ -118,18 +144,23 @@
                   save("refreshRate", Number(event.currentTarget.value))}
               >
                 {#each options as option}<option value={option.value}
-                    >{option.label}</option
+                    >{$t("common.second", {
+                      value: option.value / 1000,
+                    })}</option
                   >{/each}
               </NativeSelect.Root>
             </div>
             <p class="mt-1 text-xs text-muted-foreground">
-              Longer intervals reduce background activity. Pause and resume from
-              the app bar.
+              {$t(
+                "settingsWindow.longerIntervalsReduceBackgroundActivityPauseAnd",
+              )}
             </p>
           </Card.Content></Card.Root
         >
         <Card.Root size="sm"
-          ><Card.Header><Card.Title>Menu-bar companion</Card.Title></Card.Header
+          ><Card.Header
+            ><Card.Title>{$t("settingsWindow.menuBarCompanion")}</Card.Title
+            ></Card.Header
           ><Card.Content class="gap-5">
             <div class="flex items-start gap-3">
               <Checkbox
@@ -139,9 +170,11 @@
                 onCheckedChange={(value) => save("menuBarEnabled", value)}
               />
               <div>
-                <Label for="show-menu-icon">Show menu-bar icon</Label>
+                <Label for="show-menu-icon"
+                  >{$t("settingsWindow.showMenuBarIcon")}</Label
+                >
                 <p class="mt-1 text-xs leading-relaxed text-muted-foreground">
-                  Keep CPU, memory, graphics and network readings close at hand.
+                  {$t("settingsWindow.keepCpuMemoryGraphicsAndNetworkReadings")}
                 </p>
               </div>
             </div>
@@ -159,11 +192,10 @@
                   : ""}
               >
                 <Label for="keep-running"
-                  >Keep running when the window closes</Label
+                  >{$t("settingsWindow.keepRunningWhenTheWindowCloses")}</Label
                 >
                 <p class="mt-1 text-xs leading-relaxed text-muted-foreground">
-                  Continue from the menu bar. Choose Quit NeoHtop to exit
-                  completely.
+                  {$t("settingsWindow.continueFromTheMenuBarChooseQuit")}
                 </p>
               </div>
             </div>
@@ -171,35 +203,33 @@
         >
       </fieldset>
     {:else if pane === "privacy"}
-      <h1 class="text-lg font-semibold tracking-tight">Privacy</h1>
+      <h1 class="text-lg font-semibold tracking-tight">
+        {$t("settingsWindow.privacy")}
+      </h1>
       <p class="mt-1 mb-5 text-sm text-muted-foreground">
-        Your system readings stay on your machine.
+        {$t("settingsWindow.yourSystemReadingsStayOnYourMachine")}
       </p>
       <div class="space-y-5">
         <Card.Root size="sm"
           ><Card.Header
-            ><Card.Title>Basic launch counter</Card.Title></Card.Header
+            ><Card.Title>{$t("settingsWindow.basicLaunchCounter")}</Card.Title
+            ></Card.Header
           ><Card.Content class="gap-3">
             <p class="text-sm leading-relaxed">
-              Official builds send one app-open event per launch, including the
-              app version. This runs independently of the optional setting
-              below.
+              {$t("settingsWindow.officialBuildsSendOneAppOpenEvent")}
             </p>
             <p class="text-xs leading-relaxed text-muted-foreground">
-              No persistent identifier or system readings are included. This
-              counts launches, not unique people. The relay receives your IP
-              address to handle the request, but does not forward it to Google
-              Analytics or store request logs.
+              {$t("settingsWindow.noPersistentIdentifierOrSystemReadingsAre")}
             </p>
             {#if !analyticsConfigured}<p class="text-xs text-muted-foreground">
-                Analytics is not connected in this build. No desktop events are
-                sent.
+                {$t("settingsWindow.analyticsIsNotConnectedInThisBuild")}
               </p>{/if}
           </Card.Content></Card.Root
         >
         <Card.Root size="sm"
           ><Card.Header
-            ><Card.Title>Help improve NeoHtop</Card.Title></Card.Header
+            ><Card.Title>{$t("settingsWindow.helpImproveNeohtop")}</Card.Title
+            ></Card.Header
           ><Card.Content class="gap-4">
             <div class="flex items-start gap-3">
               <Checkbox
@@ -210,19 +240,16 @@
                 onCheckedChange={(value) => save("usageAnalytics", value)}
               />
               <div>
-                <Label for="usage-analytics">Share feature usage</Label>
+                <Label for="usage-analytics"
+                  >{$t("settingsWindow.shareFeatureUsage")}</Label
+                >
                 <p class="mt-1 text-xs leading-relaxed text-muted-foreground">
-                  Off by default. Share which resource views, themes and a few
-                  controls you use, with your app version and operating-system
-                  family. Uses a random installation identifier that is deleted
-                  when you turn this off.
+                  {$t("settingsWindow.offByDefaultShareWhichResourceViews")}
                 </p>
               </div>
             </div>
             <p class="text-xs leading-relaxed text-muted-foreground">
-              Never sends process names, commands, search text, port numbers,
-              file paths, or CPU, memory and GPU readings. No advertising
-              identifiers. Monitoring works without an internet connection.
+              {$t("settingsWindow.neverSendsProcessNamesCommandsSearchText")}
             </p>
             <Button
               href="https://abdenasser.github.io/neohtop/privacy.html"
@@ -230,15 +257,18 @@
               rel="noreferrer"
               variant="outline"
               size="sm"
-              class="self-start">Read the privacy notice</Button
+              class="self-start"
+              >{$t("settingsWindow.readThePrivacyNotice")}</Button
             >
           </Card.Content></Card.Root
         >
       </div>
     {:else}
-      <h1 class="text-lg font-semibold tracking-tight">Appearance</h1>
+      <h1 class="text-lg font-semibold tracking-tight">
+        {$t("settingsWindow.appearance")}
+      </h1>
       <p class="mt-1 mb-5 text-sm text-muted-foreground">
-        All your NeoHtop themes, across every window.
+        {$t("settingsWindow.allYourNeohtopThemesAcrossEveryWindow")}
       </p>
       <ThemeGallery embedded />
     {/if}
@@ -255,15 +285,15 @@
           onclick={() => {
             void settingsStore.retry();
             void emit("preferences-runtime-retry");
-          }}>Retry</Button
+          }}>{$t("settingsWindow.retry")}</Button
         >
       </div>
     {:else}<p role="status" class="text-xs text-muted-foreground">
         {!$settingsStatus.ready
-          ? "Loading settings…"
+          ? $t("settingsWindow.loadingSettings")
           : $settingsStatus.saving
-            ? "Saving changes…"
-            : "Changes are saved automatically."}
+            ? $t("settingsWindow.savingChanges")
+            : $t("settingsWindow.changesAreSavedAutomatically")}
       </p>{/if}
   </footer>
 </div>

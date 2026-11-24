@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t, type MessageKey } from "$lib/i18n";
   import { onMount } from "svelte";
   import { platform } from "@tauri-apps/plugin-os";
   import { themeStore } from "$lib/stores";
@@ -43,8 +44,8 @@
   <Search
     class="pointer-events-none absolute left-3 top-2.5 size-4 text-muted-foreground"
   /><Input
-    aria-label="Find a theme"
-    placeholder="Find a theme…"
+    aria-label={$t("themeGallery.findATheme")}
+    placeholder={$t("themeGallery.findATheme2")}
     bind:value={query}
     class="pl-9"
   />
@@ -54,7 +55,7 @@
 >
   {#each filtered as group}<div>
       <h3 class="mb-1 px-2 text-xs font-medium text-muted-foreground">
-        {group.label}
+        {$t(`theme.${group.label.toLowerCase()}` as MessageKey)}
       </h3>
       <div class="grid grid-cols-2 gap-1">
         {#each group.themes as name}{@const theme = themes[name]}<Button
@@ -74,6 +75,6 @@
           >{/each}
       </div>
     </div>{:else}<p class="p-3 text-center text-sm text-muted-foreground">
-      No matching themes.
+      {$t("themeGallery.noMatchingThemes")}
     </p>{/each}
 </div>

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from "$lib/i18n";
   import { onMount, onDestroy } from "svelte";
   import { invoke } from "@tauri-apps/api/core";
   import { listen, type UnlistenFn } from "@tauri-apps/api/event";
@@ -176,12 +177,12 @@
           <Card.Title>NeoHtop</Card.Title>
           <p class="mt-0.5 text-xs text-muted-foreground">
             {data?.paused
-              ? "Updates paused"
+              ? $t("menuBarOverview.updatesPaused")
               : stale
-                ? `Last reading ${age}s ago`
+                ? $t("menuBarOverview.lastReadingAgeSAgo", { age: age })
                 : data
-                  ? "Live system overview"
-                  : "Reading this machine…"}
+                  ? $t("menuBarOverview.liveSystemOverview")
+                  : $t("menuBarOverview.readingThisMachine")}
           </p>
         </div>
       </div>
@@ -189,7 +190,7 @@
         variant="ghost"
         size="icon-sm"
         onclick={() => open()}
-        aria-label="Open NeoHtop"><ArrowUpRight /></Button
+        aria-label={$t("menuBarOverview.openNeohtop")}><ArrowUpRight /></Button
       >
     </Card.Header>
     <Card.Content class="min-h-0 flex-1 overflow-y-auto pt-3 pb-3 gap-3">
@@ -197,10 +198,12 @@
           role="alert"
           class="rounded-lg border border-destructive/40 bg-destructive/5 p-2.5 text-xs text-destructive"
         >
-          {error}<Button variant="link" size="sm" onclick={read}>Retry</Button>
+          {error}<Button variant="link" size="sm" onclick={read}
+            >{$t("menuBarOverview.retry")}</Button
+          >
         </div>{/if}
       <div class="grid grid-cols-3 divide-x divide-border">
-        {#each [{ name: "CPU", value: cpu, icon: Cpu, color: "var(--chart-1)", detail: `${data?.stats.cpu_usage.length ?? 0} cores` }, { name: "Memory", value: memory, icon: MemoryStick, color: "var(--chart-3)", detail: data ? `${formatBytes(data.stats.memory_used)} used` : "Reading…" }, { name: "GPU", value: gpu?.utilization, icon: Gpu, color: "var(--chart-2)", detail: gpu?.name ?? "Unavailable" }] as metric}
+        {#each [{ name: $t("common.cpu"), value: cpu, icon: Cpu, color: "var(--chart-1)", detail: $t( "overview.coreCount", { count: data?.stats.cpu_usage.length ?? 0 }, ) }, { name: $t("common.memory"), value: memory, icon: MemoryStick, color: "var(--chart-3)", detail: data ? $t( "overview.memoryUsed", { value: formatBytes(data.stats.memory_used) }, ) : $t("menuBarOverview.reading") }, { name: $t("common.gpu"), value: gpu?.utilization, icon: Gpu, color: "var(--chart-2)", detail: gpu?.name ?? $t("common.unavailable") }] as metric}
           <div class="min-w-0 px-3 first:pl-0 last:pr-0 space-y-2">
             <div
               class="flex items-center gap-1.5 text-xs text-muted-foreground"
@@ -219,9 +222,11 @@
               value={metric.value ?? 0}
               class="h-1.5"
               style={`--primary:${metric.color}`}
-              aria-label={`${metric.name} utilization`}
+              aria-label={$t("menuBarOverview.nameUtilization", {
+                name: metric.name,
+              })}
               aria-valuetext={metric.value == null
-                ? "Unavailable"
+                ? $t("common.unavailable")
                 : pct(metric.value)}
             />
             <p
@@ -237,7 +242,7 @@
         class="grid grid-cols-2 gap-3 rounded-lg border border-border bg-muted/30 p-3 text-xs"
       >
         <div class="space-y-1.5">
-          <p class="text-muted-foreground">Network</p>
+          <p class="text-muted-foreground">{$t("menuBarOverview.network")}</p>
           <p class="flex items-center gap-1.5 font-medium tabular-nums">
             <ArrowDown class="size-3 text-[var(--chart-1)]" />{rate(
               data?.stats.network_rx_bytes,
@@ -251,22 +256,26 @@
         </div>
         <div class="space-y-1.5">
           <p class="flex items-center gap-1.5 text-muted-foreground">
-            <HardDrive class="size-3" />Storage free
+            <HardDrive class="size-3" />{$t("menuBarOverview.storageFree")}
           </p>
           <p class="font-medium tabular-nums">
             {data ? formatBytes(data.stats.disk_free_bytes) : "—"}
           </p>
           <p class="text-muted-foreground">
             {data
-              ? `of ${formatBytes(data.stats.disk_total_bytes)}`
-              : "Reading…"}
+              ? $t("menuBarOverview.ofValue", {
+                  value: formatBytes(data.stats.disk_total_bytes),
+                })
+              : $t("menuBarOverview.reading")}
           </p>
         </div>
       </div>
-      <section aria-label="Top CPU processes">
+      <section aria-label={$t("menuBarOverview.topCpuProcesses")}>
         <div class="mb-2 flex justify-between text-xs text-muted-foreground">
-          <h2 class="font-medium text-foreground">Top CPU processes</h2>
-          <span>CPU · RAM</span>
+          <h2 class="font-medium text-foreground">
+            {$t("menuBarOverview.topCpuProcesses")}
+          </h2>
+          <span>{$t("menuBarOverview.cpuRam")}</span>
         </div>
         <div
           class="overflow-hidden rounded-lg border border-border divide-y divide-border"
@@ -279,8 +288,14 @@
                 class="h-auto w-full justify-start gap-2.5 rounded-none border-0 px-3 py-2 text-left font-normal focus-visible:ring-inset"
                 onclick={() =>
                   open({ pid: process.pid, start_time: process.start_time })}
-                title={`${process.name} · PID ${process.pid}`}
-                aria-label={`Inspect ${process.name}, PID ${process.pid}`}
+                title={$t("menuBarOverview.namePidPid", {
+                  name: process.name,
+                  pid: process.pid,
+                })}
+                aria-label={$t("menuBarOverview.inspectNamePidPid", {
+                  name: process.name,
+                  pid: process.pid,
+                })}
                 ><ProcessIcon
                   pid={process.pid}
                   startTime={process.start_time}
@@ -295,23 +310,26 @@
                 ></Button
               >
             </div>{:else}<p class="p-4 text-xs text-muted-foreground">
-              {data ? "No processes reported" : "Collecting processes…"}
+              {data
+                ? $t("menuBarOverview.noProcessesReported")
+                : $t("menuBarOverview.collectingProcesses")}
             </p>{/each}
         </div>
         <p class="mt-2 text-[10px] leading-4 text-muted-foreground">
-          Select to inspect. Process CPU can exceed 100%.
+          {$t("menuBarOverview.selectToInspectProcessCpuCanExceed")}
         </p>
       </section>
     </Card.Content>
     <Card.Footer class="justify-between border-t border-border pt-3 gap-2"
       ><Button variant="outline" size="sm" onclick={pause} disabled={!data}
-        >{#if data?.paused}<Play />Resume{:else}<Pause />Pause{/if}</Button
+        >{#if data?.paused}<Play />{$t("menuBarOverview.resume")}{:else}<Pause
+          />{$t("menuBarOverview.pause")}{/if}</Button
       ><Button variant="ghost" size="sm" onclick={() => open()}
-        >Open NeoHtop<ArrowUpRight /></Button
+        >{$t("menuBarOverview.openNeohtop")}<ArrowUpRight /></Button
       ><Button
         variant="ghost"
         size="icon-sm"
-        aria-label="Quit NeoHtop"
+        aria-label={$t("menuBarOverview.quitNeohtop")}
         onclick={() => invoke("quit_app")}><Power /></Button
       ></Card.Footer
     >

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from "$lib/i18n";
   import ResourceDetails from "./ResourceDetails.svelte";
   import type { SystemStats } from "$lib/types";
   export let stats: SystemStats;
@@ -24,7 +25,7 @@
   const reading = (value: number) =>
     Number.isFinite(value)
       ? `${Math.max(0, Math.min(100, value)).toFixed(1)}%`
-      : "Unavailable";
+      : $t("common.unavailable");
   function moveCore(event: KeyboardEvent, index: number) {
     if (
       ![
@@ -76,7 +77,7 @@
     >
     <div class="flex items-center gap-1">
       <Badge variant="secondary" class="text-[10px] font-normal tabular-nums"
-        >{cpuUsage.length} cores</Badge
+        >{cpuUsage.length} {$t("cpuPanel.cores")}</Badge
       ><ResourceDetails
         kind="cpu"
         {stats}
@@ -95,13 +96,15 @@
           >{average === null ? "" : "%"}</span
         >
       </div>
-      <p class="text-xs leading-4 text-muted-foreground">Average utilization</p>
+      <p class="text-xs leading-4 text-muted-foreground">
+        {$t("cpuPanel.averageUtilization")}
+      </p>
     </div>
     {#if cpuUsage.length}<div
         class="grid max-h-12 shrink-0 gap-x-0.5 overflow-y-auto"
         style={`grid-template-columns:repeat(${cpuUsage.length <= 6 ? cpuUsage.length : cpuUsage.length <= 12 ? Math.ceil(cpuUsage.length / 2) : 8},minmax(0,1fr))`}
         role="group"
-        aria-label="CPU cores. Use arrow keys to inspect each core."
+        aria-label={$t("cpuPanel.cpuCoresUseArrowKeysToInspect")}
         data-core-meters
       >
         {#each cpuUsage as value, index}<Tooltip.Root
@@ -112,7 +115,10 @@
                   class="h-6 min-w-0 flex-col gap-0.5 rounded-sm px-0.5 py-0.5"
                   tabindex={activeCore === index ? 0 : -1}
                   data-core-index={index}
-                  aria-label={`Core ${index}, ${reading(value)}`}
+                  aria-label={$t("cpuPanel.coreIndexValue", {
+                    index: index,
+                    value: reading(value),
+                  })}
                   onfocus={(event) => {
                     if (typeof props.onfocus === "function")
                       props.onfocus(event);
@@ -136,17 +142,18 @@
                   ></Button
                 >{/snippet}</Tooltip.Trigger
             ><Tooltip.Content side="bottom" sideOffset={5}
-              ><span class="tabular-nums">Core {index} · {reading(value)}</span
+              ><span class="tabular-nums"
+                >{$t("cpuPanel.core")} {index} · {reading(value)}</span
               ></Tooltip.Content
             ></Tooltip.Root
           >{/each}
       </div>{:else}<p class="text-xs text-muted-foreground">
-        Core readings unavailable.
+        {$t("cpuPanel.coreReadingsUnavailable")}
       </p>{/if}
     <ResourceTrend
       {history}
       metric="cpu"
-      label="CPU utilization"
+      label={$t("cpuPanel.cpuUtilization")}
       {isFrozen}
       {unavailable}
     />

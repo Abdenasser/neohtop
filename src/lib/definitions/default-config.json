@@ -20,6 +20,7 @@
     }
   },
   "behavior": {
+    "language": "en",
     "itemsPerPage": 15,
     "refreshRate": 3000,
     "menuBarEnabled": true,

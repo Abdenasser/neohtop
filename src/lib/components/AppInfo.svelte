@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from "$lib/i18n";
   import { getVersion } from "@tauri-apps/api/app";
   import { onMount } from "svelte";
   import { listen } from "@tauri-apps/api/event";
@@ -73,16 +74,20 @@
     <div>
       <h2 class="font-semibold">NeoHtop {version ? `v${version}` : ""}</h2>
       <p class="mt-1 text-xs text-muted-foreground">
-        {APP_INFO.name} · by {APP_INFO.developer}
+        {APP_INFO.name}
+        {$t("appInfo.by")}
+        {APP_INFO.developer}
       </p>
     </div>
-    <Badge variant="secondary" class="ml-auto font-normal">Open source</Badge>
+    <Badge variant="secondary" class="ml-auto font-normal"
+      >{$t("appInfo.openSource")}</Badge
+    >
   </div>
   <pre
     class="overflow-x-auto rounded-md border border-border bg-background p-3 font-mono text-[8px] leading-tight text-primary">{ASCII_ART}</pre>
   <div class="space-y-2 text-xs">
     <div class="flex justify-between">
-      <span class="text-muted-foreground">Stack</span><span
+      <span class="text-muted-foreground">{$t("appInfo.stack")}</span><span
         >{APP_INFO.stack.join(" · ")}</span
       >
     </div>
@@ -93,7 +98,7 @@
       href={APP_INFO.github}
       target="_blank"
       rel="noopener noreferrer"
-      >Source on GitHub<ExternalLink class="size-3" /></Button
+      >{$t("appInfo.sourceOnGithub")}<ExternalLink class="size-3" /></Button
     >
   </div>
   <div
@@ -101,24 +106,27 @@
   >
     <span class="text-xs text-muted-foreground"
       >{checking
-        ? "Checking latest release…"
+        ? $t("appInfo.checkingLatestRelease")
         : failed
-          ? "Release check unavailable"
+          ? $t("appInfo.releaseCheckUnavailable")
           : hasUpdate
-            ? `Version ${latestVersion} available`
+            ? $t("appInfo.versionLatestversionAvailable", {
+                latestVersion: latestVersion,
+              })
             : latestVersion
-              ? "You have the latest stable release"
-              : "Desktop version information"}</span
+              ? $t("appInfo.youHaveTheLatestStableRelease")
+              : $t("appInfo.desktopVersionInformation")}</span
     >{#if hasUpdate}<Button
         variant="outline"
         size="sm"
         href="https://github.com/abdenasser/neohtop/releases/latest"
         target="_blank"
-        rel="noopener noreferrer">View release<ExternalLink /></Button
+        rel="noopener noreferrer"
+        >{$t("appInfo.viewRelease")}<ExternalLink /></Button
       >{:else if failed}<Button
         variant="ghost"
         size="icon-sm"
-        aria-label="Retry release check"
+        aria-label={$t("appInfo.retryReleaseCheck")}
         onclick={checkLatestVersion}><RefreshCw /></Button
       >{/if}
   </div>

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t, processStatus } from "$lib/i18n";
   import { Button } from "$lib/components/ui/button/index.js";
   import { Input } from "$lib/components/ui/input/index.js";
   import { Checkbox } from "$lib/components/ui/checkbox/index.js";
@@ -16,11 +17,11 @@
   };
   $: count = Object.values(filters).filter((f) => f.enabled).length;
   const numeric = [
-    { id: "cpu" as const, label: "CPU usage", unit: "%" },
-    { id: "gpu" as const, label: "GPU engine activity", unit: "%" },
-    { id: "ram" as const, label: "Memory", unit: "MB" },
-    { id: "runtime" as const, label: "Run time", unit: "min" },
-  ];
+    { id: "cpu" as const, label: "filter.cpuUsage", unit: "%" },
+    { id: "gpu" as const, label: "filter.gpuActivity", unit: "%" },
+    { id: "ram" as const, label: "common.memory", unit: "MB" },
+    { id: "runtime" as const, label: "process.runTime", unit: "min" },
+  ] as const;
   const statuses = [
     "Running",
     "Sleeping",
@@ -60,8 +61,10 @@
         variant="outline"
         size="sm"
         class="h-9"
-        aria-label={count ? `Filters, ${count} active` : "Filters"}
-        ><SlidersHorizontal />Filters{#if count}<Badge
+        aria-label={count
+          ? $t("filterToggle.filtersCountActive", { count: count })
+          : $t("filterToggle.filters")}
+        ><SlidersHorizontal />{$t("filterToggle.filters")}{#if count}<Badge
             class="ml-1 size-4 justify-center rounded-sm p-0 text-[10px]"
             >{count}</Badge
           >{/if}</Button
@@ -70,9 +73,9 @@
     align="start"
     class="w-96 max-w-[calc(100vw-2rem)] space-y-5"
     ><div>
-      <h2 class="text-sm font-medium">Filter processes</h2>
+      <h2 class="text-sm font-medium">{$t("filterToggle.filterProcesses")}</h2>
       <p class="mt-1 text-xs text-muted-foreground">
-        Combine conditions with name, command or PID search.
+        {$t("filterToggle.combineConditionsWithNameCommandOrPid")}
       </p>
     </div>
     <div class="space-y-3">
@@ -80,12 +83,14 @@
           class="grid grid-cols-[1fr_64px_80px_28px] items-center gap-2"
         >
           <Label class="gap-2 text-xs"
-            ><Checkbox
-              bind:checked={filters[rule.id].enabled}
-            />{rule.label}</Label
+            ><Checkbox bind:checked={filters[rule.id].enabled} />{$t(
+              rule.label,
+            )}</Label
           ><NativeSelect.Root
             bind:value={filters[rule.id].operator}
-            aria-label={`${rule.label} comparison`}
+            aria-label={$t("filterToggle.labelComparison", {
+              label: $t(rule.label),
+            })}
             disabled={!filters[rule.id].enabled}
             size="sm"
             ><option value=">">&gt;</option><option value="<">&lt;</option
@@ -98,27 +103,33 @@
             step="any"
             bind:value={filters[rule.id].value}
             disabled={!filters[rule.id].enabled}
-            aria-label={`${rule.label} threshold`}
+            aria-label={$t("filterToggle.labelThreshold", {
+              label: $t(rule.label),
+            })}
             class="h-8 text-xs"
-          /><span class="text-xs text-muted-foreground">{rule.unit}</span>
+          /><span class="text-xs text-muted-foreground"
+            >{rule.unit === "min" ? $t("filter.minuteUnit") : rule.unit}</span
+          >
         </div>{/each}
     </div>
     <div class="space-y-3 border-t border-border pt-4">
-      <h3 class="text-xs font-medium">Status</h3>
+      <h3 class="text-xs font-medium">{$t("filterToggle.status")}</h3>
       <div class="grid grid-cols-2 gap-3">
         {#each statuses as status}<Label class="gap-2 text-xs font-normal"
             ><Checkbox
               checked={filters.status.values.includes(status)}
               onCheckedChange={(checked) => setStatus(status, checked)}
-            />{status}</Label
+            />{processStatus($t, status)}</Label
           >{/each}
       </div>
     </div>
     <div class="flex items-center justify-between border-t border-border pt-3">
       <span class="text-xs text-muted-foreground"
-        >{count ? `${count} active conditions` : "No filters applied"}</span
+        >{count
+          ? $t("filterToggle.countActiveConditions", { count: count })
+          : $t("filterToggle.noFiltersApplied")}</span
       ><Button variant="ghost" size="sm" disabled={!count} onclick={reset}
-        ><RotateCcw />Reset filters</Button
+        ><RotateCcw />{$t("filterToggle.resetFilters")}</Button
       >
     </div></Popover.Content
   ></Popover.Root

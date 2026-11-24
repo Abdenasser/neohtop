@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from "$lib/i18n";
   import type { Process, Column, ProcessTreeRow } from "$lib/types";
   import { tableWidth } from "$lib/utils/table-layout.js";
   import { TableHeader, ProcessRow } from "$lib/components";
@@ -39,12 +40,15 @@
         }));
 </script>
 
-<section class="flex min-h-0 min-w-0 flex-1 flex-col" aria-label="Processes">
+<section
+  class="flex min-h-0 min-w-0 flex-1 flex-col"
+  aria-label={$t("processTable.processes")}
+>
   <!-- svelte-ignore a11y_no_noninteractive_tabindex a11y_no_noninteractive_element_interactions (The labeled scroll region supports WebKit keyboard scrolling.) -->
   <div
     class="process-table-region focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring"
     role="region"
-    aria-label="Process table"
+    aria-label={$t("processTable.processTable")}
     tabindex="0"
     onkeydown={(event) => {
       if (
@@ -91,18 +95,19 @@
               ><Search class="mx-auto mb-3 size-6 text-muted-foreground" />
               <p class="text-sm font-medium">
                 {searchActive
-                  ? "No matching processes"
-                  : "No processes in this snapshot"}
+                  ? $t("processTable.noMatchingProcesses")
+                  : $t("processTable.noProcessesInThisSnapshot")}
               </p>
               <p class="mt-1 text-xs text-muted-foreground">
                 {searchActive
-                  ? "Try another name, PID or condition."
-                  : "Wait for the next update or resume monitoring."}
+                  ? $t("processTable.tryAnotherNamePidOrCondition")
+                  : $t("processTable.waitForTheNextUpdateOrResume")}
               </p>
               {#if searchActive}<Button
                   variant="link"
                   size="sm"
-                  onclick={onClearFilters}>Clear search and filters</Button
+                  onclick={onClearFilters}
+                  >{$t("processTable.clearSearchAndFilters")}</Button
                 >{/if}</Table.Cell
             ></Table.Row
           >{/each}</Table.Body

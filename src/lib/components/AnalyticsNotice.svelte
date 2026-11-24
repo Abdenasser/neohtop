@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from "$lib/i18n";
   import { onMount } from "svelte";
   import { invoke, isTauri } from "@tauri-apps/api/core";
   import { Button } from "$lib/components/ui/button/index.js";
@@ -32,11 +33,11 @@
   <Card.Root size="sm" role="status" class="mx-4 mt-4 shrink-0"
     ><Card.Content class="flex-row items-start gap-3">
       <div class="min-w-0 flex-1">
-        <p class="text-sm font-medium">A small change to privacy in v1.3</p>
+        <p class="text-sm font-medium">
+          {$t("analyticsNotice.aSmallChangeToPrivacyInV1")}
+        </p>
         <p class="mt-1 text-xs leading-relaxed text-muted-foreground">
-          NeoHtop sends a basic app-open count and version each launch, without
-          a persistent identifier. Feature-usage sharing is off by default. Your
-          process and system readings stay here.
+          {$t("analyticsNotice.neohtopSendsABasicAppOpenCount")}
         </p>
         <Button
           variant="link"
@@ -44,13 +45,13 @@
           class="h-auto p-0 pt-2"
           onclick={() => {
             void invoke("open_settings", { pane: "privacy" });
-          }}>Review privacy settings</Button
+          }}>{$t("analyticsNotice.reviewPrivacySettings")}</Button
         >
       </div>
       <Button
         variant="ghost"
         size="icon-sm"
-        aria-label="Dismiss privacy notice"
+        aria-label={$t("analyticsNotice.dismissPrivacyNotice")}
         onclick={dismiss}><X /></Button
       >
     </Card.Content></Card.Root

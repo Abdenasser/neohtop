@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t, processStatus } from "$lib/i18n";
   import SearchBox from "./SearchBox.svelte";
   import FilterToggle from "./FilterToggle.svelte";
   import ColumnToggle from "./ColumnToggle.svelte";
@@ -31,7 +32,9 @@
     !!searchTerm.trim() ||
     Object.values(filters).some((filter) => filter.enabled);
   $: activeFilters = [
-    ...(searchTerm.trim() ? [`Search: ${searchTerm.trim()}`] : []),
+    ...(searchTerm.trim()
+      ? [$t("filter.searchQuery", { query: searchTerm.trim() })]
+      : []),
     ...(filters.cpu.enabled
       ? [`CPU ${filters.cpu.operator} ${filters.cpu.value}%`]
       : []),
@@ -39,13 +42,33 @@
       ? [`GPU ${filters.gpu.operator} ${filters.gpu.value}%`]
       : []),
     ...(filters.ram.enabled
-      ? [`Memory ${filters.ram.operator} ${filters.ram.value} MB`]
+      ? [
+          $t("filter.rule", {
+            label: $t("common.memory"),
+            operator: filters.ram.operator,
+            value: filters.ram.value,
+            unit: "MB",
+          }),
+        ]
       : []),
     ...(filters.runtime.enabled
-      ? [`Run time ${filters.runtime.operator} ${filters.runtime.value} min`]
+      ? [
+          $t("filter.rule", {
+            label: $t("process.runTime"),
+            operator: filters.runtime.operator,
+            value: filters.runtime.value,
+            unit: $t("filter.minuteUnit"),
+          }),
+        ]
       : []),
     ...(filters.status.enabled
-      ? [`Status: ${filters.status.values.join(", ")}`]
+      ? [
+          $t("filter.statusValues", {
+            status: filters.status.values
+              .map((value) => processStatus($t, value))
+              .join(", "),
+          }),
+        ]
       : []),
   ];
 </script>
@@ -53,7 +76,8 @@
 <div class="toolbar shrink-0 border-y border-border bg-card px-4 py-3">
   <div class="flex items-center gap-3">
     <h2 class="mr-1 shrink-0 text-sm font-semibold">
-      Processes <span class="ml-1 font-normal text-muted-foreground"
+      {$t("toolBar.processes")}
+      <span class="ml-1 font-normal text-muted-foreground"
         >{totalProcesses.toLocaleString()}</span
       >
     </h2>
@@ -67,13 +91,13 @@
         }}
         variant="outline"
         size="sm"
-        aria-label="Process view"
+        aria-label={$t("toolBar.processView")}
       >
-        <ToggleGroup.Item value="flat" aria-label="List view"
-          ><List class="size-3.5" />List</ToggleGroup.Item
+        <ToggleGroup.Item value="flat" aria-label={$t("toolBar.listView")}
+          ><List class="size-3.5" />{$t("toolBar.list")}</ToggleGroup.Item
         >
-        <ToggleGroup.Item value="tree" aria-label="Tree view"
-          ><GitBranch class="size-3.5" />Tree</ToggleGroup.Item
+        <ToggleGroup.Item value="tree" aria-label={$t("toolBar.treeView")}
+          ><GitBranch class="size-3.5" />{$t("toolBar.tree")}</ToggleGroup.Item
         >
       </ToggleGroup.Root><ColumnToggle {columns} />
     </div>
@@ -83,8 +107,10 @@
       class="mt-2 flex flex-wrap items-center gap-2 text-xs text-muted-foreground"
     >
       {#if searchActive}<span
-          >{matchingProcesses.toLocaleString()} of {totalProcesses.toLocaleString()}
-          processes match</span
+          >{$t("process.matches", {
+            count: matchingProcesses.toLocaleString(),
+            total: totalProcesses.toLocaleString(),
+          })}</span
         >{#each activeFilters as label}<Badge
             variant="secondary"
             class="max-w-64 font-normal"
@@ -93,19 +119,20 @@
           variant="ghost"
           size="sm"
           class="h-6 px-2 text-xs"
-          onclick={onClearFilters}><X class="size-3" />Clear all</Button
+          onclick={onClearFilters}
+          ><X class="size-3" />{$t("toolBar.clearAll")}</Button
         >{/if}
       {#if viewMode === "tree"}<span
-          title="Family CPU sums process CPU. Family RAM sums resident memory; shared pages may overlap."
+          title={$t("toolBar.familyCpuSumsProcessCpuFamilyRam")}
           >{searchActive
-            ? "Matching branches expanded · totals include hidden children"
-            : "App families · combined CPU and memory"}</span
+            ? $t("toolBar.matchingBranchesExpandedTotalsIncludeHiddenChildren")
+            : $t("toolBar.appFamiliesCombinedCpuAndMemory")}</span
         ><Button
           variant="ghost"
           size="sm"
           class="ml-auto h-6 text-xs"
           disabled={searchActive || expandedCount === 0}
-          onclick={onCollapseAll}>Collapse all</Button
+          onclick={onCollapseAll}>{$t("toolBar.collapseAll")}</Button
         >{/if}
     </div>
   {/if}

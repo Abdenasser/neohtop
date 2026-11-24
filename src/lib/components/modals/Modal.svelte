@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from "$lib/i18n";
   import * as Dialog from "$lib/components/ui/dialog/index.js";
   export let show = false;
   export let maxWidth = "600px";
@@ -16,7 +17,7 @@
     style={`max-width:min(calc(100vw - 2rem),${maxWidth})`}
     ><Dialog.Header
       ><Dialog.Title>{title}</Dialog.Title><Dialog.Description class="sr-only"
-        >NeoHtop details</Dialog.Description
+        >{$t("modal.neohtopDetails")}</Dialog.Description
       ></Dialog.Header
     ><slot /></Dialog.Content
   ></Dialog.Root

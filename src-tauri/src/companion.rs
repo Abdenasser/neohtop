@@ -15,6 +15,7 @@ const TRAY_ID: &str = "neohtop-overview";
 pub struct CompanionState {
     pub keep_running: bool,
     pub hidden_at: Option<Instant>,
+    chinese: Option<bool>,
 }
 
 // A monochrome pixel ghost, matching the public app's silhouette. macOS treats
@@ -57,20 +58,52 @@ fn ghost() -> tauri::image::Image<'static> {
     tauri::image::Image::new_owned(rgba, 32, 32)
 }
 
-fn configure(app: &AppHandle, enabled: bool, keep_running: bool) -> Result<(), String> {
+fn tray_menu(app: &AppHandle, chinese: bool) -> tauri::Result<Menu<tauri::Wry>> {
+    let text = |en: &'static str, zh: &'static str| if chinese { zh } else { en };
+    let overview = MenuItem::with_id(
+        app,
+        "overview",
+        text("Show overview", "显示概览"),
+        true,
+        None::<&str>,
+    )?;
+    let open = MenuItem::with_id(
+        app,
+        "open-main",
+        text("Open NeoHtop", "打开 NeoHtop"),
+        true,
+        None::<&str>,
+    )?;
+    let quit = MenuItem::with_id(
+        app,
+        "quit",
+        text("Quit NeoHtop", "退出 NeoHtop"),
+        true,
+        None::<&str>,
+    )?;
+    Menu::with_items(app, &[&overview, &open, &quit])
+}
+
+fn configure(
+    app: &AppHandle,
+    enabled: bool,
+    keep_running: bool,
+    chinese: bool,
+) -> Result<(), String> {
     // Called only on the main thread: native menus and tray destruction require it.
+    let service = app.state::<Mutex<CompanionState>>();
+    let language_changed = service.lock().map_err(|e| e.to_string())?.chinese != Some(chinese);
+    let tooltip = if chinese {
+        "NeoHtop 系统概览"
+    } else {
+        "NeoHtop — system overview"
+    };
     if enabled && app.tray_by_id(TRAY_ID).is_none() {
-        let overview = MenuItem::with_id(app, "overview", "Show overview", true, None::<&str>)
-            .map_err(|e| e.to_string())?;
-        let open = MenuItem::with_id(app, "open-main", "Open NeoHtop", true, None::<&str>)
-            .map_err(|e| e.to_string())?;
-        let quit = MenuItem::with_id(app, "quit", "Quit NeoHtop", true, None::<&str>)
-            .map_err(|e| e.to_string())?;
-        let menu = Menu::with_items(app, &[&overview, &open, &quit]).map_err(|e| e.to_string())?;
+        let menu = tray_menu(app, chinese).map_err(|e| e.to_string())?;
         TrayIconBuilder::with_id(TRAY_ID)
             .icon(ghost())
             .icon_as_template(true)
-            .tooltip("NeoHtop — system overview")
+            .tooltip(tooltip)
             .menu(&menu)
             .menu_on_left_click(false)
             .on_menu_event(|app, event| {
@@ -113,14 +146,23 @@ fn configure(app: &AppHandle, enabled: bool, keep_running: bool) -> Result<(), S
             })
             .build(app)
             .map_err(|e| e.to_string())?;
-    } else if !enabled {
+    } else if enabled && language_changed {
+        if let Some(tray) = app.tray_by_id(TRAY_ID) {
+            tray.set_menu(Some(tray_menu(app, chinese).map_err(|e| e.to_string())?))
+                .map_err(|e| e.to_string())?;
+            tray.set_tooltip(Some(tooltip)).map_err(|e| e.to_string())?;
+        }
+    }
+    if language_changed {
+        crate::desktop::apply_language(app, chinese).map_err(|e| e.to_string())?;
+    }
+    if !enabled {
         drop(app.remove_tray_by_id(TRAY_ID));
     }
     // Only opt in to hiding the main window when the tray actually exists.
-    app.state::<Mutex<CompanionState>>()
-        .lock()
-        .map_err(|e| e.to_string())?
-        .keep_running = enabled && keep_running;
+    let mut state = service.lock().map_err(|e| e.to_string())?;
+    state.chinese = Some(chinese);
+    state.keep_running = enabled && keep_running;
     Ok(())
 }
 
@@ -216,6 +258,7 @@ pub fn open_main(app: &AppHandle) -> Result<(), String> {
     window.show().map_err(|e| e.to_string())?;
     window.set_focus().map_err(|e| e.to_string())
 }
+
 pub fn window_event(window: &tauri::Window, event: &WindowEvent) {
     let app = window.app_handle();
     match (window.label(), event) {
@@ -250,11 +293,12 @@ pub async fn configure_companion(
     app: AppHandle,
     enabled: bool,
     keep_running: bool,
+    language: String,
 ) -> Result<(), String> {
     let (sender, mut receiver) = tauri::async_runtime::channel(1);
     let handle = app.clone();
     app.run_on_main_thread(move || {
-        let result = configure(&handle, enabled, keep_running);
+        let result = configure(&handle, enabled, keep_running, language == "zh-CN");
         let _ = sender.try_send(result);
     })
     .map_err(|e| e.to_string())?;

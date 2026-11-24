@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from "$lib/i18n";
   import { settingsStore } from "$lib/stores";
   import { Button } from "$lib/components/ui/button/index.js";
   import * as DropdownMenu from "$lib/components/ui/dropdown-menu/index.js";
@@ -28,18 +29,21 @@
         {...props}
         variant="ghost"
         size="sm"
-        aria-label="View options"
-        ><Columns3 />View<ChevronDown class="size-3" /></Button
+        aria-label={$t("columnToggle.viewOptions")}
+        ><Columns3 />{$t("columnToggle.view")}<ChevronDown
+          class="size-3"
+        /></Button
       >{/snippet}</DropdownMenu.Trigger
   ><DropdownMenu.Content align="end" class="max-h-[70vh] w-60 overflow-y-auto"
-    ><DropdownMenu.Label>Visible columns</DropdownMenu.Label
+    ><DropdownMenu.Label>{$t("columnToggle.visibleColumns")}</DropdownMenu.Label
     ><DropdownMenu.Separator
     />{#each columns as column}<DropdownMenu.CheckboxItem
         checked={column.visible}
         disabled={column.required}
         onCheckedChange={(value) => change(column.id, value)}
         >{column.label}{#if column.required}<span
-            class="ml-auto text-[10px] text-muted-foreground">Required</span
+            class="ml-auto text-[10px] text-muted-foreground"
+            >{$t("columnToggle.required")}</span
           >{/if}</DropdownMenu.CheckboxItem
       >{/each}</DropdownMenu.Content
   ></DropdownMenu.Root

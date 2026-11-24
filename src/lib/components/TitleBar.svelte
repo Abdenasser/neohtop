@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from "$lib/i18n";
   import { platform } from "@tauri-apps/plugin-os";
   import { invoke } from "@tauri-apps/api/core";
   import { settingsStore } from "$lib/stores/settings";
@@ -52,14 +53,23 @@
       ><span
         class={`size-1.5 rounded-full ${isFrozen ? "bg-muted-foreground" : "bg-[var(--status-running)]"}`}
       ></span>{isFrozen
-        ? "Paused"
-        : `Live · ${$settingsStore.behavior.refreshRate === 1000 ? 1.5 : $settingsStore.behavior.refreshRate / 1000}s`}</span
+        ? $t("titleBar.paused")
+        : $t("titleBar.liveValueS", {
+            value:
+              $settingsStore.behavior.refreshRate === 1000
+                ? 1.5
+                : $settingsStore.behavior.refreshRate / 1000,
+          })}</span
     >
     <Button
       variant={isFrozen ? "secondary" : "ghost"}
       size="icon-sm"
-      aria-label={isFrozen ? "Resume updates" : "Pause updates"}
-      title={isFrozen ? "Resume updates" : "Pause updates"}
+      aria-label={isFrozen
+        ? $t("titleBar.resumeUpdates")
+        : $t("titleBar.pauseUpdates")}
+      title={isFrozen
+        ? $t("titleBar.resumeUpdates")
+        : $t("titleBar.pauseUpdates")}
       aria-pressed={isFrozen}
       onclick={() => onPause(!isFrozen)}
       >{#if isFrozen}<Play />{:else}<Pause />{/if}</Button
@@ -67,8 +77,8 @@
     <Button
       variant="ghost"
       size="icon-sm"
-      aria-label="Open menu-bar overview"
-      title="Menu-bar overview"
+      aria-label={$t("titleBar.openMenuBarOverview")}
+      title={$t("titleBar.menuBarOverview")}
       onclick={() => command("show_companion")}><PanelsTopLeft /></Button
     >
     <div class="mx-1 h-4 w-px bg-border"></div>
@@ -79,26 +89,27 @@
             {...props}
             variant="ghost"
             size="icon-sm"
-            aria-label="NeoHtop menu"><Ellipsis /></Button
+            aria-label={$t("titleBar.neohtopMenu")}><Ellipsis /></Button
           >{/snippet}</DropdownMenu.Trigger
       >
       <DropdownMenu.Content align="end" class="w-60">
         <DropdownMenu.Item onclick={() => command("open_settings")}
-          ><Settings2 />Settings…<DropdownMenu.Shortcut
+          ><Settings2 />{$t("titleBar.settings")}<DropdownMenu.Shortcut
             >{settingsShortcut}</DropdownMenu.Shortcut
           ></DropdownMenu.Item
         >
         <DropdownMenu.Separator />
         <DropdownMenu.Item
           onclick={() => command("open_about", { check: false })}
-          ><Info />About NeoHtop</DropdownMenu.Item
+          ><Info />{$t("titleBar.aboutNeohtop")}</DropdownMenu.Item
         >
         <DropdownMenu.Item
           onclick={() => command("open_about", { check: true })}
-          ><RefreshCw />Check for updates…</DropdownMenu.Item
+          ><RefreshCw />{$t("titleBar.checkForUpdates")}</DropdownMenu.Item
         >
         <DropdownMenu.Separator /><DropdownMenu.Item
-          onclick={() => command("quit_app")}>Quit NeoHtop</DropdownMenu.Item
+          onclick={() => command("quit_app")}
+          >{$t("titleBar.quitNeohtop")}</DropdownMenu.Item
         >
       </DropdownMenu.Content>
     </DropdownMenu.Root>
@@ -111,6 +122,6 @@
     <span>{actionError}</span><Button
       variant="ghost"
       size="sm"
-      onclick={() => (actionError = "")}>Dismiss</Button
+      onclick={() => (actionError = "")}>{$t("titleBar.dismiss")}</Button
     >
   </div>{/if}

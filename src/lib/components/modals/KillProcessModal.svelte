@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from "$lib/i18n";
   import * as AlertDialog from "$lib/components/ui/alert-dialog/index.js";
   import { Button } from "$lib/components/ui/button/index.js";
   import { LoaderCircle } from "@lucide/svelte";
@@ -20,9 +21,12 @@
     }}
     ><AlertDialog.Header
       ><AlertDialog.Title
-        >End {process?.name || "this process"}?</AlertDialog.Title
+        >{$t("killProcessModal.end")}
+        {process?.name || "this process"}?</AlertDialog.Title
       ><AlertDialog.Description
-        >This stops the selected process. Unsaved work may be lost.</AlertDialog.Description
+        >{$t(
+          "killProcessModal.thisStopsTheSelectedProcessUnsavedWork",
+        )}</AlertDialog.Description
       ></AlertDialog.Header
     >{#if process}<div
         class="rounded-md border border-border bg-muted/50 px-4 py-3"
@@ -32,13 +36,15 @@
           PID {process.pid}
         </p>
       </div>{/if}<AlertDialog.Footer
-      ><AlertDialog.Cancel disabled={isKilling}>Cancel</AlertDialog.Cancel
+      ><AlertDialog.Cancel disabled={isKilling}
+        >{$t("killProcessModal.cancel")}</AlertDialog.Cancel
       ><Button
         variant="destructive"
         disabled={isKilling || !process}
         onclick={onConfirm}
-        >{#if isKilling}<LoaderCircle class="animate-spin" />Ending…{:else}End
-          process{/if}</Button
+        >{#if isKilling}<LoaderCircle class="animate-spin" />{$t(
+            "killProcessModal.ending",
+          )}{:else}{$t("killProcessModal.endProcess")}{/if}</Button
       ></AlertDialog.Footer
     ></AlertDialog.Content
   ></AlertDialog.Root

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from "$lib/i18n";
   import GpuPanel from "./GpuPanel.svelte";
   import * as Tooltip from "$lib/components/ui/tooltip/index.js";
   import type { SystemStats, ResourceSample, GpuDevice } from "$lib/types";
@@ -18,7 +19,10 @@
 </script>
 
 {#if systemStats}<Tooltip.Provider delayDuration={150}
-    ><section class="resource-grid shrink-0" aria-label="System resources">
+    ><section
+      class="resource-grid shrink-0"
+      aria-label={$t("statsBar.systemResources")}
+    >
       <CpuPanel
         stats={systemStats}
         {capturedAt}

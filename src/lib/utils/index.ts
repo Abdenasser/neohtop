@@ -16,11 +16,13 @@ export function formatPercentage(value: number): string {
   return `${value.toFixed(1)}%`;
 }
 
-export function formatUptime(seconds: number): string {
+export function formatUptime(seconds: number, locale?: string): string {
   const days = Math.floor(seconds / 86400);
   const hours = Math.floor((seconds % 86400) / 3600);
   const minutes = Math.floor((seconds % 3600) / 60);
-  return `${days}d ${hours}h ${minutes}m`;
+  return locale === "zh-CN"
+    ? `${days} 天 ${hours} 小时 ${minutes} 分`
+    : `${days}d ${hours}h ${minutes}m`;
 }
 
 export function getUsageClass(percentage: number): string {
@@ -43,8 +45,8 @@ export function formatBytes(bytes: number): string {
   return `${value.toFixed(1)} ${units[unitIndex]}`;
 }
 
-export function formatDate(timestamp: number) {
-  return new Date(timestamp * 1000).toLocaleString();
+export function formatDate(timestamp: number, locale?: string) {
+  return new Date(timestamp * 1000).toLocaleString(locale);
 }
 
 // Debounce utility to reduce frequency of expensive operations

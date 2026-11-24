@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from "$lib/i18n";
   import ResourceDetails from "./ResourceDetails.svelte";
   import type { SystemStats } from "$lib/types";
   export let stats: SystemStats;
@@ -26,7 +27,7 @@
         class="size-5 rounded-md border-0 p-0 bg-primary/10 text-primary [&>svg]:size-3!"
         style="--primary:var(--chart-1)"
         aria-hidden="true"><Network /></Badge
-      >Network</Card.Title
+      >{$t("networkPanel.network")}</Card.Title
     ><ResourceDetails
       kind="network"
       {stats}
@@ -53,7 +54,7 @@
         <span
           class="w-2.5 border-t-2 border-[var(--chart-1)]"
           aria-hidden="true"
-        ></span>↓ Received
+        ></span>{$t("networkPanel.received")}
       </p>
     </div>
     <div class="flex items-center gap-1.5">
@@ -63,17 +64,17 @@
       ></span>
       <div class="min-w-0 flex-1">
         <StatItem
-          label="↑ Sent"
+          label={$t("networkPanel.sent")}
           value={networkTxBytes !== null && Number.isFinite(networkTxBytes)
             ? `${formatBytes(networkTxBytes)}/s`
-            : "Unavailable"}
+            : $t("common.unavailable")}
         />
       </div>
     </div>
     <ResourceTrend
       {history}
       metric="network"
-      label="Network receive and send"
+      label={$t("networkPanel.networkReceiveAndSend")}
       {isFrozen}
       {unavailable}
     />

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t, uiLocale } from "$lib/i18n";
   import * as Chart from "$lib/components/ui/chart/index.js";
   import { AreaChart, Area, LinearGradient, Points } from "layerchart";
   import type { ResourceSample } from "$lib/types";
@@ -39,16 +40,24 @@
       ? [
           {
             key: "received" as Key,
-            label: "Received",
+            label: $t("common.received"),
             color: "var(--chart-1)",
           },
-          { key: "sent" as Key, label: "Sent", color: "var(--chart-4)" },
+          {
+            key: "sent" as Key,
+            label: $t("common.sent"),
+            color: "var(--chart-4)",
+          },
         ]
       : [
           {
             key: metric as Key,
             label:
-              metric === "cpu" ? "CPU" : metric === "gpu" ? "GPU" : "RAM used",
+              metric === "cpu"
+                ? "CPU"
+                : metric === "gpu"
+                  ? "GPU"
+                  : $t("trend.ramUsed"),
             color:
               metric === "cpu"
                 ? "var(--chart-1)"
@@ -79,37 +88,37 @@
     history.filter((p) => series.some((s) => p[s.key] != null)).length,
   );
   const time = (stamp: number) =>
-    new Date(stamp).toLocaleTimeString(undefined, {
+    new Date(stamp).toLocaleTimeString($uiLocale, {
       hour: "2-digit",
       minute: "2-digit",
       second: "2-digit",
     });
   const value = (n: number | null) =>
     n === null
-      ? "Unavailable"
+      ? $t("common.unavailable")
       : metric === "network"
         ? `${formatBytes(n)}/s`
         : `${n.toFixed(1)}%`;
   const describe = (p: ResourceSample | undefined) =>
     p
       ? `${time(p.timestamp)} · ${series.map((s) => `${s.label} ${value(p[s.key] ?? null)}`).join(" · ")}`
-      : "Collecting history";
+      : $t("trend.collecting");
   const caption = $derived(
     selectedStamp !== null
       ? metric === "network" && selected
         ? `↓ ${value(selected.received)} · ↑ ${value(selected.sent)}`
         : describe(selected)
       : isFrozen
-        ? "Paused"
+        ? $t("titleBar.paused")
         : unavailable
-          ? "Updates unavailable"
+          ? $t("resourceDetails.updatesUnavailable")
           : unsupported
-            ? "Driver counter unavailable"
+            ? $t("trend.driverUnavailable")
             : validCount < 2
-              ? "Collecting history…"
+              ? $t("trend.collectingEllipsis")
               : metric === "network"
-                ? `2m · 0–${formatBytes(ceiling)}/s`
-                : "2m · 0–100%",
+                ? $t("trend.range", { max: `${formatBytes(ceiling)}/s` })
+                : $t("trend.range", { max: "100%" }),
   );
   function point(event: PointerEvent) {
     if (!history.length) return;
@@ -163,7 +172,9 @@
     class={`${expanded ? "h-28" : "h-12"} w-full rounded-sm aspect-auto focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring`}
     role="slider"
     tabindex={history.length ? 0 : -1}
-    aria-label={`${label} history, last two minutes. Use Left and Right arrows to inspect samples.`}
+    aria-label={$t("resourceTrend.labelHistoryLastTwoMinutesUseLeft", {
+      label: label,
+    })}
     aria-valuemin={0}
     aria-valuemax={Math.max(0, history.length - 1)}
     aria-valuenow={selectedIndex}
@@ -248,7 +259,10 @@
   </Chart.Container>
   <div
     class="min-h-3 truncate text-[10px] leading-3 text-muted-foreground tabular-nums"
-    title={`${label}: ${caption}. History stays in memory. Pauses and missed reads stay disconnected.`}
+    title={$t("resourceTrend.labelCaptionHistoryStaysInMemoryPauses", {
+      label: label,
+      caption: caption,
+    })}
   >
     {caption}
   </div>

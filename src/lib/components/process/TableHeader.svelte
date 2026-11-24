@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from "$lib/i18n";
   import { columnWidth } from "$lib/utils/table-layout.js";
   import type { Process, Column } from "$lib/types";
   import { Button } from "$lib/components/ui/button/index.js";
@@ -34,15 +35,15 @@
           class={`h-8 max-w-full px-1 text-xs ${sortConfig.field === column.id ? "text-primary" : "text-muted-foreground"}`}
           onclick={() => onToggleSort(column.id)}
           title={treeView && column.id === "memory_usage"
-            ? "Sum of resident memory for each family; shared pages can be counted more than once."
+            ? $t("tableHeader.sumOfResidentMemoryForEachFamily")
             : treeView && column.id === "cpu_usage"
-              ? "Combined family CPU; may exceed 100% across cores."
-              : `Sort by ${column.label}`}
+              ? $t("tableHeader.combinedFamilyCpuMayExceed100Across")
+              : $t("tableHeader.sortByLabel", { label: column.label })}
           ><span
             >{treeView && column.id === "cpu_usage"
-              ? "Family CPU"
+              ? $t("tableHeader.familyCpu")
               : treeView && column.id === "memory_usage"
-                ? "Family RAM"
+                ? $t("tableHeader.familyRam")
                 : column.label}</span
           >{#if sortConfig.field === column.id}{#if sortConfig.direction === "asc"}<ArrowUp
                 class="size-3"
@@ -51,7 +52,7 @@
             />{/if}</Button
         ></Table.Head
       >{/each}<Table.Head class="actions-heading w-28 pr-4 text-right"
-      >Actions</Table.Head
+      >{$t("tableHeader.actions")}</Table.Head
     ></Table.Row
   ></Table.Header
 >

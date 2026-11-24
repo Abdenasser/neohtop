@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t, type MessageKey } from "$lib/i18n";
   import { onMount } from "svelte";
   import { Input } from "$lib/components/ui/input/index.js";
   import { Button } from "$lib/components/ui/button/index.js";
@@ -7,17 +8,17 @@
   export let searchTerm: string;
   let input: HTMLInputElement | null = null;
   let open = false;
-  const examples = [
-    ["systemd, dbus", "Multiple names, separated by commas"],
-    ["d$", "Names ending in d"],
-    ["^kernel", "Names starting with kernel"],
-    ["ssh.*server", "Regular expressions"],
-    ["1234", "Find a process ID"],
-    [":3000", "Processes listening on a local port"],
-    ["port:443", "Explicit local TCP listener or UDP port"],
-    ["python, node, nginx", "Several runtimes"],
-    ["docker, containerd", "Container processes"],
-    ["gnome, plasma", "Desktop environments"],
+  const examples: [string, MessageKey][] = [
+    ["systemd, dbus", "search.multipleNames"],
+    ["d$", "search.endsInD"],
+    ["^kernel", "search.startsWithKernel"],
+    ["ssh.*server", "search.regex"],
+    ["1234", "search.processId"],
+    [":3000", "search.usingPort"],
+    ["port:443", "search.explicitPort"],
+    ["python, node, nginx", "search.runtimes"],
+    ["docker, containerd", "search.containers"],
+    ["gnome, plasma", "search.desktops"],
   ];
   function useExample(query: string) {
     searchTerm = query;
@@ -47,8 +48,8 @@
     /><Input
       bind:ref={input}
       bind:value={searchTerm}
-      aria-label="Search processes"
-      placeholder="Search processes…"
+      aria-label={$t("searchBox.searchProcesses")}
+      placeholder={$t("searchBox.searchProcesses2")}
       class="h-9 pl-9 pr-9"
       onkeydown={(event) => {
         if (event.key === "Escape") {
@@ -60,7 +61,7 @@
         variant="ghost"
         size="icon-xs"
         class="absolute right-1.5 top-1.5 text-muted-foreground"
-        aria-label="Clear search"
+        aria-label={$t("searchBox.clearSearch")}
         onclick={() => {
           searchTerm = "";
           input?.focus();
@@ -73,17 +74,16 @@
           {...props}
           variant="ghost"
           size="icon-sm"
-          aria-label="Search syntax and examples"
+          aria-label={$t("searchBox.searchSyntaxAndExamples")}
           ><CircleHelp class="size-4 text-muted-foreground" /></Button
         >{/snippet}</Popover.Trigger
     ><Popover.Content
       align="start"
       class="max-h-[70vh] w-80 overflow-y-auto space-y-4"
       ><div>
-        <h2 class="text-sm font-medium">Find a process</h2>
+        <h2 class="text-sm font-medium">{$t("searchBox.findAProcess")}</h2>
         <p class="mt-1 text-xs text-muted-foreground">
-          Search names, commands, PIDs or local ports (:3000). Comma-separated
-          terms match any term. Name searches also support regular expressions.
+          {$t("searchBox.searchNamesCommandsPidsOrLocalPorts")}
         </p>
       </div>
       <div class="space-y-1">
@@ -92,13 +92,13 @@
             class="h-auto w-full items-start justify-start gap-3 whitespace-normal py-2 text-left"
             onclick={() => useExample(query)}
             ><code class="shrink-0 text-xs text-primary">{query}</code><span
-              class="text-xs font-normal text-muted-foreground">{label}</span
+              class="text-xs font-normal text-muted-foreground"
+              >{$t(label)}</span
             ></Button
           >{/each}
       </div>
       <p class="border-t border-border pt-3 text-xs text-muted-foreground">
-        ⌘ / Ctrl F focuses search. Escape clears it. Invalid expressions still
-        match literal text.
+        {$t("searchBox.ctrlFFocusesSearchEscapeClearsIt")}
       </p></Popover.Content
     ></Popover.Root
   >

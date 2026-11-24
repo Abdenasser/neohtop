@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from "$lib/i18n";
   import ResourceDetails from "./ResourceDetails.svelte";
   import type { SystemStats } from "$lib/types";
   export let stats: SystemStats;
@@ -34,7 +35,7 @@
         class="size-5 rounded-md border-0 p-0 bg-primary/10 text-primary [&>svg]:size-3!"
         style="--primary:var(--chart-3)"
         aria-hidden="true"><MemoryStick /></Badge
-      >Memory</Card.Title
+      >{$t("memoryPanel.memory")}</Card.Title
     ><ResourceDetails
       kind="memory"
       {stats}
@@ -50,21 +51,24 @@
         {ready ? formatMemorySize(memoryUsed) : "—"}
       </div>
       <p class="text-xs leading-4 text-muted-foreground">
-        used of {ready ? formatMemorySize(memoryTotal) : "unknown total"}
+        {$t("memoryPanel.usedOf")}
+        {ready ? formatMemorySize(memoryTotal) : $t("memoryPanel.unknownTotal")}
       </p>
     </div>
     <StatItem
-      label="Not in use"
-      value={ready ? formatMemorySize(memoryFree) : "Unavailable"}
+      label={$t("memoryPanel.notInUse")}
+      value={ready ? formatMemorySize(memoryFree) : $t("common.unavailable")}
     />
     <StatItem
-      label="Utilization"
-      value={percentage === null ? "Unavailable" : `${percentage.toFixed(1)}%`}
+      label={$t("memoryPanel.utilization")}
+      value={percentage === null
+        ? $t("common.unavailable")
+        : `${percentage.toFixed(1)}%`}
     />
     <ResourceTrend
       {history}
       metric="memory"
-      label="Memory utilization"
+      label={$t("memoryPanel.memoryUtilization")}
       {isFrozen}
       {unavailable}
     />

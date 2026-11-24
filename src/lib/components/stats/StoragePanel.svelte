@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from "$lib/i18n";
   import ResourceDetails from "./ResourceDetails.svelte";
   import type { SystemStats } from "$lib/types";
   export let stats: SystemStats;
@@ -30,7 +31,7 @@
         class="size-5 rounded-md border-0 p-0 bg-primary/10 text-primary [&>svg]:size-3!"
         style="--primary:var(--chart-4)"
         aria-hidden="true"><HardDrive /></Badge
-      >Storage</Card.Title
+      >{$t("storagePanel.storage")}</Card.Title
     ><ResourceDetails
       kind="storage"
       {stats}
@@ -45,21 +46,24 @@
         {ready ? formatBytes(diskFreeBytes) : "—"}
       </div>
       <p class="text-xs leading-4 text-muted-foreground">
-        free of {ready ? formatBytes(diskTotalBytes) : "unknown capacity"}
+        {$t("storagePanel.freeOf")}
+        {ready
+          ? formatBytes(diskTotalBytes)
+          : $t("storagePanel.unknownCapacity")}
       </p>
     </div>
     <StatItem
-      label="Used"
-      value={ready ? formatBytes(diskUsedBytes) : "Unavailable"}
+      label={$t("storagePanel.used")}
+      value={ready ? formatBytes(diskUsedBytes) : $t("common.unavailable")}
     />
     <div class="mt-auto space-y-2 pb-0.5">
       <Progress
         value={percentage}
         class="h-2"
         style="--primary:var(--chart-4)"
-        aria-label="Storage capacity used"
+        aria-label={$t("storagePanel.storageCapacityUsed")}
         aria-valuetext={percentage === null
-          ? "Unavailable"
+          ? $t("common.unavailable")
           : `${percentage.toFixed(1)}% used; ${formatBytes(diskFreeBytes)} free`}
       />
       <div
@@ -70,12 +74,16 @@
             class="size-1.5 rounded-full bg-[var(--chart-4)]"
             aria-hidden="true"
           ></span>{percentage === null
-            ? "Unavailable"
-            : `${formatUsagePercentage(diskUsedBytes, diskTotalBytes)} used`}</span
+            ? $t("storagePanel.unavailable")
+            : $t("storagePanel.valueUsed", {
+                value: formatUsagePercentage(diskUsedBytes, diskTotalBytes),
+              })}</span
         ><span
           >{percentage === null
             ? ""
-            : `${(100 - percentage).toFixed(1)}% free`}</span
+            : $t("storagePanel.valueFree", {
+                value: (100 - percentage).toFixed(1),
+              })}</span
         >
       </div>
     </div></Card.Content

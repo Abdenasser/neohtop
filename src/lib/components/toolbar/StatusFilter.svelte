@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t, processStatus } from "$lib/i18n";
   import { STATUS_OPTIONS } from "$lib/constants";
   import { settingsStore } from "$lib/stores";
   import { Label } from "$lib/components/ui/label/index.js";
@@ -15,12 +16,14 @@
 </script>
 
 <Label class="gap-2 text-xs"
-  >Status<NativeSelect.Root
+  >{$t("statusFilter.status")}<NativeSelect.Root
     bind:value={statusFilter}
     onchange={save}
-    aria-label="Process status"
+    aria-label={$t("statusFilter.processStatus")}
     >{#each STATUS_OPTIONS as option}<option value={option.value}
-        >{option.label}</option
+        >{option.value === "all"
+          ? $t("status.all")
+          : processStatus($t, option.label)}</option
       >{/each}</NativeSelect.Root
   ></Label
 >

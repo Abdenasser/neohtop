@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t, type MessageKey } from "$lib/i18n";
   import { trackUsage } from "$lib/utils/telemetry";
   import AnalyticsNotice from "$lib/components/AnalyticsNotice.svelte";
   import SettingsWindow from "$lib/components/SettingsWindow.svelte";
@@ -97,6 +98,7 @@
 
   $: columns = column_definitions.map((col) => ({
     ...col,
+    label: $t(`columns.${col.id}` as MessageKey),
     visible:
       col.required ||
       ($settingsStore.appearance.columnVisibility[col.id] ?? col.visible),
@@ -206,6 +208,7 @@
   onMount(() => {
     if (auxiliary) {
       if (!companion) themeStore.init();
+      void settingsStore.init();
       return;
     }
     themeStore.init();
@@ -264,7 +267,7 @@
           else
             processStore.update((state) => ({
               ...state,
-              error: "This process is no longer available.",
+              error: $t("process.noLongerAvailable"),
             }));
         },
       );
@@ -295,7 +298,7 @@
 {:else if isLoading}
   <div class="loading-container">
     <div class="loading-content">
-      <img src="128x128.png" alt="NeoHtop Logo" class="logo" />
+      <img src="128x128.png" alt={$t("+page.neohtopLogo")} class="logo" />
     </div>
   </div>
 {:else}
@@ -359,13 +362,7 @@
         totalResults={processView === "tree"
           ? tree.rootCount
           : cachedFilteredProcesses.length}
-        resultLabel={processView === "tree"
-          ? tree.rootCount === 1
-            ? "family"
-            : "families"
-          : cachedFilteredProcesses.length === 1
-            ? "process"
-            : "processes"}
+        groupFamilies={processView === "tree"}
       />
     </main>
   </div>

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from "$lib/i18n";
   import { Dialog as DialogPrimitive } from "bits-ui";
   import { XIcon } from "@lucide/svelte";
   import { Button } from "$lib/components/ui/button/index.js";
@@ -44,7 +45,7 @@
             {...props}
           >
             <XIcon />
-            <span class="sr-only">Close</span>
+            <span class="sr-only">{$t("dialog-content.close")}</span>
           </Button>
         {/snippet}
       </DialogPrimitive.Close>

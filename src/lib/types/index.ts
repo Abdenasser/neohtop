@@ -95,7 +95,7 @@ export interface Column {
   label: string;
   visible: boolean;
   required?: boolean;
-  format?: (value: any) => string;
+  format?: (value: any, locale?: string) => string;
 }
 
 export interface Theme {
@@ -131,6 +131,7 @@ export interface AppConfig {
     columnVisibility: Record<string, boolean>;
   };
   behavior: {
+    language: "zh-CN" | "en";
     itemsPerPage: number;
     refreshRate: number;
     defaultStatusFilter: string;

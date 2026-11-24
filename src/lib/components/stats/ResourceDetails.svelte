@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from "$lib/i18n";
   import { trackUsage } from "$lib/utils/telemetry";
   import type { Snippet } from "svelte";
   import * as Sheet from "$lib/components/ui/sheet/index.js";
@@ -8,38 +9,38 @@
   import { processStore } from "$lib/stores/processes";
   import type { SystemStats, ResourceSample } from "$lib/types";
   import ResourceDetailsContent from "./ResourceDetailsContent.svelte";
-  const panels = {
+  const panels = $derived({
     cpu: {
-      title: "CPU",
-      label: "CPU details",
-      description: "Overall utilization and activity on each core.",
+      title: $t("common.cpu"),
+      label: $t("details.cpu"),
+      description: $t("details.cpuDescription"),
     },
     memory: {
-      title: "Memory",
-      label: "Memory details",
-      description: "Physical RAM, allocation, and swap.",
+      title: $t("common.memory"),
+      label: $t("details.memory"),
+      description: $t("details.memoryDescription"),
     },
     storage: {
-      title: "Storage",
-      label: "Storage details",
-      description: "Mounted volumes and their available capacity.",
+      title: $t("common.storage"),
+      label: $t("details.storage"),
+      description: $t("details.storageDescription"),
     },
     system: {
-      title: "System",
-      label: "System details",
-      description: "Operating system, uptime, and system load.",
+      title: $t("common.system"),
+      label: $t("details.system"),
+      description: $t("details.systemDescription"),
     },
     network: {
-      title: "Network",
-      label: "Network details",
-      description: "Traffic across this machine’s network interfaces.",
+      title: $t("common.network"),
+      label: $t("details.network"),
+      description: $t("details.networkDescription"),
     },
     gpu: {
-      title: "Graphics",
-      label: "GPU details",
-      description: "Driver-reported readings from this machine.",
+      title: $t("details.graphics"),
+      label: $t("details.gpu"),
+      description: $t("details.gpuDescription"),
     },
-  };
+  });
   let {
     kind,
     stats,
@@ -49,7 +50,7 @@
     capturedAt = 0,
     children,
   }: {
-    kind: keyof typeof panels;
+    kind: "cpu" | "memory" | "storage" | "system" | "network" | "gpu";
     stats?: SystemStats;
     history?: ResourceSample[];
     isFrozen?: boolean;
@@ -93,16 +94,20 @@
       >
       <Sheet.Description>{panel.description}</Sheet.Description>
       <div class="mt-1 flex items-center gap-2 text-xs text-muted-foreground">
-        {#if unavailable}<Badge variant="destructive">Updates unavailable</Badge
-          >{:else if isFrozen}<Badge variant="secondary">Paused</Badge
+        {#if unavailable}<Badge variant="destructive"
+            >{$t("resourceDetails.updatesUnavailable")}</Badge
+          >{:else if isFrozen}<Badge variant="secondary"
+            >{$t("resourceDetails.paused")}</Badge
           >{:else}<span
             class="size-1.5 rounded-full bg-[var(--status-running)]"
             aria-hidden="true"
           ></span>{/if}
         <span
           >{capturedAt
-            ? `Reading from ${new Date(capturedAt).toLocaleTimeString()}`
-            : "Waiting for a reading"}</span
+            ? $t("resourceDetails.readingFromValue", {
+                value: new Date(capturedAt).toLocaleTimeString(),
+              })
+            : $t("resourceDetails.waitingForAReading")}</span
         >
       </div>
     </Sheet.Header>
@@ -121,15 +126,18 @@
       <Button
         variant="outline"
         size="sm"
-        aria-label={isFrozen ? "Resume monitoring" : "Pause monitoring"}
+        aria-label={isFrozen
+          ? $t("resourceDetails.resumeMonitoring")
+          : $t("resourceDetails.pauseMonitoring")}
         onclick={() => processStore.setIsFrozen(!isFrozen)}
-        >{#if isFrozen}<Play />Resume{:else}<Pause />Pause{/if}</Button
+        >{#if isFrozen}<Play />{$t("resourceDetails.resume")}{:else}<Pause
+          />{$t("resourceDetails.pause")}{/if}</Button
       >
       <Sheet.Close
         >{#snippet child({ props })}<Button
             {...props}
             variant="secondary"
-            size="sm">Done</Button
+            size="sm">{$t("resourceDetails.done")}</Button
           >{/snippet}</Sheet.Close
       >
     </Sheet.Footer>

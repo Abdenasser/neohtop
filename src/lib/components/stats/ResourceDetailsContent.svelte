@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t, uiLocale } from "$lib/i18n";
   import { onMount } from "svelte";
   import { Checkbox } from "$lib/components/ui/checkbox/index.js";
   import { Label } from "$lib/components/ui/label/index.js";
@@ -93,10 +94,10 @@
   );
   const percent = (value: number | null) =>
     value === null || !Number.isFinite(value)
-      ? "Unavailable"
+      ? $t("common.unavailable")
       : `${value.toFixed(1)}%`;
   const rate = (value: number | null) =>
-    value === null ? "Unavailable" : `${formatBytes(value)}/s`;
+    value === null ? $t("common.unavailable") : `${formatBytes(value)}/s`;
 </script>
 
 {#snippet facts(items: [string, string][])}
@@ -121,27 +122,36 @@
 
 {#if kind === "cpu"}
   <div>
-    <h3 class="text-lg font-semibold">{identity.cpu_model ?? "Processor"}</h3>
+    <h3 class="text-lg font-semibold">
+      {identity.cpu_model ?? $t("resourceDetailsContent.processor")}
+    </h3>
     <p class="mt-1 text-sm text-muted-foreground">
-      {stats.cpu_usage.length} logical processors · {identity.architecture}
+      {stats.cpu_usage.length}
+      {$t("resourceDetailsContent.logicalProcessors")}
+      {identity.architecture}
     </p>
   </div>
   {@render facts([
-    ["Average utilization", percent(cpu)],
+    [$t("details.averageUtilization"), percent(cpu)],
     [
-      "Physical cores",
+      $t("details.physicalCores"),
       identity.physical_cores === null
-        ? "Unavailable"
+        ? $t("common.unavailable")
         : String(identity.physical_cores),
     ],
-    ["Logical processors", String(stats.cpu_usage.length)],
+    [$t("details.logicalCores"), String(stats.cpu_usage.length)],
   ])}
-  <section class="space-y-2" aria-label="CPU history">
-    <h3 class="text-sm font-medium">Utilization over time</h3>
+  <section
+    class="space-y-2"
+    aria-label={$t("resourceDetailsContent.cpuHistory")}
+  >
+    <h3 class="text-sm font-medium">
+      {$t("resourceDetailsContent.utilizationOverTime")}
+    </h3>
     <ResourceTrend
       {history}
       metric="cpu"
-      label="CPU utilization"
+      label={$t("resourceDetailsContent.cpuUtilization")}
       expanded
       {isFrozen}
       {unavailable}
@@ -149,85 +159,98 @@
   </section>
   <Card.Root size="sm"
     ><Card.Header
-      ><Card.Title class="text-sm">Per-core activity</Card.Title
-      ><Card.Description>Each core is scaled from 0 to 100%.</Card.Description
+      ><Card.Title class="text-sm"
+        >{$t("resourceDetailsContent.perCoreActivity")}</Card.Title
+      ><Card.Description
+        >{$t(
+          "resourceDetailsContent.eachCoreIsScaledFrom0To",
+        )}</Card.Description
       ></Card.Header
     ><Card.Content class="grid grid-cols-2 gap-x-5 gap-y-4">
       {#each stats.cpu_usage as value, index}<div class="min-w-0 space-y-1.5">
           <div class="flex justify-between gap-2 text-xs">
-            <span class="text-muted-foreground">Core {index}</span><span
-              class="tabular-nums">{percent(value)}</span
-            >
+            <span class="text-muted-foreground"
+              >{$t("resourceDetailsContent.core")} {index}</span
+            ><span class="tabular-nums">{percent(value)}</span>
           </div>
           <Progress
             value={Number.isFinite(value)
               ? Math.max(0, Math.min(100, value))
               : null}
-            aria-label={`Core ${index} utilization`}
+            aria-label={$t("resourceDetailsContent.coreIndexUtilization", {
+              index: index,
+            })}
             aria-valuetext={percent(value)}
             style="--primary:var(--chart-1)"
           />
         </div>{:else}<p class="col-span-2 text-sm text-muted-foreground">
-          Core readings are unavailable.
+          {$t("resourceDetailsContent.coreReadingsAreUnavailable")}
         </p>{/each}
     </Card.Content></Card.Root
   >
-  {@render note(
-    "The overview averages utilization across logical processors. An individual process can exceed 100% CPU when it uses several cores.",
-  )}
+  {@render note($t("details.cpuNote"))}
 {:else if kind === "memory"}
   <div>
     <p class="text-3xl font-semibold tracking-tight tabular-nums">
       {formatBytes(stats.memory_used)}
     </p>
     <p class="mt-1 text-sm text-muted-foreground">
-      RAM in use · {percent(memory)} of {formatBytes(stats.memory_total)}
+      {$t("resourceDetailsContent.ramInUse")}
+      {percent(memory)}
+      {$t("resourceDetailsContent.of")}
+      {formatBytes(stats.memory_total)}
     </p>
   </div>
   <ResourceTrend
     {history}
     metric="memory"
-    label="Memory utilization"
+    label={$t("resourceDetailsContent.memoryUtilization")}
     expanded
     {isFrozen}
     {unavailable}
   />
   {@render facts([
-    ["Physical memory", formatBytes(stats.memory_total)],
-    ["In use", formatBytes(stats.memory_used)],
-    ["Not in use", formatBytes(stats.memory_free)],
-    ["Unallocated", formatBytes(details.memory_unallocated)],
+    [$t("details.physicalMemory"), formatBytes(stats.memory_total)],
+    [$t("details.inUse"), formatBytes(stats.memory_used)],
+    [$t("details.memoryFree"), formatBytes(stats.memory_free)],
+    [$t("details.unallocated"), formatBytes(details.memory_unallocated)],
   ])}
   <Card.Root size="sm"
     ><Card.Header
-      ><Card.Title class="text-sm">Swap</Card.Title><Card.Description
-        >Memory the operating system stores on disk.</Card.Description
+      ><Card.Title class="text-sm"
+        >{$t("resourceDetailsContent.swap")}</Card.Title
+      ><Card.Description
+        >{$t(
+          "resourceDetailsContent.memoryTheOperatingSystemStoresOnDisk",
+        )}</Card.Description
       ></Card.Header
     ><Card.Content>
       {#if details.swap_total > 0}<div
           class="flex justify-between gap-3 text-sm"
         >
-          <span class="tabular-nums">{formatBytes(details.swap_used)} used</span
+          <span class="tabular-nums"
+            >{formatBytes(details.swap_used)}
+            {$t("resourceDetailsContent.used")}</span
           ><span class="text-muted-foreground"
-            >of {formatBytes(details.swap_total)}</span
+            >{$t("resourceDetailsContent.of")}
+            {formatBytes(details.swap_total)}</span
           >
         </div>
         <Progress
           value={Math.min(100, (details.swap_used / details.swap_total) * 100)}
-          aria-label="Swap used"
+          aria-label={$t("resourceDetailsContent.swapUsed")}
           style="--primary:var(--chart-3)"
         />{:else}<p class="text-sm text-muted-foreground">
-          No swap space is currently allocated.
+          {$t("resourceDetailsContent.noSwapSpaceIsCurrentlyAllocated")}
         </p>{/if}
     </Card.Content></Card.Root
   >
-  {@render note(
-    "Not in use is total RAM minus reported use, matching the overview. Unallocated is the operating system’s free-page count. These figures can overlap. Swap usage alone does not measure memory pressure.",
-  )}
+  {@render note($t("details.memoryNote"))}
 {:else if kind === "storage"}
   {#if volume}
     <div class="space-y-2">
-      <label for="resource-volume" class="text-sm font-medium">Volume</label
+      <label for="resource-volume" class="text-sm font-medium"
+        >{$t("resourceDetailsContent.volume")}</label
       ><NativeSelect.Root
         id="resource-volume"
         value={volume.mount}
@@ -235,13 +258,13 @@
         class="w-full min-w-0"
         title={volume.mount}
         >{#each details.volumes as item}<option value={item.mount}
-            >{item.mount} · {item.name || "Volume"}</option
+            >{item.mount} · {item.name || $t("details.volume")}</option
           >{/each}</NativeSelect.Root
       >
     </div>
     <div>
       <h3 class="break-words text-lg font-semibold">
-        {volume.name || "Volume"}
+        {volume.name || $t("details.volume")}
       </h3>
       <p class="mt-1 break-all text-xs text-muted-foreground" data-selectable>
         {volume.mount}
@@ -251,88 +274,107 @@
       ><Card.Content
         ><div>
           <p class="text-3xl font-semibold tracking-tight tabular-nums">
-            {volume.total > 0 ? formatBytes(volume.available) : "Unavailable"}
+            {volume.total > 0
+              ? formatBytes(volume.available)
+              : $t("resourceDetailsContent.unavailable")}
           </p>
           <p class="mt-1 text-sm text-muted-foreground">
-            Available on this volume
+            {$t("resourceDetailsContent.availableOnThisVolume")}
           </p>
         </div>
         <Progress
           value={volumeUsage}
-          aria-label="Selected volume capacity used"
+          aria-label={$t("resourceDetailsContent.selectedVolumeCapacityUsed")}
           aria-valuetext={percent(volumeUsage)}
           style="--primary:var(--chart-4)"
         />
         <div class="flex justify-between text-xs text-muted-foreground">
-          <span>{percent(volumeUsage)} used</span><span
+          <span>{percent(volumeUsage)} {$t("resourceDetailsContent.used")}</span
+          ><span
             >{volumeUsage === null
               ? ""
-              : `${(100 - volumeUsage).toFixed(1)}% available`}</span
+              : $t("resourceDetailsContent.valueAvailable", {
+                  value: (100 - volumeUsage).toFixed(1),
+                })}</span
           >
         </div></Card.Content
       ></Card.Root
     >
     {@render facts([
       [
-        "Capacity",
-        volume.total > 0 ? formatBytes(volume.total) : "Unavailable",
+        $t("details.capacity"),
+        volume.total > 0 ? formatBytes(volume.total) : $t("common.unavailable"),
       ],
       [
-        "Used",
+        $t("details.used"),
         volume.total > 0
           ? formatBytes(Math.max(0, volume.total - volume.available))
-          : "Unavailable",
+          : $t("common.unavailable"),
       ],
-      ["File system", volume.file_system || "Unavailable"],
-      ["Access", volume.read_only ? "Read only" : "Read and write"],
+      [
+        $t("details.fileSystem"),
+        volume.file_system || $t("common.unavailable"),
+      ],
+      [
+        $t("details.access"),
+        volume.read_only ? $t("details.readOnly") : $t("details.readWrite"),
+      ],
     ])}
-    {@render note(
-      "These are filesystem capacity readings, not a scan of files or folders. Volumes can share a physical storage pool, especially with APFS, so adding their capacities can count the same space more than once.",
-    )}
+    {@render note($t("details.storageNote"))}
   {:else}<div class="space-y-3 py-6">
       <HardDrive class="size-8 text-muted-foreground" />
-      <h3 class="font-semibold">No volumes reported</h3>
+      <h3 class="font-semibold">
+        {$t("resourceDetailsContent.noVolumesReported")}
+      </h3>
       <p class="text-sm text-muted-foreground">
-        Mounted-volume information is unavailable in the current system reading.
+        {$t(
+          "resourceDetailsContent.mountedVolumeInformationIsUnavailableInThe",
+        )}
       </p>
     </div>{/if}
 {:else if kind === "system"}
   <div>
     <h3 class="break-words text-lg font-semibold">
-      {identity.os_version ?? "Operating system unavailable"}
+      {identity.os_version ??
+        $t("resourceDetailsContent.operatingSystemUnavailable")}
     </h3>
     <p class="mt-1 text-sm text-muted-foreground">{identity.architecture}</p>
   </div>
   {@render facts([
-    ["Uptime", formatUptime(stats.uptime)],
-    ["Kernel", identity.kernel_version ?? "Unavailable"],
-    ["Architecture", identity.architecture],
-    ["Processor", identity.cpu_model ?? "Unavailable"],
-    ["Logical processors", String(stats.cpu_usage.length)],
+    [$t("details.uptime"), formatUptime(stats.uptime, $uiLocale)],
+    [$t("details.kernel"), identity.kernel_version ?? $t("common.unavailable")],
+    [$t("details.architecture"), identity.architecture],
+    [$t("details.processor"), identity.cpu_model ?? $t("common.unavailable")],
+    [$t("details.logicalCores"), String(stats.cpu_usage.length)],
   ])}
   <Card.Root size="sm"
     ><Card.Header
-      ><Card.Title class="text-sm">Load average</Card.Title><Card.Description
-        >Queued and running work over time.</Card.Description
+      ><Card.Title class="text-sm"
+        >{$t("resourceDetailsContent.loadAverage")}</Card.Title
+      ><Card.Description
+        >{$t(
+          "resourceDetailsContent.queuedAndRunningWorkOverTime",
+        )}</Card.Description
       ></Card.Header
     ><Card.Content>
       {#if identity.platform !== "windows"}<dl class="grid grid-cols-3 gap-3">
           {#each stats.load_avg as value, index}<div>
               <dt class="text-xs text-muted-foreground">
-                {[1, 5, 15][index]} minute{index ? "s" : ""}
+                {[1, 5, 15][index]}
+                {$t("resourceDetailsContent.minute")}{index ? "s" : ""}
               </dt>
               <dd class="mt-1 text-xl font-semibold tabular-nums">
-                {Number.isFinite(value) ? value.toFixed(2) : "Unavailable"}
+                {Number.isFinite(value)
+                  ? value.toFixed(2)
+                  : $t("resourceDetailsContent.unavailable")}
               </dd>
             </div>{/each}
         </dl>{:else}<p class="text-sm text-muted-foreground">
-          Load averages are not provided on Windows.
+          {$t("resourceDetailsContent.loadAveragesAreNotProvidedOnWindows")}
         </p>{/if}
     </Card.Content></Card.Root
   >
-  {@render note(
-    "Load is not a CPU percentage. Compare its trend on this machine alongside CPU utilization. Uptime is the time since the operating system started, not how long NeoHtop has been open.",
-  )}
+  {@render note($t("details.systemNote"))}
 {:else if kind === "network"}
   <Card.Root size="sm"
     ><Card.Content class="grid grid-cols-2 gap-4"
@@ -354,22 +396,29 @@
   <ResourceTrend
     {history}
     metric="network"
-    label="Network receive and send"
+    label={$t("resourceDetailsContent.networkReceiveAndSend")}
     expanded
     {isFrozen}
     {unavailable}
   />
-  <section class="space-y-3" aria-label="Network interfaces">
+  <section
+    class="space-y-3"
+    aria-label={$t("resourceDetailsContent.networkInterfaces")}
+  >
     <div class="flex items-center justify-between gap-2">
-      <h3 class="text-sm font-medium">Interfaces</h3>
+      <h3 class="text-sm font-medium">
+        {$t("resourceDetailsContent.interfaces")}
+      </h3>
       <span class="text-xs text-muted-foreground"
-        >{interfaces.length} of {details.interfaces.length}</span
+        >{interfaces.length}
+        {$t("resourceDetailsContent.of")}
+        {details.interfaces.length}</span
       >
     </div>
     <Input
       type="search"
-      placeholder="Search all interfaces…"
-      aria-label="Find a network interface"
+      placeholder={$t("resourceDetailsContent.searchAllInterfaces")}
+      aria-label={$t("resourceDetailsContent.findANetworkInterface")}
       bind:value={interfaceSearch}
     />
     <div class="flex items-center gap-2">
@@ -380,7 +429,7 @@
       /><Label
         for="include-unused-interfaces"
         class="text-xs font-normal text-muted-foreground"
-        >Include unused interfaces</Label
+        >{$t("resourceDetailsContent.includeUnusedInterfaces")}</Label
       >
     </div>
     {#each interfaces as item (item.name)}<Card.Root size="sm" class="gap-3"
@@ -391,13 +440,17 @@
         ><Card.Content
           ><div class="grid grid-cols-2 gap-4">
             <div>
-              <p class="text-xs text-muted-foreground">↓ Received /s</p>
+              <p class="text-xs text-muted-foreground">
+                {$t("resourceDetailsContent.receivedS")}
+              </p>
               <p class="mt-1 text-sm font-medium tabular-nums">
                 {rate(item.received)}
               </p>
             </div>
             <div>
-              <p class="text-xs text-muted-foreground">↑ Sent /s</p>
+              <p class="text-xs text-muted-foreground">
+                {$t("resourceDetailsContent.sentS")}
+              </p>
               <p class="mt-1 text-sm font-medium tabular-nums">
                 {rate(item.sent)}
               </p>
@@ -407,13 +460,17 @@
             class="grid grid-cols-2 gap-4 border-t border-border pt-2 text-xs"
           >
             <div>
-              <dt class="text-muted-foreground">Received total</dt>
+              <dt class="text-muted-foreground">
+                {$t("resourceDetailsContent.receivedTotal")}
+              </dt>
               <dd class="mt-1 tabular-nums">
                 {formatBytes(item.received_total)}
               </dd>
             </div>
             <div>
-              <dt class="text-muted-foreground">Sent total</dt>
+              <dt class="text-muted-foreground">
+                {$t("resourceDetailsContent.sentTotal")}
+              </dt>
               <dd class="mt-1 tabular-nums">{formatBytes(item.sent_total)}</dd>
             </div>
           </dl></Card.Content
@@ -424,26 +481,26 @@
         <Network class="mb-2 size-5" />
         <p>
           {interfaceSearch.trim()
-            ? "No interfaces match this search."
+            ? $t("resourceDetailsContent.noInterfacesMatchThisSearch")
             : details.interfaces.length
-              ? "No interfaces with recorded traffic."
-              : "No network interfaces were reported."}
+              ? $t("resourceDetailsContent.noInterfacesWithRecordedTraffic")
+              : $t("resourceDetailsContent.noNetworkInterfacesWereReported")}
         </p>
         {#if interfaceSearch}<Button
             variant="link"
             size="sm"
             class="mt-2 px-0"
-            onclick={() => (interfaceSearch = "")}>Clear search</Button
+            onclick={() => (interfaceSearch = "")}
+            >{$t("resourceDetailsContent.clearSearch")}</Button
           >{/if}
         {#if !interfaceSearch.trim() && details.interfaces.length && !includeUnused}<Button
             variant="link"
             size="sm"
             class="mt-2 px-0"
-            onclick={() => (includeUnused = true)}>Show all interfaces</Button
+            onclick={() => (includeUnused = true)}
+            >{$t("resourceDetailsContent.showAllInterfaces")}</Button
           >{/if}
       </div>{/each}
   </section>
-  {@render note(
-    "Rates use the shared sampling interval. Totals come from the operating system and can reset when an interface restarts. Virtual interfaces and loopback can count the same traffic more than once; this is not an internet speed test.",
-  )}
+  {@render note($t("details.networkNote"))}
 {/if}

@@ -45,11 +45,25 @@ pub fn open_about(app: AppHandle, check: bool) -> Result<(), String> {
     }
     Ok(())
 }
-pub fn setup(app: &AppHandle) -> tauri::Result<()> {
-    let about = MenuItem::with_id(app, "app-about", "About NeoHtop", true, None::<&str>)?;
-    let updates = MenuItem::with_id(app, "app-updates", "Check for Updates…", true, None::<&str>)?;
-    let settings = MenuItem::with_id(app, "app-settings", "Settings…", true, Some("CmdOrCtrl+,"))?;
-    let quit = Stock::quit(app, Some("Quit NeoHtop"))?;
+pub fn apply_language(app: &AppHandle, chinese: bool) -> tauri::Result<()> {
+    let text = |en: &'static str, zh: &'static str| if chinese { zh } else { en };
+    let about_title = text("About NeoHtop", "关于 NeoHtop");
+    let about = MenuItem::with_id(app, "app-about", about_title, true, None::<&str>)?;
+    let updates = MenuItem::with_id(
+        app,
+        "app-updates",
+        text("Check for Updates…", "检查更新…"),
+        true,
+        None::<&str>,
+    )?;
+    let settings = MenuItem::with_id(
+        app,
+        "app-settings",
+        text("Settings…", "设置…"),
+        true,
+        Some("CmdOrCtrl+,"),
+    )?;
+    let quit = Stock::quit(app, Some(text("Quit NeoHtop", "退出 NeoHtop")))?;
     let application = Submenu::with_items(
         app,
         "NeoHtop",
@@ -59,40 +73,58 @@ pub fn setup(app: &AppHandle) -> tauri::Result<()> {
     #[cfg(target_os = "macos")]
     application.append_items(&[
         &Stock::separator(app)?,
-        &Stock::services(app, None)?,
+        &Stock::services(app, chinese.then_some("服务"))?,
         &Stock::separator(app)?,
-        &Stock::hide(app, None)?,
-        &Stock::hide_others(app, None)?,
-        &Stock::show_all(app, None)?,
+        &Stock::hide(app, chinese.then_some("隐藏 NeoHtop"))?,
+        &Stock::hide_others(app, chinese.then_some("隐藏其他应用"))?,
+        &Stock::show_all(app, chinese.then_some("显示全部"))?,
     ])?;
     application.append_items(&[&Stock::separator(app)?, &quit])?;
     let edit = Submenu::with_items(
         app,
-        "Edit",
+        text("Edit", "编辑"),
         true,
         &[
-            &Stock::undo(app, None)?,
-            &Stock::redo(app, None)?,
+            &Stock::undo(app, chinese.then_some("撤销"))?,
+            &Stock::redo(app, chinese.then_some("重做"))?,
             &Stock::separator(app)?,
-            &Stock::cut(app, None)?,
-            &Stock::copy(app, None)?,
-            &Stock::paste(app, None)?,
-            &Stock::select_all(app, None)?,
+            &Stock::cut(app, chinese.then_some("剪切"))?,
+            &Stock::copy(app, chinese.then_some("复制"))?,
+            &Stock::paste(app, chinese.then_some("粘贴"))?,
+            &Stock::select_all(app, chinese.then_some("全选"))?,
         ],
     )?;
-    let list = MenuItem::with_id(app, "view-list", "Process List", true, None::<&str>)?;
-    let tree = MenuItem::with_id(app, "view-tree", "Process Tree", true, None::<&str>)?;
-    let appearance = MenuItem::with_id(app, "view-appearance", "Appearance…", true, None::<&str>)?;
+    let list = MenuItem::with_id(
+        app,
+        "view-list",
+        text("Process List", "进程列表"),
+        true,
+        None::<&str>,
+    )?;
+    let tree = MenuItem::with_id(
+        app,
+        "view-tree",
+        text("Process Tree", "进程树"),
+        true,
+        None::<&str>,
+    )?;
+    let appearance = MenuItem::with_id(
+        app,
+        "view-appearance",
+        text("Appearance…", "外观…"),
+        true,
+        None::<&str>,
+    )?;
     let overview = MenuItem::with_id(
         app,
         "view-overview",
-        "Menu-bar Overview",
+        text("Menu-bar Overview", "菜单栏概览"),
         true,
         None::<&str>,
     )?;
     let view = Submenu::with_items(
         app,
-        "View",
+        text("View", "显示"),
         true,
         &[
             &list,
@@ -104,17 +136,29 @@ pub fn setup(app: &AppHandle) -> tauri::Result<()> {
     )?;
     let window = Submenu::with_items(
         app,
-        "Window",
+        text("Window", "窗口"),
         true,
         &[
-            &Stock::minimize(app, None)?,
-            &Stock::close_window(app, None)?,
+            &Stock::minimize(app, chinese.then_some("最小化"))?,
+            &Stock::close_window(app, chinese.then_some("关闭窗口"))?,
         ],
     )?;
     app.set_menu(Menu::with_items(
         app,
         &[&application, &edit, &view, &window],
     )?)?;
+    for (label, title) in [
+        ("settings", text("Settings", "设置")),
+        ("about", about_title),
+    ] {
+        if let Some(window) = app.get_webview_window(label) {
+            window.set_title(title)?;
+        }
+    }
+    Ok(())
+}
+pub fn setup(app: &AppHandle) -> tauri::Result<()> {
+    apply_language(app, false)?;
     app.on_menu_event(|app, event| {
         let _ = match event.id.as_ref() {
             "app-settings" => open_settings(app.clone(), None),
